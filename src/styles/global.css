@@ -1,0 +1,100 @@
+:root {
+  --white: rgba(255, 255, 255, 0.87);
+  --primary-color: hsl(330 100% 70%);
+  --primary-color-1: hsl(330 100% 70%/0.1);
+  --primary-color-2: hsl(330 100% 70%/0.2);
+  --primary-color-3: hsl(330 100% 70%/0.3);
+  --primary-color-4: hsl(330 100% 70%/0.4);
+  --primary-color-5: hsl(330 100% 70%/0.5);
+  --primary-color-6: hsl(330 100% 70%/0.6);
+  --primary-color-7: hsl(330 100% 70%/0.7);
+  --primary-color-8: hsl(330 100% 70%/0.8);
+  --primary-color-9: hsl(330 100% 70%/0.9);
+  --secondary-color: hsl(270, 50%, 40%);
+  --blackLinear: linear-gradient(
+    to bottom,
+    hsl(213, 0%, 11%) 0%,
+    hsl(213, 0%, 1%) 100%
+  );
+
+  --shadow-color: 0deg 0% 0%;
+  --shadow-elevation-low: 0.3px 0.5px 0.7px hsl(var(--shadow-color) / 0.1),
+    0.4px 0.4px 1px -1.2px hsl(var(--shadow-color) / 0.1),
+    1px 2px 2.5px -2.5px hsl(var(--shadow-color) / 0.1);
+  --shadow-elevation-medium: 0.3px 0.5px 0.7px hsl(var(--shadow-color) / 0.11),
+    0.4px 1.6px 2px -0.4px hsl(var(--shadow-color) / 0.11),
+    2.1px 4.1px 5.2px -1.7px hsl(var(--shadow-color) / 0.11),
+    5px 10px 12.6px -2.5px hsl(var(--shadow-color) / 0.11);
+  --shadow-elevation-high: 0.3px 0.5px 0.7px hsl(var(--shadow-color) / 0.1),
+    1.5px 2.9px 3.7px -0.4px hsl(var(--shadow-color) / 0.1),
+    2.7px 5.4px 6.4px -0.7px hsl(var(--shadow-color) / 0.1),
+    4.5px 8.9px 11.2px -1.1px hsl(var(--shadow-color) / 0.1),
+    7.1px 14.3px 14px -1.4px hsl(var(--shadow-color) / 0.1),
+    11.2px 22.3px 28.1px -1.4px hsl(var(--shadow-color) / 0.1),
+    17px 33.9px 42.7px -2.1px hsl(var(--shadow-color) / 0.1),
+    25px 50px 62.9px -2.5px hsl(var(--shadow-color) / 0.1);
+}
+
+* {
+  accent-color: var(--primary-color);
+  color-scheme: light dark;
+}
+
+body {
+  font-family: system-ui, Helvetica, Arial, sans-serif;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+}
+
+#root {
+  display: grid;
+  min-height: 80vh;
+  place-content: center;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+h3 {
+  margin: 0 0 8px;
+  text-align: left;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+select {
+  border-radius: 6px;
+  background: var(--blackLinear);
+  max-width: 100%;
+  margin: 0 auto 4px;
+}
+
+select[name="songs"] {
+  margin: 12px auto;
+  padding: 12px;
+}
+
+.range-y {
+  appearance: none;
+  background: none;
+  rotate: 270deg;
+  position: relative;
+  border-radius: 20px;
+  outline-offset: -5px;
+  padding: 0 6px;
+}
+
+.fx-panel {
+  background: var(--blackLinear);
+  padding: 8px 12px;
+}
+
+.fx-menu {
+  background: hsl(0, 0%, 20%);
+  padding: 8px;
+  box-shadow: var(--shadow-elevation-medium);
+  border: 1px solid hsl(0, 0%, 35%);
+  border-radius: 4px;
+}
