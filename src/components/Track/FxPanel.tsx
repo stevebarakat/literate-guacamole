@@ -5,6 +5,8 @@ import PitchShifter from "../Fx/PitchShifter";
 import Delay from "../Fx/Delay";
 import { useState, useEffect } from "react";
 import { TrackContext } from "@/machines";
+import AutoFilter from "../Fx/AutoFilter";
+import { AutoFilterContext } from "@/machines/autoFilterMachine";
 
 function FxPanel({ trackId }: { trackId: number }) {
   const { track, fx, fxNames } = TrackContext.useSelector(
@@ -12,9 +14,14 @@ function FxPanel({ trackId }: { trackId: number }) {
   );
 
   const [delayIndex, setDelayIndex] = useState(-1);
+  const [autoFilterIndex, setAutoFilterIndex] = useState(-1);
   const [pitchIndex, setPitchIndex] = useState(-1);
+
   useEffect(() => {
     setDelayIndex(fxNames?.findIndex((value: string) => value === "delay"));
+    setAutoFilterIndex(
+      fxNames?.findIndex((value: string) => value === "autoFilter")
+    );
     setPitchIndex(
       fxNames?.findIndex((value: string) => value === "pitchShift")
     );
@@ -22,9 +29,8 @@ function FxPanel({ trackId }: { trackId: number }) {
 
   const showDelay = fxNames.includes("delay");
   const showPitchShifter = fxNames.includes("pitchShift");
-  // const showPanel = showDelay || showPitchShifter;
-
-  const showPanel = fxNames.includes("delay");
+  const showAutoFilter = fxNames.includes("autoFilter");
+  const showPanel = showDelay || showPitchShifter || showAutoFilter;
 
   return (
     showPanel && (
@@ -51,6 +57,18 @@ function FxPanel({ trackId }: { trackId: number }) {
                       <Delay delay={delayIndex !== -1 && fx[delayIndex]} />
                     </li>
                   </DelayContext.Provider>
+                );
+              case "autoFilter":
+                return (
+                  <AutoFilterContext.Provider key="autoFilter">
+                    <li>
+                      <AutoFilter
+                        autoFilter={
+                          autoFilterIndex !== -1 && fx[autoFilterIndex]
+                        }
+                      />
+                    </li>
+                  </AutoFilterContext.Provider>
                 );
               case "pitchShift":
                 return (
