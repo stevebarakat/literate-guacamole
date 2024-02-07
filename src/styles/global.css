@@ -113,6 +113,30 @@ select[name="songs"] {
   }
 }
 
+.fx-panel-label {
+  display: flex;
+  /* flex-direction: column; */
+  font-size: 1.2rem;
+  gap: 0.4rem;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  color: var(--white);
+  & .circle {
+    background: var(--white);
+    color: #232323;
+    font-size: 1.4rem;
+    font-weight: 700;
+    border-radius: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.2rem;
+    width: 24px;
+    height: 24px;
+  }
+}
+
 .fx-menu {
   background: hsl(0, 0%, 20%);
   padding: 8px;

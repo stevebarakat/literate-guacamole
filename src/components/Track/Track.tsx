@@ -11,26 +11,21 @@ import { Rnd } from "react-rnd";
 import { DelayContext } from "@/machines/delayMachine";
 import { PitchContext } from "@/machines/pitchShiftMachine";
 import { array } from "@/utils";
+import FxPanel from "./FxPanel";
 // import * as Popover from "@radix-ui/react-popover";
 
 export default function Track({ trackId }: { trackId: number }) {
-  // Get these separately to prevent ChannelLabel from re-rendering when meterLevel changes
-  const { name } = TrackContext.useSelector((state) => state.context.track);
+  const { send } = TrackContext.useActorRef();
+
+  // Get these separately to prevent others from re-rendering when meterLevel changes
   const meterLevel = TrackContext.useSelector(
     (state) => state.context.meterLevel
   );
-  const { fx, fxNames, channel } = TrackContext.useSelector(
+  const { name, fx, fxNames, channel } = TrackContext.useSelector(
     (state) => state.context
   );
-  const { send } = TrackContext.useActorRef();
 
   fx && channel.chain(...fx);
-
-  // console.log("fxNames", fxNames);
-
-  const showDelay = fxNames.includes("delay");
-  const showPitchShifter = fxNames.includes("pitchShift");
-  const showPanel = showDelay || showPitchShifter;
 
   function handleSetFxNames(
     e: React.FormEvent<HTMLSelectElement>,
@@ -39,13 +34,7 @@ export default function Track({ trackId }: { trackId: number }) {
     const fxName = e.currentTarget.value;
     const id = e.currentTarget.id.at(-1);
 
-    if (!id) return;
     if (action === "add") {
-      const fxId = parseInt(id, 10);
-
-      // const spliced = fxNames.toSpliced(fxId, 1);
-      // const fxSpliced = fx.toSpliced(fxId, 1);
-
       switch (fxName) {
         case "delay":
           return send({
@@ -62,9 +51,8 @@ export default function Track({ trackId }: { trackId: number }) {
         default:
           break;
       }
-    } else if (action === "remove") {
+    } else if (id) {
       const fxId = parseInt(id, 10);
-
       const spliced = fxNames.toSpliced(fxId, 1);
       const fxSpliced = fx.toSpliced(fxId, 1);
 
@@ -73,8 +61,8 @@ export default function Track({ trackId }: { trackId: number }) {
           fx[fxId].dispose();
           return send({
             type: "TRACK.UPDATE_FX_NAMES",
-            fxNames: [...spliced],
-            fx: [...fxSpliced],
+            fxNames: spliced,
+            fx: fxSpliced,
           });
         default:
           break;
@@ -82,73 +70,9 @@ export default function Track({ trackId }: { trackId: number }) {
     }
   }
 
-  const [delayIndex, setDelayIndex] = useState(-1);
-  const [pitchIndex, setPitchIndex] = useState(-1);
-
-  useEffect(() => {
-    setDelayIndex(fxNames?.findIndex((value: string) => value === "delay"));
-    setPitchIndex(
-      fxNames?.findIndex((value: string) => value === "pitchShift")
-    );
-  }, [fxNames, trackId]);
-
   return (
     <>
-      {showPanel && (
-        <Rnd
-          className="fx-panel"
-          cancel="input"
-          minWidth="fit-content"
-          height="auto"
-        >
-          {/* <ul>
-            {showDelay && (
-              <DelayContext.Provider>
-                <li>
-                  <Delay delay={delayIndex !== -1 && fx[delayIndex]} />
-                </li>
-              </DelayContext.Provider>
-            )}
-
-            {showPitchShifter && (
-              <PitchContext.Provider>
-                <li>
-                  <PitchShifter
-                    pitchShift={pitchIndex !== -1 && fx[pitchIndex]}
-                  />
-                </li>
-              </PitchContext.Provider>
-            )}
-          </ul> */}
-
-          <ul>
-            {fxNames.map((name: string) => {
-              switch (name) {
-                case "delay":
-                  return (
-                    <DelayContext.Provider key="delay">
-                      <li>
-                        <Delay delay={delayIndex !== -1 && fx[delayIndex]} />
-                      </li>
-                    </DelayContext.Provider>
-                  );
-                case "pitchShift":
-                  return (
-                    <PitchContext.Provider key="pitchShift">
-                      <li>
-                        <PitchShifter
-                          pitchShift={pitchIndex !== -1 && fx[pitchIndex]}
-                        />
-                      </li>
-                    </PitchContext.Provider>
-                  );
-                default:
-                  break;
-              }
-            })}
-          </ul>
-        </Rnd>
-      )}
+      <FxPanel trackId={trackId} />
       <div className="channel">
         {array(fxNames.length + 1).map((_: void, fxId: number) => (
           <select
