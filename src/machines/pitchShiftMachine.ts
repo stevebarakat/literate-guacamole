@@ -4,6 +4,7 @@ import { createMachine, assign, assertEvent } from "xstate";
 
 export const pitchShiftMachine = createMachine(
   {
+    id: "pitchShiftMachine",
     context: {
       mix: 0.5,
       pitch: 0,

@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@radix-ui/react-popover": "^1.0.7",
+    "@statelyai/inspect": "^0.2.2",
     "@types/uuid": "^9.0.7",
     "@xstate/react": "^4.0.2",
     "immer": "^10.0.3",

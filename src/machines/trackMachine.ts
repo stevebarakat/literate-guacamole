@@ -7,6 +7,7 @@ import { createMachine, assign, fromObservable, assertEvent } from "xstate";
 
 export const trackMachine = createMachine(
   {
+    id: "trackMachine",
     context: ({ input }) => ({
       volume: -32,
       pan: 0,

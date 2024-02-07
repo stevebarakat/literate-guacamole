@@ -4,6 +4,7 @@ import { createMachine, assign, assertEvent } from "xstate";
 
 export const delayMachine = createMachine(
   {
+    id: "delayMachine",
     context: {
       mix: 0.5,
       feedback: 0,
