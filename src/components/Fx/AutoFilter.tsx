@@ -32,11 +32,29 @@ function AutoFilter({ autoFilter }: Props) {
         />
       </div>
       <div className="flex-y">
+        <label htmlFor="baseFrequency">Base Frequency:</label>
+        <input
+          min={0}
+          max={100}
+          step={0.1}
+          type="range"
+          name="baseFrequency"
+          id="baseFrequency"
+          onChange={(e) =>
+            send({
+              type: "AUTOFILTER.CHANGE_BASE_FREQUENCY",
+              baseFrequency: parseFloat(e.currentTarget.value),
+              autoFilter,
+            })
+          }
+        />
+      </div>
+      <div className="flex-y">
         <label htmlFor="frequency">Frequency:</label>
         <input
           min={0}
-          max={1}
-          step={0.01}
+          max={100}
+          step={0.1}
           type="range"
           name="frequency"
           id="frequency"
@@ -71,14 +89,14 @@ function AutoFilter({ autoFilter }: Props) {
         <label htmlFor="octaves">Octaves:</label>
         <input
           min={0}
-          max={1}
+          max={10}
           step={0.01}
           type="range"
           name="octaves"
           id="octaves"
           onChange={(e) =>
             send({
-              type: "AUTOFILTER.CHANGE_OCTAVE",
+              type: "AUTOFILTER.CHANGE_OCTAVES",
               octaves: parseFloat(e.currentTarget.value),
               autoFilter,
             })
