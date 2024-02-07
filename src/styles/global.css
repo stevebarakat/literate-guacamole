@@ -1,5 +1,9 @@
 :root {
   --white: hsl(0, 0%, 80%);
+  --white-2: hsl(0, 0%, 20%);
+  --white-3: hsl(0, 0%, 30%);
+  --white-4: hsl(0, 0%, 40%);
+  --white-5: hsl(0, 0%, 50%);
   --primary-color: hsl(330 100% 70%);
   --primary-color-1: hsl(330 100% 70%/0.1);
   --primary-color-2: hsl(330 100% 70%/0.2);
@@ -66,6 +70,7 @@ h3 {
 
 select {
   border-radius: 6px;
+  border: 1px solid var(--white-4);
   background: var(--blackLinear);
   max-width: 100%;
   margin: 0 auto 4px;

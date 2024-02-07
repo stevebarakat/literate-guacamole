@@ -39,8 +39,8 @@ function App() {
         input: initialContext,
       }}
     >
-      <SongSelector />
       <Mixer />
+      <SongSelector />
     </MixerContext.Provider>
   );
 }

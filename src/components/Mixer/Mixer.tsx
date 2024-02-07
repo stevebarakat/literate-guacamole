@@ -20,7 +20,7 @@ export default function Mixer() {
 
   return loaded ? (
     <>
-      <div className="mixer">
+      <div className="channels">
         {tracks.map((track: SourceTrack, i: number) => {
           return (
             <TrackContext.Provider
