@@ -92,7 +92,6 @@ export default function Track({ trackId }: { trackId: number }) {
     setPitchIndex(fxNames?.findIndex((value) => value === "pitchShift"));
   }, [fxNames, trackId]);
 
-  console.log("pitchIndex", pitchIndex);
   return (
     <>
       {showPanel && (
@@ -102,17 +101,25 @@ export default function Track({ trackId }: { trackId: number }) {
           minWidth="fit-content"
           height="auto"
         >
-          {showDelay && (
-            <DelayContext.Provider>
-              <Delay delay={delayIndex !== -1 && fx[delayIndex]} />
-            </DelayContext.Provider>
-          )}
+          <ul>
+            {showDelay && (
+              <DelayContext.Provider>
+                <li>
+                  <Delay delay={delayIndex !== -1 && fx[delayIndex]} />
+                </li>
+              </DelayContext.Provider>
+            )}
 
-          {showPitchShifter && (
-            <PitchContext.Provider>
-              <PitchShifter pitchShift={pitchIndex !== -1 && fx[pitchIndex]} />
-            </PitchContext.Provider>
-          )}
+            {showPitchShifter && (
+              <PitchContext.Provider>
+                <li>
+                  <PitchShifter
+                    pitchShift={pitchIndex !== -1 && fx[pitchIndex]}
+                  />
+                </li>
+              </PitchContext.Provider>
+            )}
+          </ul>
         </Rnd>
       )}
       <div className="channel">

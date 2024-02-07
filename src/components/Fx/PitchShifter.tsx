@@ -48,42 +48,6 @@ function PitchShifter({ pitchShift }: Props) {
           }
         />
       </div>
-      <div className="flex-y">
-        <label htmlFor="delayTime">Delay Time:</label>
-        <input
-          min={0}
-          max={1}
-          step={0.01}
-          type="range"
-          name="delayTime"
-          id="delayTime"
-          onChange={(e) =>
-            send({
-              type: "PITCH.CHANGE_TIME",
-              delayTime: parseFloat(e.currentTarget.value),
-              pitchShift,
-            })
-          }
-        />
-      </div>
-      <div className="flex-y">
-        <label htmlFor="feedback">Feedback:</label>
-        <input
-          min={0}
-          max={1}
-          step={0.01}
-          type="range"
-          name="feedback"
-          id="feedback"
-          onChange={(e) =>
-            send({
-              type: "PITCH.CHANGE_FEEDBACK",
-              feedback: parseFloat(e.currentTarget.value),
-              pitchShift,
-            })
-          }
-        />
-      </div>
     </div>
   );
 }
