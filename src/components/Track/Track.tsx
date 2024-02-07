@@ -138,7 +138,7 @@ export default function Track({ trackId }: { trackId: number }) {
             <option value={"nofx"}>
               {fxNames[fxId] === undefined
                 ? "Add Fx"
-                : `- ${upperFirst(fxNames[fxId])}`}
+                : `❌ ${upperFirst(fxNames[fxId])}`}
             </option>
             <option value={"delay"} disabled={fxNames.includes("delay")}>
               Delay
