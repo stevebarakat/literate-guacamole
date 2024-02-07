@@ -21,9 +21,12 @@ export default function Track({ trackId }: { trackId: number }) {
   const meterLevel = TrackContext.useSelector(
     (state) => state.context.meterLevel
   );
-  const { name, fx, fxNames, channel } = TrackContext.useSelector(
-    (state) => state.context
-  );
+  const {
+    track: { name },
+    fx,
+    fxNames,
+    channel,
+  } = TrackContext.useSelector((state) => state.context);
 
   fx && channel.chain(...fx);
 

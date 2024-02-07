@@ -27,6 +27,7 @@
 }
 
 .channel-label {
+  padding-top: 4px;
   max-width: 70px;
   white-space: nowrap;
   overflow: hidden;
