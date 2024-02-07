@@ -4,8 +4,8 @@ import Seek from "./Seek";
 import Play from "./Play";
 
 const Transport = () => (
-  <div className="flex gap12">
-    <div className="flex gap4">
+  <div className="flex gap4">
+    <div className="flex gap2">
       <Reset />
       <Seek direction="backward" amount={10} />
       <Play />
