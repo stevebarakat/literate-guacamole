@@ -1,9 +1,9 @@
-import { MixerContext } from "@/machines";
 import { Track } from "../Track";
 import Main from "../Main";
 import Transport from "@/components/Transport";
-import { TrackContext } from "@/machines/trackMachine";
+import { TrackContext } from "@/components/Track/trackMachine";
 import Spinner from "../Loader";
+import { MixerContext } from "./mixerMachine";
 
 export default function Mixer() {
   const tracks = MixerContext.useSelector(

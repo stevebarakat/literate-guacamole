@@ -1,4 +1,4 @@
-import { MixerContext } from "@/machines";
+import { MixerContext } from "@/components/Mixer/mixerMachine";
 import { ReactNode } from "react";
 
 type Props = {

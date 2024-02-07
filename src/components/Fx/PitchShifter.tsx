@@ -1,4 +1,4 @@
-import { PitchContext } from "@/machines/pitchShiftMachine";
+import { PitchContext } from "@/components/Fx/pitchShiftMachine";
 import { PitchShift } from "tone";
 
 type Props = {

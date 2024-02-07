@@ -1,4 +1,4 @@
-import { TrackContext } from "@/machines/trackMachine";
+import { TrackContext } from "@/components/Track/trackMachine";
 import { Pan, Fader, SoloMute } from ".";
 import VuMeter from "../Meter";
 import ChannelLabel from "../ChannelLabel";

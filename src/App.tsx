@@ -1,8 +1,8 @@
 import Mixer from "@/components/Mixer";
 import { SongSelector } from "@/components/SongSelector";
-import { MixerContext } from "@/machines";
 import { Meter } from "tone";
 import "@/styles/global.css";
+import { MixerContext } from "./components/Mixer/mixerMachine";
 
 const volume = -32;
 const currentTime = "00:00:00";

@@ -1,12 +1,12 @@
-import { DelayContext } from "@/machines/delayMachine";
-import { PitchContext } from "@/machines/pitchShiftMachine";
+import { DelayContext } from "@/components/Fx/delayMachine";
+import { PitchContext } from "@/components/Fx/pitchShiftMachine";
 import { Rnd } from "react-rnd";
 import PitchShifter from "../Fx/PitchShifter";
 import Delay from "../Fx/Delay";
 import { useState, useEffect } from "react";
-import { TrackContext } from "@/machines";
 import AutoFilter from "../Fx/AutoFilter";
-import { AutoFilterContext } from "@/machines/autoFilterMachine";
+import { AutoFilterContext } from "@/components/Fx/autoFilterMachine";
+import { TrackContext } from "./trackMachine";
 
 function FxPanel({ trackId }: { trackId: number }) {
   const { track, fx, fxNames } = TrackContext.useSelector(

@@ -1,7 +1,7 @@
 import { scale, logarithmically } from "@/utils";
 import { createActorContext } from "@xstate/react";
 import { interval, animationFrameScheduler } from "rxjs";
-import { FeedbackDelay, PitchShift, Meter } from "tone";
+import { Meter } from "tone";
 import { produce } from "immer";
 import { createMachine, assign, fromObservable, assertEvent } from "xstate";
 
@@ -53,16 +53,6 @@ export const trackMachine = createMachine(
               type: "toggleMute",
             },
           },
-          "TRACK.TOGGLE_DELAY": {
-            actions: {
-              type: "toggleDelay",
-            },
-          },
-          "TRACK.TOGGLE_PITCHSHIFT": {
-            actions: {
-              type: "togglePitchShift",
-            },
-          },
         },
       },
     },
@@ -72,13 +62,11 @@ export const trackMachine = createMachine(
         | {
             type: "TRACK.UPDATE_FX_NAMES";
             fxNames: string[];
-            fx: FeedbackDelay[];
+            fx: Fx;
           }
         | { type: "TRACK.CHANGE_PAN"; pan: number }
         | { type: "TRACK.TOGGLE_SOLO"; checked: boolean }
-        | { type: "TRACK.TOGGLE_MUTE"; checked: boolean }
-        | { type: "TRACK.TOGGLE_PITCHSHIFT"; checked: boolean }
-        | { type: "TRACK.TOGGLE_DELAY"; checked: boolean },
+        | { type: "TRACK.TOGGLE_MUTE"; checked: boolean },
       input: {} as {
         track: SourceTrack;
         channel: Channel | undefined;
@@ -106,7 +94,7 @@ export const trackMachine = createMachine(
         });
         return { pan };
       }),
-      setFxNames: assign(({ context, event }) => {
+      setFxNames: assign(({ event }) => {
         assertEvent(event, "TRACK.UPDATE_FX_NAMES");
         return { fxNames: event.fxNames, fx: event.fx };
       }),
@@ -123,39 +111,6 @@ export const trackMachine = createMachine(
         produce(context, (draft) => {
           draft.channel.solo = checked;
         });
-      }),
-      toggleDelay: assign(({ context, event }) => {
-        assertEvent(event, "TRACK.TOGGLE_DELAY");
-        // const checked = context.fxNames.includes("delay");
-        // console.log("checked", checked);
-        // const delay: FeedbackDelay | undefined = undefined;
-        // const values = Object.values(context.fx).filter((value) => {
-        //   return typeof value !== "undefined";
-        // });
-        // if (checked) {
-        //   delay = new FeedbackDelay().toDestination();
-        //   context.channel.chain(...values, delay);
-        // } else {
-        //   context.fx.delay?.dispose();
-        //   delay = undefined;
-        // }
-        // return { fx: { ...context.fx, delay } };
-      }),
-      togglePitchShift: assign(({ context, event }) => {
-        assertEvent(event, "TRACK.TOGGLE_PITCHSHIFT");
-        const checked = event.checked;
-        let pitchShift: PitchShift | undefined = new PitchShift();
-        if (checked) {
-          pitchShift = new PitchShift().toDestination();
-          const values = Object.values(context.fx).filter(
-            (value) => typeof value !== "undefined"
-          );
-          context.channel.chain(...values, pitchShift);
-        } else {
-          context.fx.pitchShift?.dispose();
-          pitchShift = undefined;
-        }
-        return { fx: { ...context.fx, pitchShift } };
       }),
     },
     actors: {

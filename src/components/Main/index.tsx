@@ -1,6 +1,6 @@
 import Fader from "./Fader";
 import VuMeter from "../Meter";
-import { MixerContext } from "@/machines";
+import { MixerContext } from "@/components/Mixer/mixerMachine";
 import ChannelLable from "../ChannelLabel";
 
 export default function Main() {

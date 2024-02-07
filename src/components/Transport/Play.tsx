@@ -1,4 +1,4 @@
-import { MixerContext } from "@/machines";
+import { MixerContext } from "@/components/Mixer/mixerMachine";
 import { TransportButton } from "../Buttons";
 import { Play as PlayIcon, Pause as PauseIcon } from "lucide-react";
 

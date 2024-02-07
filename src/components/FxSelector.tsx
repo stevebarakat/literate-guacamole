@@ -1,7 +1,7 @@
-import { TrackContext } from "@/machines";
 import { array } from "@/utils";
 import { upperFirst } from "lodash";
 import { FeedbackDelay, PitchShift, AutoFilter } from "tone";
+import { TrackContext } from "./Track/trackMachine";
 
 function FxSelector({ trackId }: { trackId: number }) {
   const { send } = TrackContext.useActorRef();

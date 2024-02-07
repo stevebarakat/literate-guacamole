@@ -4,6 +4,7 @@ import type {
   Reverb,
   Volume,
   Channel as ToneChannel,
+  AutoFilter,
 } from "tone";
 import type { Destination as ToneDestination } from "tone/build/esm/core/context/Destination";
 import { Transport as ToneTransport } from "tone/build/esm/core/clock/Transport";
@@ -15,7 +16,7 @@ declare global {
   type Channel = ToneChannel;
   type DefaultTrackData = typeof defaultTrackData;
 
-  type Fx = Volume | Reverb | FeedbackDelay | PitchShift;
+  type Fx = (AutoFilter | Reverb | FeedbackDelay | PitchShift)[];
 
   type TrackFx = {
     nofx: Volume | null;
@@ -77,7 +78,6 @@ declare global {
   };
 
   type DelaySettings = {
-    playbackMode: string | undefined;
     bypassed: boolean | undefined;
     mix: number | undefined;
     delayTime: number | undefined;
@@ -85,7 +85,6 @@ declare global {
   };
 
   type ReverbSettings = {
-    playbackMode: string | undefined;
     bypassed: boolean | undefined;
     mix: number | undefined;
     preDelay: number | undefined;
@@ -93,7 +92,6 @@ declare global {
   };
 
   type PitchShiftSettings = {
-    playbackMode: string | undefined;
     bypassed: boolean | undefined;
     mix: number | undefined;
     pitch: number | undefined;

@@ -28,7 +28,24 @@ export const autoFilterMachine = createMachine(
             autoFilter: AutoFilter;
           }
         | {
-            type: "AUTOFILTER.CHANGE_TIME";
+            type: "AUTOFILTER.CHANGE_FREQUENCY";
+            frequency: number;
+            autoFilter: AutoFilter;
+          }
+        | {
+            type: "AUTOFILTER.CHANGE_DEPTH";
+            depth: number;
+            autoFilter: AutoFilter;
+          }
+        | {
+            type: "AUTOFILTER.CHANGE_OCTAVE";
+            octaves: number;
+            autoFilter: AutoFilter;
+          }
+        | {
+            type: "AUTOFILTER.CHANGE_TYPE";
+            filterType: string;
+            autoFilter: AutoFilter;
           },
     },
   },

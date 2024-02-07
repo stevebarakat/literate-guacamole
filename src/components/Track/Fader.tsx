@@ -1,4 +1,4 @@
-import { TrackContext } from "@/machines/trackMachine";
+import { TrackContext } from "@/components/Track/trackMachine";
 import { ReactNode } from "react";
 
 type Props = {

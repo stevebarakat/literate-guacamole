@@ -1,4 +1,4 @@
-import { DelayContext } from "@/machines/delayMachine";
+import { DelayContext } from "@/components/Fx/delayMachine";
 import { FeedbackDelay } from "tone";
 
 type Props = {
