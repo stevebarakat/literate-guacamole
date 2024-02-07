@@ -15,10 +15,16 @@
   --primary-color-8: hsl(330 100% 70%/0.8);
   --primary-color-9: hsl(330 100% 70%/0.9);
   --secondary-color: hsl(270, 50%, 40%);
+  --off-black: hsl(213, 0%, 4%);
   --blackLinear: linear-gradient(
     to bottom,
     hsl(213, 0%, 11%) 0%,
     hsl(213, 0%, 1%) 100%
+  );
+  --greyLinear: linear-gradient(
+    to bottom,
+    hsl(213, 0%, 16%) 0%,
+    hsl(213, 0%, 6%) 100%
   );
 
   --shadow-color: 0deg 0% 0%;
@@ -70,13 +76,18 @@ h3 {
 
 select {
   border-radius: 6px;
-  border: 1px solid var(--white-4);
-  background: var(--blackLinear);
+  border: 1px solid var(--white-2);
+  background: var(--off-black);
   max-width: 100%;
   margin: 0 auto 4px;
 }
 
-select[name="songs"] {
+select[name="fx-select"] {
+  background: var(--blackLinear);
+  margin: 0px;
+}
+
+select[name="song-select"] {
   margin: 12px auto;
   padding: 12px;
 }

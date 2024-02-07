@@ -13,7 +13,7 @@ export function SongSelector() {
   }
 
   return (
-    <select name="songs" onChange={handleSongSelect} value={value}>
+    <select name="song-select" onChange={handleSongSelect} value={value}>
       <option value="" disabled>
         Choose a song :
       </option>

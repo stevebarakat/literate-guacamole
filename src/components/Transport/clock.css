@@ -22,7 +22,7 @@
 }
 
 .clock {
-  background: black;
+  background: var(--off-black);
   position: relative;
   color: var(--primary-color-8);
   z-index: 2;

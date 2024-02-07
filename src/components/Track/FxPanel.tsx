@@ -7,11 +7,9 @@ import { useState, useEffect } from "react";
 import { TrackContext } from "@/machines";
 
 function FxPanel({ trackId }: { trackId: number }) {
-  const {
-    track: { name },
-    fx,
-    fxNames,
-  } = TrackContext.useSelector((state) => state.context);
+  const { track, fx, fxNames } = TrackContext.useSelector(
+    (state) => state.context
+  );
 
   const [delayIndex, setDelayIndex] = useState(-1);
   const [pitchIndex, setPitchIndex] = useState(-1);
@@ -24,7 +22,9 @@ function FxPanel({ trackId }: { trackId: number }) {
 
   const showDelay = fxNames.includes("delay");
   const showPitchShifter = fxNames.includes("pitchShift");
-  const showPanel = showDelay || showPitchShifter;
+  // const showPanel = showDelay || showPitchShifter;
+
+  const showPanel = fxNames.includes("delay");
 
   return (
     showPanel && (
@@ -36,7 +36,7 @@ function FxPanel({ trackId }: { trackId: number }) {
       >
         <div className="fx-panel-inner">
           <div className="fx-panel-label">
-            {name}
+            {track.name}
             <div className="circle">{trackId + 1}</div>
           </div>
         </div>

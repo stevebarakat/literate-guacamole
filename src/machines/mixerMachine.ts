@@ -35,7 +35,7 @@ export const mixerMachine = createMachine(
         states: {
           unavailable: {
             invoke: {
-              src: "INITIALIZER",
+              src: "initializer",
             },
             on: {
               "INITIALIZE.AUDIO": {
@@ -57,7 +57,7 @@ export const mixerMachine = createMachine(
               type: "buildMixer",
             },
             invoke: {
-              src: "LOADER",
+              src: "loader",
               onDone: [
                 {
                   target: "loaded",
@@ -66,13 +66,12 @@ export const mixerMachine = createMachine(
               onError: {
                 target: "idle",
                 actions: ["TRACKS.DISPOSE"],
-                description: `The players instance failed to load at least one of the tracks (e.g. bad url). Dispose the existing players and fallback into the **idle** state.`,
               },
             },
           },
           loaded: {
             invoke: {
-              src: "TICKER",
+              src: "ticker",
               id: "ticker",
               onSnapshot: [
                 {
@@ -86,7 +85,6 @@ export const mixerMachine = createMachine(
                 {
                   actions: assign(({ context }) => {
                     const currentTime = formatMilliseconds(t.seconds);
-
                     let meterLevel = context.meter?.getValue();
                     if (typeof meterLevel !== "number") {
                       meterLevel = 0;
@@ -241,7 +239,7 @@ export const mixerMachine = createMachine(
       }),
     },
     actors: {
-      INITIALIZER: fromCallback(({ sendBack }) => {
+      initializer: fromCallback(({ sendBack }) => {
         function handler() {
           start();
           sendBack({ type: "INITIALIZE.AUDIO" });
@@ -251,8 +249,8 @@ export const mixerMachine = createMachine(
           document.body.removeEventListener("click", handler);
         };
       }),
-      LOADER: fromPromise(async () => await loaded()),
-      TICKER: fromObservable(() => interval(0, animationFrameScheduler)),
+      loader: fromPromise(async () => await loaded()),
+      ticker: fromObservable(() => interval(0, animationFrameScheduler)),
     },
     guards: {
       "canSeek?": ({ context, event }) => {

@@ -22,7 +22,7 @@ export const trackMachine = createMachine(
     states: {
       ready: {
         invoke: {
-          src: "TICKER",
+          src: "ticker",
           onSnapshot: {
             actions: assign(({ context }) => ({
               meterLevel: context.meter.getValue(),
@@ -159,7 +159,7 @@ export const trackMachine = createMachine(
       }),
     },
     actors: {
-      TICKER: fromObservable(() => interval(0, animationFrameScheduler)),
+      ticker: fromObservable(() => interval(0, animationFrameScheduler)),
     },
     guards: {},
     delays: {},
