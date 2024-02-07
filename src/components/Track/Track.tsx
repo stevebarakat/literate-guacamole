@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+import { FeedbackDelay, PitchShift } from "tone";
 import { TrackContext } from "@/machines/trackMachine";
 import { Pan, Fader, SoloMute } from ".";
 import VuMeter from "../Meter";
@@ -9,8 +11,6 @@ import { Rnd } from "react-rnd";
 import { DelayContext } from "@/machines/delayMachine";
 import { PitchContext } from "@/machines/pitchShiftMachine";
 import { array } from "@/utils";
-import { useEffect, useState } from "react";
-import { FeedbackDelay, PitchShift } from "tone";
 // import * as Popover from "@radix-ui/react-popover";
 
 export default function Track({ trackId }: { trackId: number }) {
@@ -39,8 +39,30 @@ export default function Track({ trackId }: { trackId: number }) {
     const fxName = e.currentTarget.value;
     const id = e.currentTarget.id.at(-1);
 
-    if (action === "remove") {
-      if (!id) return;
+    if (!id) return;
+    if (action === "add") {
+      const fxId = parseInt(id, 10);
+
+      // const spliced = fxNames.toSpliced(fxId, 1);
+      // const fxSpliced = fx.toSpliced(fxId, 1);
+
+      switch (fxName) {
+        case "delay":
+          return send({
+            type: "TRACK.UPDATE_FX_NAMES",
+            fxNames: [...fxNames, fxName],
+            fx: [...fx, new FeedbackDelay().toDestination()],
+          });
+        case "pitchShift":
+          return send({
+            type: "TRACK.UPDATE_FX_NAMES",
+            fxNames: [...fxNames, fxName],
+            fx: [...fx, new PitchShift().toDestination()],
+          });
+        default:
+          break;
+      }
+    } else if (action === "remove") {
       const fxId = parseInt(id, 10);
 
       const spliced = fxNames.toSpliced(fxId, 1);
@@ -57,39 +79,17 @@ export default function Track({ trackId }: { trackId: number }) {
         default:
           break;
       }
-    } else {
-      if (!id) return;
-      const fxId = parseInt(id, 10);
-
-      const spliced = fxNames.toSpliced(fxId, 1);
-      const fxSpliced = fx.toSpliced(fxId, 1);
-
-      switch (fxName) {
-        case "delay":
-          return send({
-            type: "TRACK.UPDATE_FX_NAMES",
-            fxNames: [...spliced, fxName],
-            fx: [...fxSpliced, new FeedbackDelay().toDestination()],
-          });
-        case "pitchShift":
-          return send({
-            type: "TRACK.UPDATE_FX_NAMES",
-            fxNames: [...spliced, fxName],
-            fx: [...fxSpliced, new PitchShift().toDestination()],
-          });
-        default:
-          break;
-      }
     }
   }
 
-  // console.log("fx", fx);
   const [delayIndex, setDelayIndex] = useState(-1);
   const [pitchIndex, setPitchIndex] = useState(-1);
 
   useEffect(() => {
-    setDelayIndex(fxNames?.findIndex((value) => value === "delay"));
-    setPitchIndex(fxNames?.findIndex((value) => value === "pitchShift"));
+    setDelayIndex(fxNames?.findIndex((value: string) => value === "delay"));
+    setPitchIndex(
+      fxNames?.findIndex((value: string) => value === "pitchShift")
+    );
   }, [fxNames, trackId]);
 
   return (
@@ -101,7 +101,7 @@ export default function Track({ trackId }: { trackId: number }) {
           minWidth="fit-content"
           height="auto"
         >
-          <ul>
+          {/* <ul>
             {showDelay && (
               <DelayContext.Provider>
                 <li>
@@ -119,6 +119,33 @@ export default function Track({ trackId }: { trackId: number }) {
                 </li>
               </PitchContext.Provider>
             )}
+          </ul> */}
+
+          <ul>
+            {fxNames.map((name: string) => {
+              switch (name) {
+                case "delay":
+                  return (
+                    <DelayContext.Provider key="delay">
+                      <li>
+                        <Delay delay={delayIndex !== -1 && fx[delayIndex]} />
+                      </li>
+                    </DelayContext.Provider>
+                  );
+                case "pitchShift":
+                  return (
+                    <PitchContext.Provider key="pitchShift">
+                      <li>
+                        <PitchShifter
+                          pitchShift={pitchIndex !== -1 && fx[pitchIndex]}
+                        />
+                      </li>
+                    </PitchContext.Provider>
+                  );
+                default:
+                  break;
+              }
+            })}
           </ul>
         </Rnd>
       )}
