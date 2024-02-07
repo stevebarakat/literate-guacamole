@@ -265,7 +265,6 @@ export const mixerMachine = createMachine(
       "canReset?": () => t.seconds !== 0,
       "canPlay?": () => !(t.state === "started"),
     },
-    delays: {},
   }
 );
 
