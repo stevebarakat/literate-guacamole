@@ -12,48 +12,43 @@ function FxSelector({ trackId }: { trackId: number }) {
     action: string
   ) {
     const fxName = e.currentTarget.value;
-    const id = e.currentTarget.id.at(-1);
+    const fxId = Number(e.currentTarget.id.at(-1));
 
     if (action === "add") {
+      const spliced = fxNames.toSpliced(fxId, 1);
+      const fxSpliced = fx.toSpliced(fxId, 1);
+      fx[fxId]?.disconnect();
+
       switch (fxName) {
         case "delay":
           return send({
             type: "TRACK.UPDATE_FX_NAMES",
-            fxNames: [...fxNames, fxName],
-            fx: [...fx, new FeedbackDelay().toDestination()],
+            fxNames: [...spliced, fxName],
+            fx: [...fxSpliced, new FeedbackDelay().toDestination()],
           });
         case "autoFilter":
           return send({
             type: "TRACK.UPDATE_FX_NAMES",
-            fxNames: [...fxNames, fxName],
-            fx: [...fx, new AutoFilter().start().toDestination()],
+            fxNames: [...spliced, fxName],
+            fx: [...fxSpliced, new AutoFilter().start().toDestination()],
           });
 
         case "pitchShift":
           return send({
             type: "TRACK.UPDATE_FX_NAMES",
-            fxNames: [...fxNames, fxName],
-            fx: [...fx, new PitchShift().toDestination()],
+            fxNames: [...spliced, fxName],
+            fx: [...fxSpliced, new PitchShift().toDestination()],
           });
         default:
           break;
       }
-    } else if (id) {
-      const fxId = parseInt(id, 10);
-      const spliced = fxNames.toSpliced(fxId, 1);
-      const fxSpliced = fx.toSpliced(fxId, 1);
-
-      switch (fxName) {
-        case "nofx":
-          fx[fxId].dispose();
-          return send({
-            type: "TRACK.UPDATE_FX_NAMES",
-            fxNames: spliced,
-            fx: fxSpliced,
-          });
-        default:
-          break;
-      }
+    } else {
+      fx[fxId].dispose();
+      return send({
+        type: "TRACK.UPDATE_FX_NAMES",
+        fxNames: fxNames.toSpliced(fxId, 1),
+        fx: fx.toSpliced(fxId, 1),
+      });
     }
   }
 
