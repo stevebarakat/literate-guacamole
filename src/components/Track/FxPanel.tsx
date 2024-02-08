@@ -18,75 +18,87 @@ function FxPanel({ trackId }: { trackId: number }) {
   const [pitchIndex, setPitchIndex] = useState(-1);
 
   useEffect(() => {
-    setDelayIndex(fxNames?.findIndex((value: string) => value === "delay"));
-    setAutoFilterIndex(
-      fxNames?.findIndex((value: string) => value === "autoFilter")
-    );
-    setPitchIndex(
-      fxNames?.findIndex((value: string) => value === "pitchShift")
-    );
+    setDelayIndex(fxNames?.indexOf("delay"));
+    setAutoFilterIndex(fxNames?.indexOf("autoFilter"));
+    setPitchIndex(fxNames?.indexOf("pitchShift"));
   }, [fxNames]);
 
-  const showDelay = fxNames.includes("delay");
-  const showPitchShifter = fxNames.includes("pitchShift");
-  const showAutoFilter = fxNames.includes("autoFilter");
-  const showPanel = showDelay || showPitchShifter || showAutoFilter;
-
   return (
-    showPanel && (
-      <Rnd
-        className="fx-panel"
-        cancel="input"
-        minWidth="fit-content"
-        height="auto"
-      >
-        <div className="fx-panel-inner">
-          <div className="fx-panel-label">
-            {track.name}
-            <div className="circle">{trackId + 1}</div>
-          </div>
-        </div>
-        <hr />
-        <ul>
-          {fxNames.map((name: string) => {
-            switch (name) {
-              case "delay":
-                return (
-                  <DelayContext.Provider key="delay">
-                    <li>
-                      <Delay delay={delayIndex !== -1 && fx[delayIndex]} />
-                    </li>
-                  </DelayContext.Provider>
-                );
-              case "autoFilter":
-                return (
-                  <AutoFilterContext.Provider key="autoFilter">
-                    <li>
-                      <AutoFilter
-                        autoFilter={
-                          autoFilterIndex !== -1 && fx[autoFilterIndex]
-                        }
-                      />
-                    </li>
-                  </AutoFilterContext.Provider>
-                );
-              case "pitchShift":
-                return (
-                  <PitchContext.Provider key="pitchShift">
-                    <li>
-                      <PitchShifter
-                        pitchShift={pitchIndex !== -1 && fx[pitchIndex]}
-                      />
-                    </li>
-                  </PitchContext.Provider>
-                );
-              default:
-                break;
-            }
-          })}
-        </ul>
-      </Rnd>
-    )
+    <>
+      {fxNames.map((name: string) => {
+        switch (name) {
+          case "delay":
+            return (
+              <Rnd
+                key="delay"
+                className="fx-panel"
+                cancel="input"
+                minWidth="fit-content"
+                height="auto"
+              >
+                <div className="fx-panel-inner">
+                  <div className="fx-panel-label">
+                    {track.name}
+                    <div className="circle">{trackId + 1}</div>
+                  </div>
+                </div>
+                <hr />
+                <DelayContext.Provider key="delay">
+                  <Delay delay={delayIndex !== -1 && fx[delayIndex]} />
+                </DelayContext.Provider>
+              </Rnd>
+            );
+          case "autoFilter":
+            return (
+              <Rnd
+                key="autoFilter"
+                className="fx-panel"
+                cancel="input"
+                minWidth="fit-content"
+                height="auto"
+              >
+                <div className="fx-panel-inner">
+                  <div className="fx-panel-label">
+                    {track.name}
+                    <div className="circle">{trackId + 1}</div>
+                  </div>
+                </div>
+                <hr />
+                <AutoFilterContext.Provider key="autoFilter">
+                  <AutoFilter
+                    autoFilter={autoFilterIndex !== -1 && fx[autoFilterIndex]}
+                  />
+                </AutoFilterContext.Provider>
+              </Rnd>
+            );
+          case "pitchShift":
+            return (
+              <Rnd
+                key="pitchShift"
+                className="fx-panel"
+                cancel="input"
+                minWidth="fit-content"
+                height="auto"
+              >
+                <div className="fx-panel-inner">
+                  <div className="fx-panel-label">
+                    {track.name}
+                    <div className="circle">{trackId + 1}</div>
+                  </div>
+                </div>
+                <hr />
+                <PitchContext.Provider key="pitchShift">
+                  <PitchShifter
+                    pitchShift={pitchIndex !== -1 && fx[pitchIndex]}
+                  />
+                </PitchContext.Provider>
+              </Rnd>
+            );
+          default:
+            break;
+        }
+      })}
+    </>
   );
 }
 

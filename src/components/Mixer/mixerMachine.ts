@@ -65,7 +65,7 @@ export const mixerMachine = createMachine(
               ],
               onError: {
                 target: "idle",
-                actions: ["TRACKS.DISPOSE"],
+                actions: "disposeTracks",
               },
             },
           },
