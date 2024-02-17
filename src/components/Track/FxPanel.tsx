@@ -6,25 +6,34 @@ import Delay from "../Fx/Delay";
 import { useState, useEffect } from "react";
 import { TrackContext } from "./trackMachine";
 
+const defaults = {
+  className: "fx-panel",
+  cancel: "input",
+  minWidth: "150px",
+  minHeight: "fit-content",
+};
+
 function FxPanel({ trackId }: { trackId: number }) {
   const { track, fx, fxNames } = TrackContext.useSelector(
     (state) => state.context
   );
+  const { send } = TrackContext.useActorRef();
 
   const [delayIndex, setDelayIndex] = useState(-1);
   const [pitchIndex, setPitchIndex] = useState(-1);
-
-  const defaults = {
-    className: "fx-panel",
-    cancel: "input",
-    minWidth: "150px",
-    minHeight: "fit-content",
-  };
 
   useEffect(() => {
     setDelayIndex(fxNames?.indexOf("delay"));
     setPitchIndex(fxNames?.indexOf("pitchShift"));
   }, [fxNames]);
+
+  function togglePanel() {
+    send({ type: "TRACK.TOGGLE_FX_PANEL" });
+  }
+
+  const state = TrackContext.useSelector((s) => s);
+  const isOpen = state.matches({ ready: "fxPanelOpen" });
+  if (!isOpen) return;
 
   return (
     <>
@@ -36,9 +45,13 @@ function FxPanel({ trackId }: { trackId: number }) {
                 <div className="fx-panel-inner">
                   <div className="fx-panel-label">
                     {track.name}
-                    <div id={trackId.toString()} className="circle">
+                    <button
+                      onClick={togglePanel}
+                      id={trackId.toString()}
+                      className="circle"
+                    >
                       {trackId + 1}
-                    </div>
+                    </button>
                   </div>
                 </div>
                 <hr />

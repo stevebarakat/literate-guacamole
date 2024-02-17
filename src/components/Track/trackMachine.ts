@@ -22,6 +22,23 @@ export const trackMachine = createMachine(
     initial: "ready",
     states: {
       ready: {
+        initial: "fxPanelOpen",
+        states: {
+          fxPanelOpen: {
+            on: {
+              "TRACK.TOGGLE_FX_PANEL": {
+                target: "fxPanelClosed",
+              },
+            },
+          },
+          fxPanelClosed: {
+            on: {
+              "TRACK.TOGGLE_FX_PANEL": {
+                target: "fxPanelOpen",
+              },
+            },
+          },
+        },
         invoke: {
           src: "ticker",
           onSnapshot: {
@@ -67,6 +84,7 @@ export const trackMachine = createMachine(
             action: string;
           }
         | { type: "TRACK.CHANGE_PAN"; pan: number }
+        | { type: "TRACK.TOGGLE_FX_PANEL" }
         | { type: "TRACK.TOGGLE_SOLO"; checked: boolean }
         | { type: "TRACK.TOGGLE_MUTE"; checked: boolean },
       input: {} as {
