@@ -13,7 +13,9 @@ export default function Mixer() {
     (state) => state.context
   );
 
+  const isLoaded = MixerContext.useSelector((state) => state.matches("loaded"));
   if (!tracks) return null;
+  if (!isLoaded) return null;
 
   return (
     <>

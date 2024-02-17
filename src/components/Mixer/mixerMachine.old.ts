@@ -26,123 +26,143 @@ export const mixerMachine = createMachine(
     context: ({ input: initialContext }: Input) => ({
       ...initialContext,
     }),
-    initial: "idle",
+    type: "parallel",
     states: {
-      idle: {},
-      loading: {
-        entry: {
-          type: "buildMixer",
-        },
-        invoke: {
-          src: "loader",
-          onDone: [
-            {
-              target: "loaded",
-            },
-          ],
-          onError: {
-            target: "idle",
-            actions: "disposeTracks",
-          },
-        },
-      },
-      loaded: {
-        invoke: {
-          src: "ticker",
-          id: "ticker",
-          onSnapshot: [
-            {
-              target: ".stopped",
-              guard: ({ context }) =>
-                Boolean(
-                  context.sourceSong &&
-                    t.seconds > context.sourceSong.endPosition
-                ),
-            },
-            {
-              actions: assign(({ context }) => {
-                const currentTime = formatMilliseconds(t.seconds);
-                let meterLevel = context.meter?.getValue();
-                if (typeof meterLevel !== "number") {
-                  meterLevel = 0;
-                }
-                return {
-                  meterLevel,
-                  currentTime,
-                };
-              }),
-            },
-          ],
-        },
-        exit: ["reset", "disposeTracks"],
-        initial: "stopped",
+      audioContext: {
+        initial: "unavailable",
         states: {
-          stopped: {
+          unavailable: {
             on: {
-              "SONG.START": {
-                target: "started",
-                guard: "canPlay?",
-                actions: {
-                  type: "play",
-                },
-              },
-              "SONG.RESET": {
-                guard: "canReset?",
-                target: "stopped",
-                actions: {
-                  type: "reset",
-                },
-              },
-              "SONG.SEEK": {
-                guard: "canSeek?",
-                actions: {
-                  type: "seek",
-                },
-              },
-              "SONG.CHANGE_VOLUME": {
-                actions: {
-                  type: "setMainVolume",
-                },
+              "INITIALIZE.AUDIO": {
+                target: "available",
               },
             },
           },
-          started: {
-            on: {
-              "SONG.PAUSE": {
-                target: "stopped",
-                actions: {
-                  type: "pause",
+          available: {
+            type: "final",
+          },
+        },
+      },
+      song: {
+        initial: "idle",
+        states: {
+          idle: {},
+          loading: {
+            entry: {
+              type: "buildMixer",
+            },
+            invoke: {
+              src: "loader",
+              onDone: [
+                {
+                  target: "loaded",
+                },
+              ],
+              onError: {
+                target: "idle",
+                actions: "disposeTracks",
+              },
+            },
+          },
+          loaded: {
+            invoke: {
+              src: "ticker",
+              id: "ticker",
+              onSnapshot: [
+                {
+                  target: ".stopped",
+                  guard: ({ context }) =>
+                    Boolean(
+                      context.sourceSong &&
+                        t.seconds > context.sourceSong.endPosition
+                    ),
+                },
+                {
+                  actions: assign(({ context }) => {
+                    const currentTime = formatMilliseconds(t.seconds);
+                    let meterLevel = context.meter?.getValue();
+                    if (typeof meterLevel !== "number") {
+                      meterLevel = 0;
+                    }
+                    return {
+                      meterLevel,
+                      currentTime,
+                    };
+                  }),
+                },
+              ],
+            },
+            exit: ["reset", "disposeTracks"],
+            initial: "stopped",
+            states: {
+              stopped: {
+                on: {
+                  "SONG.START": {
+                    target: "started",
+                    guard: "canPlay?",
+                    actions: {
+                      type: "play",
+                    },
+                  },
+                  "SONG.RESET": {
+                    guard: "canReset?",
+                    target: "stopped",
+                    actions: {
+                      type: "reset",
+                    },
+                  },
+                  "SONG.SEEK": {
+                    guard: "canSeek?",
+                    actions: {
+                      type: "seek",
+                    },
+                  },
+                  "SONG.CHANGE_VOLUME": {
+                    actions: {
+                      type: "setMainVolume",
+                    },
+                  },
                 },
               },
-              "SONG.RESET": {
-                target: "stopped",
-                actions: {
-                  type: "reset",
-                },
-              },
-              "SONG.SEEK": {
-                guard: "canSeek?",
-                actions: {
-                  type: "seek",
-                },
-              },
-              "SONG.CHANGE_VOLUME": {
-                actions: {
-                  type: "setMainVolume",
-                },
-              },
+              started: {
+                on: {
+                  "SONG.PAUSE": {
+                    target: "stopped",
+                    actions: {
+                      type: "pause",
+                    },
+                  },
+                  "SONG.RESET": {
+                    target: "stopped",
+                    actions: {
+                      type: "reset",
+                    },
+                  },
+                  "SONG.SEEK": {
+                    guard: "canSeek?",
+                    actions: {
+                      type: "seek",
+                    },
+                  },
+                  "SONG.CHANGE_VOLUME": {
+                    actions: {
+                      type: "setMainVolume",
+                    },
+                  },
 
-              "SONG.ENDED": {
-                actions: stopChild("ticker"),
+                  "SONG.ENDED": {
+                    actions: stopChild("ticker"),
+                  },
+                },
               },
             },
           },
         },
-      },
-    },
-    on: {
-      "SONG.LOAD": {
-        target: ".loading",
+        on: {
+          "SONG.LOAD": {
+            target: ".loading",
+          },
+        },
       },
     },
     types: {

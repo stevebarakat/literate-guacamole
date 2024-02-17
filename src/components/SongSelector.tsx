@@ -9,7 +9,10 @@ export function SongSelector() {
 
   function handleSongSelect(event: React.ChangeEvent<HTMLSelectElement>) {
     const song = songs.find((song) => song.slug === event.target.value);
-    if (song) send({ type: "SONG.LOAD", song });
+    if (song) {
+      send({ type: "SONG.LOAD", song });
+      send({ type: "INITIALIZE.AUDIO" });
+    }
   }
 
   return (
