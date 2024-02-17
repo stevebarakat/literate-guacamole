@@ -3,6 +3,7 @@ import { createActorContext } from "@xstate/react";
 import { interval, animationFrameScheduler } from "rxjs";
 import { Meter } from "tone";
 import { produce } from "immer";
+import { FeedbackDelay, PitchShift, AutoFilter } from "tone";
 import { createMachine, assign, fromObservable, assertEvent } from "xstate";
 
 export const trackMachine = createMachine(
@@ -61,8 +62,9 @@ export const trackMachine = createMachine(
         | { type: "TRACK.CHANGE_VOLUME"; volume: number }
         | {
             type: "TRACK.UPDATE_FX_NAMES";
-            fxNames: string[];
-            fx: Fx;
+            fxName: string;
+            fxId: number;
+            action: string;
           }
         | { type: "TRACK.CHANGE_PAN"; pan: number }
         | { type: "TRACK.TOGGLE_SOLO"; checked: boolean }
@@ -94,9 +96,46 @@ export const trackMachine = createMachine(
         });
         return { pan };
       }),
-      setFxNames: assign(({ event }) => {
+      setFxNames: assign(({ context, event }) => {
         assertEvent(event, "TRACK.UPDATE_FX_NAMES");
-        return { fxNames: event.fxNames, fx: event.fx };
+
+        if (event.action === "add") {
+          const spliced = context.fxNames.toSpliced(event.fxId, 1);
+          const fxSpliced = context.fx.toSpliced(event.fxId, 1);
+          context.fx[event.fxId]?.disconnect();
+
+          switch (event.fxName) {
+            case "delay":
+              // produce(context, (draft) => {
+              context.fxNames = [...spliced, event.fxName];
+              context.fx = [...fxSpliced, new FeedbackDelay().toDestination()];
+              // });
+              break;
+            // case "autoFilter":
+            //   return send({
+            //     type: "TRACK.UPDATE_FX_NAMES",
+            //     fxNames: [...spliced, fxName],
+            //     fx: [...fxSpliced, new AutoFilter().start().toDestination()],
+            //   });
+
+            // case "pitchShift":
+            //   return send({
+            //     type: "TRACK.UPDATE_FX_NAMES",
+            //     fxNames: [...spliced, fxName],
+            //     fx: [...fxSpliced, new PitchShift().toDestination()],
+            //   });
+            default:
+              break;
+          }
+        } else {
+          context.fx[event.fxId].dispose();
+          // context.fxNames = context.fxNames.toSpliced(event.fxId, 1);
+          // context.fx = context.fx.toSpliced(event.fxId, 1);
+          return {
+            fxNames: context.fxNames.toSpliced(event.fxId, 1),
+            fx: context.fx.toSpliced(event.fxId, 1),
+          };
+        }
       }),
       toggleMute: assign(({ context, event }) => {
         assertEvent(event, "TRACK.TOGGLE_MUTE");

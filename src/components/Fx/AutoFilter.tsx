@@ -5,8 +5,6 @@ type Props = {
   autoFilter: af;
 };
 
-console.log("af.defaultValue", af.getDefaults());
-
 function AutoFilter({ autoFilter }: Props) {
   const { send } = AutoFilterContext.useActorRef();
 

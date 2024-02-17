@@ -1,10 +1,11 @@
 import { array } from "@/utils";
 import { upperFirst } from "lodash";
+import { FeedbackDelay, PitchShift, AutoFilter } from "tone";
 import { TrackContext } from "./Track/trackMachine";
 
 function FxSelector({ trackId }: { trackId: number }) {
   const { send } = TrackContext.useActorRef();
-  const { fxNames } = TrackContext.useSelector((state) => state.context);
+  const { fx, fxNames } = TrackContext.useSelector((state) => state.context);
 
   function handleSetFxNames(
     e: React.FormEvent<HTMLSelectElement>,
@@ -13,7 +14,42 @@ function FxSelector({ trackId }: { trackId: number }) {
     const fxName = e.currentTarget.value;
     const fxId = Number(e.currentTarget.id.at(-1));
 
-    send({ type: "TRACK.UPDATE_FX_NAMES", fxId, fxName, action });
+    if (action === "add") {
+      const spliced = fxNames.toSpliced(fxId, 1);
+      const fxSpliced = fx.toSpliced(fxId, 1);
+      fx[fxId]?.disconnect();
+
+      switch (fxName) {
+        case "delay":
+          return send({
+            type: "TRACK.UPDATE_FX_NAMES",
+            fxNames: [...spliced, fxName],
+            fx: [...fxSpliced, new FeedbackDelay().toDestination()],
+          });
+        case "autoFilter":
+          return send({
+            type: "TRACK.UPDATE_FX_NAMES",
+            fxNames: [...spliced, fxName],
+            fx: [...fxSpliced, new AutoFilter().start().toDestination()],
+          });
+
+        case "pitchShift":
+          return send({
+            type: "TRACK.UPDATE_FX_NAMES",
+            fxNames: [...spliced, fxName],
+            fx: [...fxSpliced, new PitchShift().toDestination()],
+          });
+        default:
+          break;
+      }
+    } else {
+      fx[fxId].dispose();
+      return send({
+        type: "TRACK.UPDATE_FX_NAMES",
+        fxNames: fxNames.toSpliced(fxId, 1),
+        fx: fx.toSpliced(fxId, 1),
+      });
+    }
   }
 
   return array(fxNames.length + 1).map((_: void, fxId: number) => (
