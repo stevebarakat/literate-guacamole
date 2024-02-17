@@ -3,7 +3,7 @@ import { Pan, Fader, SoloMute } from ".";
 import VuMeter from "../Meter";
 import ChannelLabel from "../ChannelLabel";
 import { FxPanel } from "../FxPanel";
-import FxSelector from "../FxSelector";
+import { FxSelector } from "../Selectors";
 
 export default function Track({ trackId }: { trackId: number }) {
   // Get these separately to prevent others from re-rendering when meterLevel changes

@@ -1,5 +1,5 @@
 import Mixer from "@/components/Mixer";
-import { SongSelector } from "@/components/SongSelector";
+import { SongSelector } from "@/components/Selectors";
 import { Meter } from "tone";
 import "@/styles/global.css";
 import { MixerContext } from "./components/Mixer/mixerMachine";
