@@ -15,7 +15,7 @@ export const roxanne = {
     {
       id: uuid(),
       name: "Drums",
-      path: "https://ioxpcmpvgermtfqxwykx.supabase.co/storage/v1/object/public/songs/roxanne/Roxanne_Drums.mp3",
+      path: "https://ipcmpvgermtfqxwykx.supabase.co/storage/v1/object/public/songs/roxanne/Roxanne_Drums.mp3",
     },
     {
       id: uuid(),

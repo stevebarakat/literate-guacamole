@@ -3,6 +3,7 @@ import { SongSelector } from "@/components/SongSelector";
 import { Meter } from "tone";
 import "@/styles/global.css";
 import { MixerContext } from "./components/Mixer/mixerMachine";
+import Spinner from "./components/Loader";
 
 const volume = -32;
 const currentTime = "00:00:00";
@@ -39,6 +40,7 @@ function App() {
         input: initialContext,
       }}
     >
+      <Spinner />
       <Mixer />
       <SongSelector />
     </MixerContext.Provider>

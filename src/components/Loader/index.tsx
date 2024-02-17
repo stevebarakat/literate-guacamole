@@ -3,8 +3,14 @@ import "./styles.css";
 
 const Spinner = () => {
   const state = MixerContext.useSelector((state) => state);
-  const isLoading = !state.matches("ready");
+  const isLoading = MixerContext.useSelector((state) =>
+    state.matches("song.loading")
+  );
+
+  if (!isLoading) return null;
   const song = state.context.sourceSong;
+
+  console.log("state.value", state.value);
 
   if (!isLoading) return null;
   return (
