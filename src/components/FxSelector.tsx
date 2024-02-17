@@ -36,9 +36,6 @@ function FxSelector({ trackId }: { trackId: number }) {
       <option value={"delay"} disabled={fxNames.includes("delay")}>
         Delay
       </option>
-      <option value={"autoFilter"} disabled={fxNames.includes("autoFilter")}>
-        Auto Filter
-      </option>
       <option value={"pitchShift"} disabled={fxNames.includes("pitchShift")}>
         Pitch Shift
       </option>

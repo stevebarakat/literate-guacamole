@@ -3,7 +3,7 @@ import { createActorContext } from "@xstate/react";
 import { interval, animationFrameScheduler } from "rxjs";
 import { Meter } from "tone";
 import { produce } from "immer";
-import { FeedbackDelay, PitchShift, AutoFilter } from "tone";
+import { FeedbackDelay, PitchShift } from "tone";
 import { createMachine, assign, fromObservable, assertEvent } from "xstate";
 
 export const trackMachine = createMachine(
@@ -102,7 +102,7 @@ export const trackMachine = createMachine(
         if (event.action === "add") {
           const spliced = context.fxNames.toSpliced(event.fxId, 1);
           const fxSpliced = context.fx.toSpliced(event.fxId, 1);
-          context.fx[event.fxId]?.disconnect();
+          context.fx[event.fxId]?.dispose();
 
           switch (event.fxName) {
             case "delay":
@@ -110,27 +110,18 @@ export const trackMachine = createMachine(
                 fxNames: [...spliced, event.fxName],
                 fx: [...fxSpliced, new FeedbackDelay().toDestination()],
               };
-              break;
-            // case "autoFilter":
-            //   return send({
-            //     type: "TRACK.UPDATE_FX_NAMES",
-            //     fxNames: [...spliced, fxName],
-            //     fx: [...fxSpliced, new AutoFilter().start().toDestination()],
-            //   });
 
-            // case "pitchShift":
-            //   return send({
-            //     type: "TRACK.UPDATE_FX_NAMES",
-            //     fxNames: [...spliced, fxName],
-            //     fx: [...fxSpliced, new PitchShift().toDestination()],
-            //   });
+            case "pitchShift":
+              return {
+                fxNames: [...spliced, event.fxName],
+                fx: [...fxSpliced, new PitchShift().toDestination()],
+              };
+
             default:
               break;
           }
         } else {
           context.fx[event.fxId].dispose();
-          // context.fxNames = context.fxNames.toSpliced(event.fxId, 1);
-          // context.fx = context.fx.toSpliced(event.fxId, 1);
           return {
             fxNames: context.fxNames.toSpliced(event.fxId, 1),
             fx: context.fx.toSpliced(event.fxId, 1),
