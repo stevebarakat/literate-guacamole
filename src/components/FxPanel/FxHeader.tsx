@@ -1,4 +1,4 @@
-import { TrackContext } from "./trackMachine";
+import { TrackContext } from "../Track/trackMachine";
 import { X } from "lucide-react";
 
 type Props = {

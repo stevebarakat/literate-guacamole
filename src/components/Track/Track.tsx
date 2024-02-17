@@ -2,7 +2,7 @@ import { TrackContext } from "@/components/Track/trackMachine";
 import { Pan, Fader, SoloMute } from ".";
 import VuMeter from "../Meter";
 import ChannelLabel from "../ChannelLabel";
-import FxPanel from "./FxPanel";
+import { FxPanel } from "../FxPanel";
 import FxSelector from "../FxSelector";
 
 export default function Track({ trackId }: { trackId: number }) {

@@ -4,8 +4,8 @@ import { Rnd } from "react-rnd";
 import PitchShifter from "../Fx/PitchShifter";
 import Delay from "../Fx/Delay";
 import { useState, useEffect } from "react";
-import { TrackContext } from "./trackMachine";
-import FxHeader from "./FxHeader";
+import { TrackContext } from "../Track/trackMachine";
+import { FxHeader } from "../FxPanel";
 
 const defaults = {
   className: "fx-panel",
