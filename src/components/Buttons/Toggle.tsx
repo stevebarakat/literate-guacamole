@@ -5,10 +5,20 @@ type Props = {
   value?: string;
   children: React.ReactNode;
   checked?: boolean | undefined;
+  className?: string;
   onChange: (e: React.FormEvent<HTMLInputElement>) => void;
 };
 
-function Toggle({ children, id, name, type, value, checked, onChange }: Props) {
+function Toggle({
+  children,
+  id,
+  name,
+  type,
+  value,
+  checked,
+  onChange,
+  className,
+}: Props) {
   return (
     <>
       <input
@@ -20,7 +30,9 @@ function Toggle({ children, id, name, type, value, checked, onChange }: Props) {
         checked={checked}
         onChange={onChange}
       />
-      <label htmlFor={id}>{children}</label>
+      <label className={className} htmlFor={id}>
+        {children}
+      </label>
     </>
   );
 }

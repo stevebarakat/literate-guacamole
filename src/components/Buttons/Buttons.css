@@ -29,11 +29,18 @@
   border-radius: 4px;
   padding: 0.175rem 0.25rem;
   user-select: none;
+  border: 1px solid transparent;
 }
 
 .channel input[type="checkbox"]:checked + label {
   background: var(--primary-color);
   color: black;
+}
+
+.channel input[type="checkbox"]:checked + label.mute {
+  background: none;
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
 }
 
 .channel input[type="checkbox"]:focus-visible + label {

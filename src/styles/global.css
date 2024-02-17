@@ -14,7 +14,7 @@
   --primary-color-7: hsl(330 100% 70%/0.7);
   --primary-color-8: hsl(330 100% 70%/0.8);
   --primary-color-9: hsl(330 100% 70%/0.9);
-  --secondary-color: hsl(270, 50%, 40%);
+  --secondary-color: hsl(250, 80%, 70%);
   --off-black: hsl(213, 0%, 4%);
   --blackLinear: linear-gradient(
     to bottom,

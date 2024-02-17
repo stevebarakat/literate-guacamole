@@ -22,6 +22,7 @@ function SoloMute() {
       </Toggle>
       <Toggle
         id={`trackMute${id}`}
+        className="mute"
         checked={context.channel.muted}
         onChange={(e) => {
           send({
