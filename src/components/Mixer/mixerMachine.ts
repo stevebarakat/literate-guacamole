@@ -36,12 +36,12 @@ export const mixerMachine = createMachine(
           },
         },
 
-        description: `Waiting for song to be loaded.`
+        description: `Waiting for song to be loaded.`,
       },
       error: {
         target: "idle",
         entry: "disposeTracks",
-        description: `The players instance failed to load at least one of the tracks (e.g. bad url). Dispose the existing players and target the **idle** state.`
+        description: `The players instance failed to load at least one of the tracks (e.g. bad url). Dispose the existing players and target the **idle** state.`,
       },
       loading: {
         entry: {
@@ -144,7 +144,9 @@ export const mixerMachine = createMachine(
               },
 
               "SONG.ENDED": {
-                actions: "inline:mixerMachine.loaded.started#SONG.ENDED[-1]#transition[0]",
+                actions: {
+                  type: "endSong",
+                },
               },
             },
           },
@@ -153,10 +155,9 @@ export const mixerMachine = createMachine(
     },
     types: {
       context: {} as InitialContext,
-      events: {} as
-        | { type: "INITIALIZE.AUDIO" }
-        | { type: "SONG.LOAD"; song: SourceSong }
-        | { type: "SONG.ASSIGN" }
+      events: {} as // | { type: "INITIALIZE.AUDIO" }
+      // | { type: "SONG.ASSIGN" }
+      | { type: "SONG.LOAD"; song: SourceSong }
         | { type: "SONG.START" }
         | { type: "SONG.PAUSE" }
         | { type: "SONG.RESET" }
@@ -210,6 +211,7 @@ export const mixerMachine = createMachine(
         Destination.volume.value = scaled;
         return { volume: event.volume };
       }),
+      endSong: () => stopChild("ticker"),
       disposeTracks: assign(({ context }) => {
         context.channels?.forEach((channel: Channel | undefined) =>
           channel?.dispose()

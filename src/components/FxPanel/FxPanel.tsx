@@ -26,7 +26,7 @@ function FxPanel({ trackId }: { trackId: number }) {
     setPitchIndex(fxNames?.indexOf("pitchShift"));
   }, [fxNames]);
 
-  const isOpen = state.matches({ ready: "fxPanelOpen" });
+  const isOpen = state.matches("ready.fxPanelOpen");
   if (!isOpen) return;
 
   return (
