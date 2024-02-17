@@ -106,10 +106,10 @@ export const trackMachine = createMachine(
 
           switch (event.fxName) {
             case "delay":
-              // produce(context, (draft) => {
-              context.fxNames = [...spliced, event.fxName];
-              context.fx = [...fxSpliced, new FeedbackDelay().toDestination()];
-              // });
+              return {
+                fxNames: [...spliced, event.fxName],
+                fx: [...fxSpliced, new FeedbackDelay().toDestination()],
+              };
               break;
             // case "autoFilter":
             //   return send({
