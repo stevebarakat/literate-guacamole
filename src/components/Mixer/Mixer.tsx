@@ -2,6 +2,7 @@ import { Track } from "../Track";
 import Main from "../Main";
 import Transport from "@/components/Transport";
 import { TrackContext } from "@/components/Track/trackMachine";
+import Spinner from "../Loader";
 import { MixerContext } from "./mixerMachine";
 
 export default function Mixer() {
