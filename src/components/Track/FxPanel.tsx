@@ -15,9 +15,8 @@ const defaults = {
 };
 
 function FxPanel({ trackId }: { trackId: number }) {
-  const { track, fx, fxNames } = TrackContext.useSelector(
-    (state) => state.context
-  );
+  const state = TrackContext.useSelector((s) => s);
+  const { track, fx, fxNames } = state.context;
 
   const [delayIndex, setDelayIndex] = useState(-1);
   const [pitchIndex, setPitchIndex] = useState(-1);
@@ -27,7 +26,6 @@ function FxPanel({ trackId }: { trackId: number }) {
     setPitchIndex(fxNames?.indexOf("pitchShift"));
   }, [fxNames]);
 
-  const state = TrackContext.useSelector((s) => s);
   const isOpen = state.matches({ ready: "fxPanelOpen" });
   if (!isOpen) return;
 

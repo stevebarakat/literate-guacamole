@@ -22,7 +22,10 @@ function FxSelector({ trackId }: { trackId: number }) {
   return (
     <>
       {fxNames.length > 0 && (
-        <button onClick={() => send({ type: "TRACK.TOGGLE_FX_PANEL" })}>
+        <button
+          className="toggle-fx-btn"
+          onClick={() => send({ type: "TRACK.TOGGLE_FX_PANEL" })}
+        >
           {isOpen ? "Close Fx" : "Open Fx"}
         </button>
       )}

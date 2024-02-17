@@ -1,4 +1,5 @@
 import { TrackContext } from "./trackMachine";
+import { X } from "lucide-react";
 
 type Props = {
   track: SourceTrack;
@@ -18,7 +19,9 @@ function FxHeader({ track, trackId }: Props) {
         <div className="fx-panel-label">
           <div className="circle">{trackId + 1}</div>
           {track.name}
-          <button onClick={togglePanel}>X</button>
+          <button className="close-panel-btn" onClick={togglePanel}>
+            <X />
+          </button>
         </div>
       </div>
       <hr />

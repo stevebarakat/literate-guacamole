@@ -66,3 +66,22 @@
 .toggle:focus-within label {
   outline: 1px solid;
 }
+
+.toggle-fx-btn {
+  padding: 0;
+  background: var(--blackLinear);
+  border: 1px solid var(--white-2);
+  border-radius: 6px;
+  line-height: 1.5;
+}
+
+.close-panel-btn {
+  background: none;
+  border: none;
+  transition: color 0.2s;
+}
+
+.close-panel-btn:hover {
+  color: var(--primary-color);
+  transition: color 0.2s;
+}
