@@ -1,7 +1,7 @@
 import { MixerContext } from "@/components/Mixer/mixerMachine";
 import "./styles.css";
 
-const Spinner = () => {
+const Loader = () => {
   const state = MixerContext.useSelector((state) => state);
   const isLoading = MixerContext.useSelector((state) =>
     state.matches("loading")
@@ -30,4 +30,4 @@ const Spinner = () => {
   );
 };
 
-export default Spinner;
+export default Loader;
