@@ -22,7 +22,6 @@ type Input = { input: InitialContext };
 
 export const mixerMachine = createMachine(
   {
-    /** @xstate-layout N4IgpgJg5mDOIC5QFsCWAPMAnAsgQwGMALVAOzADpUIAbMAYgGUB5AOQHEKAZZgQQBEA2gAYAuolAAHAPaxUAF1TTSEkOkQBOAMxaKAdgCsegGwAOLYeEAWYQYBMAGhABPRAEZTdisJ8+rxuw07Y2EdAF8wpzRMXEIScgoaaTwIMih6CGVKMgA3aQBrSmjsfGIySiSUtIRc6QI8RWURUWbVGTlGlSQ1RE89CgNTIw1jMw0rPVsnVwQrc29fYys3Ny0DA2NwyJBi2LKEytTSdOwsaSwKSRoGgDNz5Apd0viK5KOoGtI8+s7m1u72golF1QOoEB4DBoKFpRhpQnYYWZTNNEHNdL5hEsVmsNlsohgSnFyok3pAKLB5NJJJJIEw2JxGAAVXgAJUZ-yksiBylUYJWei8Rj0hjcxhMxjcdj0KIQGkGC2Ebg0plMy2M9gi+Jiz2JhzJFKpNIgdI4FBZAFFGOb2WI2lzOrz3MJkS5NFYvL43Ho3AYLDDxpqdgS9i8SSl9ZTqbSWKareaANIckCAh3dPlWbQUQLq+yKrR5l0zcYenxen1+4wB7ZPIkHUkQcmRo0mzgAYQAErwOOaAPoANWYXAAqjhzUmU8DHbMtKYKJ5TKKNG4rGtxoW3SXFd7fXp-VZAzX9q9ww2KXgsPJo-SKAAFXhDq3j+2TtNu2d2YTZgw+JYTKwyuVZ09ZVVVFDVq2DHU6xPRtz0vY0Y04C0rRtcQAWfHlXwQAVdHnL1zBhOwFw0AD5WAlU1XArVCSPMMIAjOCr1jc0EyfDoX1BRBRmEAYggFeFxm0aVXXBD9jAVBEJj0ZUJgPSDa2PejT3kRiEOvDsu3YXsB2HUc2O5EEellQw513YtKwMd0tDcGVJUxCStCkmS9Dk7UFLohiLyYzhzVYfhzSEW10PYzDOIQNZxJCUxK2srQ5RCYSZjs8TfEk4VnIibZSGkej4G6Q8XjtELDL5RwRMlBUMSqnwXIgtzaOoOgioMqcNG9aFlSIuxLMlQx1wQUwoQ0YaRjmSVHImDRXJo0NTnOZrUzCiFxKFYUVz0QaVxlIx0VLTEVRVRVTGmkNdTeNIFo4ozpP6KwrAMXqdFMDbEsQKVN2sPQbHu2xVROqDFMgS7QqMkJtt3BU3H2g6jv+9y9WUw0geClqsJ9WxoRhGx4U-e6tBlTweM9az+Lxqa6pms6YLPLyIGBkrNCXCg5ndYRhrsZcxXx8qVisSHBICbRRUysIgA */
     id: "mixerMachine",
     context: ({ input: initialContext }: Input) => ({
       ...initialContext,
@@ -140,7 +139,7 @@ export const mixerMachine = createMachine(
               },
 
               "SONG.ENDED": {
-                actions: "inline:mixerMachine.loaded.started#SONG.ENDED[-1]#transition[0]",
+                actions: stopChild("ticker"),
               },
             },
           },

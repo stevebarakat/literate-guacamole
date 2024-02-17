@@ -17,7 +17,7 @@ function FxSelector({ trackId }: { trackId: number }) {
   }
 
   const state = TrackContext.useSelector((s) => s);
-  const isOpen = state.matches({ ready: "fxPanelOpen" });
+  const isOpen = state.matches("ready.fxPanelOpen");
 
   return (
     <>

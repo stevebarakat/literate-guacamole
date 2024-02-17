@@ -4,7 +4,6 @@ import { createMachine, assign, assertEvent } from "xstate";
 
 export const pitchShiftMachine = createMachine(
   {
-    /** @xstate-layout N4IgpgJg5mDOIC5QAcCWAXAxgCwMrdQDN0BZAQx1QDswA6AJzDIgE8BiABQEkAVAYQAStQQEEAcgHEAogH0SXABoBtAAwBdRCgD2sDKi1VNIAB6IAjAA4ArLQBsAdkv2rAGhAtEAJitmAvr7c0LDwCYnJKGgYmVk5eQWEBcWkZbn4BVQ0kEGQdPQMjUwRLGwcnV3dEABZPAGZ-AJAqLQg4IyCcfCJSCgIaNtz0fUMswoBaSos3DwRR2oBOf0CMDtDuiLpGZmntXUH8kcRbFSmvCxraT1sr65urq3rfIA */
     id: "pitchShiftMachine",
     context: {
       mix: 0.5,
