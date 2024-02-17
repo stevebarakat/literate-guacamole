@@ -29,7 +29,11 @@ export const mixerMachine = createMachine(
     initial: "idle",
     states: {
       idle: {
-        description: `Wait patiently for a song to be loaded.`,
+        on: {
+          "SONG.LOAD": {
+            target: "loading",
+          },
+        },
       },
       error: { target: "idle", entry: "disposeTracks" },
       loading: {
@@ -140,11 +144,6 @@ export const mixerMachine = createMachine(
             },
           },
         },
-      },
-    },
-    on: {
-      "SONG.LOAD": {
-        target: ".loading",
       },
     },
     types: {
