@@ -4,8 +4,6 @@ import { Rnd } from "react-rnd";
 import PitchShifter from "../Fx/PitchShifter";
 import Delay from "../Fx/Delay";
 import { useState, useEffect } from "react";
-import AutoFilter from "../Fx/AutoFilter";
-import { AutoFilterContext } from "@/components/Fx/autoFilterMachine";
 import { TrackContext } from "./trackMachine";
 
 function FxPanel({ trackId }: { trackId: number }) {
@@ -14,12 +12,17 @@ function FxPanel({ trackId }: { trackId: number }) {
   );
 
   const [delayIndex, setDelayIndex] = useState(-1);
-  const [autoFilterIndex, setAutoFilterIndex] = useState(-1);
   const [pitchIndex, setPitchIndex] = useState(-1);
+
+  const defaults = {
+    className: "fx-panel",
+    cancel: "input",
+    minWidth: "150px",
+    minHeight: "fit-content",
+  };
 
   useEffect(() => {
     setDelayIndex(fxNames?.indexOf("delay"));
-    setAutoFilterIndex(fxNames?.indexOf("autoFilter"));
     setPitchIndex(fxNames?.indexOf("pitchShift"));
   }, [fxNames]);
 
@@ -29,17 +32,13 @@ function FxPanel({ trackId }: { trackId: number }) {
         switch (name) {
           case "delay":
             return (
-              <Rnd
-                key="delay"
-                className="fx-panel"
-                cancel="input"
-                minWidth="fit-content"
-                height="auto"
-              >
+              <Rnd key="delay" {...defaults}>
                 <div className="fx-panel-inner">
                   <div className="fx-panel-label">
                     {track.name}
-                    <div className="circle">{trackId + 1}</div>
+                    <div id={trackId.toString()} className="circle">
+                      {trackId + 1}
+                    </div>
                   </div>
                 </div>
                 <hr />
@@ -48,38 +47,9 @@ function FxPanel({ trackId }: { trackId: number }) {
                 </DelayContext.Provider>
               </Rnd>
             );
-          case "autoFilter":
-            return (
-              <Rnd
-                key="autoFilter"
-                className="fx-panel"
-                cancel="input"
-                minWidth="fit-content"
-                height="auto"
-              >
-                <div className="fx-panel-inner">
-                  <div className="fx-panel-label">
-                    {track.name}
-                    <div className="circle">{trackId + 1}</div>
-                  </div>
-                </div>
-                <hr />
-                <AutoFilterContext.Provider key="autoFilter">
-                  <AutoFilter
-                    autoFilter={autoFilterIndex !== -1 && fx[autoFilterIndex]}
-                  />
-                </AutoFilterContext.Provider>
-              </Rnd>
-            );
           case "pitchShift":
             return (
-              <Rnd
-                key="pitchShift"
-                className="fx-panel"
-                cancel="input"
-                minWidth="fit-content"
-                height="auto"
-              >
+              <Rnd key="pitchShift" {...defaults}>
                 <div className="fx-panel-inner">
                   <div className="fx-panel-label">
                     {track.name}
