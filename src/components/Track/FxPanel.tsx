@@ -5,6 +5,7 @@ import PitchShifter from "../Fx/PitchShifter";
 import Delay from "../Fx/Delay";
 import { useState, useEffect } from "react";
 import { TrackContext } from "./trackMachine";
+import FxHeader from "./FxHeader";
 
 const defaults = {
   className: "fx-panel",
@@ -17,7 +18,6 @@ function FxPanel({ trackId }: { trackId: number }) {
   const { track, fx, fxNames } = TrackContext.useSelector(
     (state) => state.context
   );
-  const { send } = TrackContext.useActorRef();
 
   const [delayIndex, setDelayIndex] = useState(-1);
   const [pitchIndex, setPitchIndex] = useState(-1);
@@ -26,10 +26,6 @@ function FxPanel({ trackId }: { trackId: number }) {
     setDelayIndex(fxNames?.indexOf("delay"));
     setPitchIndex(fxNames?.indexOf("pitchShift"));
   }, [fxNames]);
-
-  function togglePanel() {
-    send({ type: "TRACK.TOGGLE_FX_PANEL" });
-  }
 
   const state = TrackContext.useSelector((s) => s);
   const isOpen = state.matches({ ready: "fxPanelOpen" });
@@ -42,19 +38,7 @@ function FxPanel({ trackId }: { trackId: number }) {
           case "delay":
             return (
               <Rnd key="delay" {...defaults}>
-                <div className="fx-panel-inner">
-                  <div className="fx-panel-label">
-                    {track.name}
-                    <button
-                      onClick={togglePanel}
-                      id={trackId.toString()}
-                      className="circle"
-                    >
-                      {trackId + 1}
-                    </button>
-                  </div>
-                </div>
-                <hr />
+                <FxHeader track={track} trackId={trackId} />
                 <DelayContext.Provider key="delay">
                   <Delay delay={delayIndex !== -1 && fx[delayIndex]} />
                 </DelayContext.Provider>
@@ -63,13 +47,7 @@ function FxPanel({ trackId }: { trackId: number }) {
           case "pitchShift":
             return (
               <Rnd key="pitchShift" {...defaults}>
-                <div className="fx-panel-inner">
-                  <div className="fx-panel-label">
-                    {track.name}
-                    <div className="circle">{trackId + 1}</div>
-                  </div>
-                </div>
-                <hr />
+                <FxHeader track={track} trackId={trackId} />
                 <PitchContext.Provider key="pitchShift">
                   <PitchShifter
                     pitchShift={pitchIndex !== -1 && fx[pitchIndex]}

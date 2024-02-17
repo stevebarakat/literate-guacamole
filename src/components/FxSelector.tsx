@@ -1,7 +1,6 @@
 import { array } from "@/utils";
 import { upperFirst } from "lodash";
 import { TrackContext } from "./Track/trackMachine";
-import { Fragment } from "react";
 
 function FxSelector({ trackId }: { trackId: number }) {
   const { send } = TrackContext.useActorRef();
