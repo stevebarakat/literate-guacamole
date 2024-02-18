@@ -34,7 +34,6 @@ export const mixerMachine = createMachine(
       error: {
         after: {
           2000: { actions: "reload" },
-          3000: { target: "idle" },
         },
         entry: "disposeTracks",
       },
