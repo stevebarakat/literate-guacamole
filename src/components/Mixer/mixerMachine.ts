@@ -33,7 +33,7 @@ export const mixerMachine = createMachine(
       },
       error: {
         after: {
-          2000: { actions: () => window.location.reload() },
+          2000: { actions: "reload" },
           3000: { target: "idle" },
         },
         entry: "disposeTracks",
@@ -178,6 +178,7 @@ export const mixerMachine = createMachine(
           meters,
         };
       }),
+      reload: () => window.location.reload(),
       reset: () => t.stop(),
       play: () => t.start(),
       pause: () => t.pause(),

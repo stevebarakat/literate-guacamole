@@ -5,7 +5,9 @@ export function SongSelector() {
   const slug = MixerContext.useSelector(
     (state) => state.context.sourceSong?.slug || ""
   );
-  const isLoading = MixerContext.useSelector((s) => s.matches("loading"));
+  const disabled = MixerContext.useSelector(
+    (s) => s.matches("loading") || s.matches("error")
+  );
   const { send } = MixerContext.useActorRef();
 
   function handleSongSelect(event: React.ChangeEvent<HTMLSelectElement>) {
@@ -20,7 +22,7 @@ export function SongSelector() {
       name="song-select"
       onChange={handleSongSelect}
       value={slug}
-      disabled={isLoading}
+      disabled={disabled}
     >
       <option value="" disabled>
         Choose a song :
