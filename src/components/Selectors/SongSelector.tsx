@@ -2,21 +2,26 @@ import { songs } from "../../assets/songs";
 import { MixerContext } from "../Mixer/mixerMachine";
 
 export function SongSelector() {
-  const value = MixerContext.useSelector(
+  const slug = MixerContext.useSelector(
     (state) => state.context.sourceSong?.slug || ""
   );
+  const isLoading = MixerContext.useSelector((s) => s.matches("loading"));
   const { send } = MixerContext.useActorRef();
 
   function handleSongSelect(event: React.ChangeEvent<HTMLSelectElement>) {
     const song = songs.find((song) => song.slug === event.target.value);
     if (song) {
       send({ type: "SONG.LOAD", song });
-      send({ type: "INITIALIZE.AUDIO" });
     }
   }
 
   return (
-    <select name="song-select" onChange={handleSongSelect} value={value}>
+    <select
+      name="song-select"
+      onChange={handleSongSelect}
+      value={slug}
+      disabled={isLoading}
+    >
       <option value="" disabled>
         Choose a song :
       </option>

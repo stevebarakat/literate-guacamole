@@ -15,7 +15,7 @@ export const aDayInTheLife = {
     {
       id: uuid(),
       name: "Bass/Drums",
-      path: "https://ioxpcmpvgermtfqxwykx.supabase.co/storage/v1/object/public/songs/aDayInTheLife/bass-drums.mp3",
+      path: "https://ioxpcmpvgermtfqxwx.supabase.co/storage/v1/object/public/songs/aDayInTheLife/bass-drums.mp3",
     },
     {
       id: uuid(),

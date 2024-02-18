@@ -1,6 +1,6 @@
 import Mixer from "@/components/Mixer";
 import { SongSelector } from "@/components/Selectors";
-import { Meter } from "tone";
+import { Meter, Player } from "tone";
 import "@/styles/global.css";
 import { MixerContext } from "./components/Mixer/mixerMachine";
 import { Loader } from "./components/Loader";
@@ -13,6 +13,7 @@ const meterLevel = undefined;
 const sourceSong = undefined;
 const channels = [undefined];
 const meters = [undefined];
+const players = [undefined];
 
 export type InitialContext = {
   currentTime: string;
@@ -22,6 +23,7 @@ export type InitialContext = {
   sourceSong?: SourceSong | undefined;
   channels: (Channel | undefined)[];
   meters: (Meter | undefined)[];
+  players: (Player | undefined)[];
 };
 
 const initialContext: InitialContext = {
@@ -31,6 +33,7 @@ const initialContext: InitialContext = {
   currentTime,
   sourceSong,
   meters,
+  players,
   channels,
 };
 
