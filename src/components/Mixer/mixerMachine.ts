@@ -22,7 +22,7 @@ type Input = { input: InitialContext };
 
 export const mixerMachine = createMachine(
   {
-    /** @xstate-layout N4IgpgJg5mDOIC5QFsCWAPMAnAsgQwGMALVAOzADpUIAbMAYgGUB5AOQHEKAZZgQQBEA2gAYAuolAAHAPaxUAF1TTSEkOkQA2AKxaKAdgCMWgMwazAJgMBOACxaAHABoQAT0RGbFew-N7jWvQd7Xy0AX1DnNExcQhJyChppPAgyKHoIZUoyADdpAGtKKOx8YjJKROTUhBzpAjxFZRFRJtUZOQaVJDVELRsrCl7jGz0rLQ0DYQMDZzcEO11ve2Nl4Q1JvXs9cMiMYtiyhKSU0jTsLGksCkkaeoAzC+QKIpjS+IrjqGrSXLqOppaum0FEpOqB1AgjPYDBRjOY7PZxsJguZvDNEPMvA5lsZVutNtsQM8SnFykdIBRYPJpJJJJAmGxOIwACq8ABKTIBUlkwOUqnB9lsA38NiGvShJi0aIQVhxmPsNg0eg2wT0dgJRP2bzJEApVJpdJYHAorIAoowTRyxK1uR0+YgALQGPTCCjCGzmYxOgwouy2GxSqwGTyLGw2N1LKyBqzq3YvEmHZLkynU2kQelG80mgDSnJAQNtXXB3qMFHMvQ9Nns8p0dgDQblofDxkj1hj0WJB3eSb1qfTnAAwgAJXgcE0AfQAaswuABVHAm3P5kF2iFrfSLLTmSZaAz+ZZ14MORuV5tRtt7V6kxM6yl4LDyA0MigABV4M-Ni5ty8LmmdFAMawaMMmwjJsVgBrKIaKsqvhqhEhKxh2WrXrqd4PmmhqcKa5qWuIgJfryP5zHY64OOMW4bOYcKSq4iAyi6UFKlWsFhPBGqXgmEDdmhj4Zia2afu035gogxjBAMWhusIsKTNJ7pSlMGxypJxh6OYQEaKM55xp22qofevEDsOo6TtOc4Lla+FCYRIkIJpeheJ6GhlmMmkaKpClOvYynSWpGlaWxiGaleXE3vIPEYU+JqsPwJpCJZXLWaC3QIEprmqWsUwTN6Ti0RCXk+ap6kKgF8GkNIXHwF07EktaSUrva6kaK67qeoYPpaH6Ur2n0FCKrJBgIi5ZZbIF7bBVQtBgHVPLJeCaz9D4ASGENnXGFKYYwuYLYys5ViBFuNjaUhlBnBcM0FrZRhpcKARlk2ehSr0CxYoESzliKx0Te8qQXcJKU7v0YYohMljSSEUpwoeSwAf4UwolRX0cV2EB-TZKWNYNLUel6HVdXlz1yp6Tq+WJo07ONyN6cm+qo1Zs0rt6vilrYSKeoGGxjFKIzmA2wirP1ehAUj8Yo-p6Fo3NiCGMYFChoNVi+PRwgbApSLNVBzbCKMz3hOEQA */
+    /** @xstate-layout N4IgpgJg5mDOIC5QFsCWAPMAnAsgQwGMALVAOzADpUIAbMAYgGUB5AOQHEKAZZgQQBEA2gAYAuolAAHAPaxUAF1TTSEkOkQBOAEwUAbAEYAHFq36tu3RuEBmAKwAaEAE9EpgOwVr14Vp+GLhvoabm4AvqGOaJi4hCTkFDTSeBBkUPQQypRkAG7SANaUicnYIuJIIDJyisqq6giGHpbCbl4ALLb6Ia3WWo4uCK1WnhpB1rqGXhpjYREgUdj4xGSFSSmkadhY0lgUkjR48gBm28gJqyViqpUKSirlde22FK0G3hqGrW76umMOzohjYR6LS2azdYRWYS6WyGcKRDALWLLM7FCAUWDyaSSSSQJhsTiMAAqvAASoTSldZDcavdEIZms9dG4tBoXoEXtZDH06e9ng1Pq1WkZhCLWnC5giYkt4kUIJB0ZjsbiWBwKCSAKKMdXky7la7VO6gOoAWlsrQo31swiM-lawkMU16-wQ+jB+j0wk+LOs+hhrVhs3mUriK1RCrwWHkyvxFAACrwAKpail6qkG2p02xPYzvYyfCztNzcl3WL4ez76b4vZpiwOSxYhlFytEYiNRiB41Va9UAaRTUjTtwzLsF1goLLcU2r3yhxbMbkMz2sU7cWa09Jm8OiDeRsvlrcj0dV6tY-HVQl1A6qQ9pLtBunHHw0Gls40GIKd-Ur+iBuhslaZN13i0cUgx3GVzhbRUcQ7FUCXVXt+wqQcaSNRAfw8QwzRza1DAaV9i2CB8QlwrRBTcH5WhAuttyRCCwwPdtO04DUtR1Mor2pQ01HQ9cNAoYwSMorw3H9Od2nNZkvBhEURmEGFQPrOjQ2bZiKAAYQACV4Dh1QAfQANWYLgExwdUkP1G80JdP8HxhJljB-LDOlaYtBSebQF2aMi3ChKiZlmUhpDleByjA5TKWvVCeIQY1fSBS1cNte1HWLMdX0rZkoRZa1RM3CVaOlLJaDASKuOHFkBKzSdPVsd5BheQix2+TLrTGbQpg0RTCsbTZtjK9Nbxac0vH0F4fkrF8ejSmwKHtdcJnIn1QVrLdESKptUgGqyYri90-y0LwHS6LwyI0GbzV0EE7AhXxl30br1sbPcIG26KTR-HREptXQ7QdabnSZc1tC0EJzC+boLEe4Nd0ghUsRgt7uLqWxJzmnzSzqw6Xz+L9vh0TqGlZSs-IDNaYfo5tw0PV7Uyi5HeJCChXw3StBmMUE5yMHRDtuq1TDqrxwnCIA */
     id: "mixerMachine",
     context: ({ input: initialContext }: Input) => ({
       ...initialContext,
@@ -41,7 +41,7 @@ export const mixerMachine = createMachine(
       error: {
         target: "idle",
         entry: "disposeTracks",
-        description: `The players instance failed to load at least one of the tracks (e.g. bad url). Dispose the existing players and target the **idle** state.`,
+        description: `The players instance failed to load at least one of the tracks (e.g. bad url). Dispose the existing tracks and target the **idle** state.`,
       },
       loading: {
         entry: {
@@ -49,18 +49,20 @@ export const mixerMachine = createMachine(
         },
         invoke: {
           src: "loader",
-          onDone: [
-            {
-              target: "loaded",
-            },
-          ],
+
+          onDone: {
+            target: "loaded",
+          },
+
           onError: "error",
+          id: "loader"
         },
       },
       loaded: {
         invoke: {
           src: "ticker",
           id: "ticker",
+
           onSnapshot: [
             {
               target: ".stopped",
@@ -83,10 +85,12 @@ export const mixerMachine = createMachine(
                 };
               }),
             },
-          ],
+          ]
         },
+
         exit: ["reset", "disposeTracks"],
         initial: "stopped",
+
         states: {
           stopped: {
             on: {
@@ -97,26 +101,22 @@ export const mixerMachine = createMachine(
                   type: "play",
                 },
               },
+
               "SONG.RESET": {
                 guard: "canReset?",
                 target: "stopped",
+
                 actions: {
                   type: "reset",
                 },
-              },
-              "SONG.SEEK": {
-                guard: "canSeek?",
-                actions: {
-                  type: "seek",
-                },
-              },
-              "SONG.CHANGE_VOLUME": {
-                actions: {
-                  type: "setMainVolume",
-                },
-              },
+
+                description: `Stop playback and reset
+
+playhead to start position.`
+              }
             },
           },
+
           started: {
             on: {
               "SONG.PAUSE": {
@@ -125,22 +125,17 @@ export const mixerMachine = createMachine(
                   type: "pause",
                 },
               },
-              "SONG.RESET": {
-                target: "stopped",
-                actions: {
-                  type: "reset",
-                },
-              },
+
               "SONG.SEEK": {
                 guard: "canSeek?",
+
                 actions: {
                   type: "seek",
                 },
-              },
-              "SONG.CHANGE_VOLUME": {
-                actions: {
-                  type: "setMainVolume",
-                },
+
+                description: `Skip song position forward or backward
+
+the given amount of seconds.`
               },
 
               "SONG.ENDED": {
@@ -148,9 +143,28 @@ export const mixerMachine = createMachine(
                   type: "endSong",
                 },
               },
+
+              "SONG.RESET": {
+                target: "started",
+                internal: true,
+                cond: "canReset?",
+
+                description: `Stop playback and reset
+
+playhead to start position.`,
+
+                actions: "reset"
+              }
             },
-          },
+          }
         },
+
+        on: {
+          "SONG.CHANGE_VOLUME": {
+            target: undefined,
+            actions: "setMainVolume"
+          }
+        }
       },
     },
     types: {
