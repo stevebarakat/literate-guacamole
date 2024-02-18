@@ -33,9 +33,9 @@ export const mixerMachine = createMachine(
       },
       error: {
         after: {
-          2000: { actions: "reload" },
+          2000: { actions: "disposeTracks" },
         },
-        entry: "disposeTracks",
+        // entry: "disposeTracks",
       },
       loading: {
         entry: ["buildMixer"],

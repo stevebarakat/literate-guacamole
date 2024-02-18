@@ -1,13 +1,11 @@
-import { songs } from "../../assets/songs";
+import { songs } from "@/assets/songs";
 import { MixerContext } from "../Mixer/mixerMachine";
 
 export function SongSelector() {
   const slug = MixerContext.useSelector(
     (state) => state.context.sourceSong?.slug || ""
   );
-  const disabled = MixerContext.useSelector(
-    (s) => s.matches("loading") || s.matches("error")
-  );
+  const disabled = MixerContext.useSelector((s) => s.matches("loading"));
   const { send } = MixerContext.useActorRef();
 
   function handleSongSelect(event: React.ChangeEvent<HTMLSelectElement>) {
