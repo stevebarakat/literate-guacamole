@@ -6,13 +6,13 @@ function Reset() {
   const { send } = MixerContext.useActorRef();
 
   const canReset = MixerContext.useSelector((state) =>
-    state.can({ type: "SONG.RESET" })
+    state.can({ type: "RESET" })
   );
 
   return (
     <TransportButton
       disabled={!canReset}
-      onClick={() => send({ type: "SONG.RESET" })}
+      onClick={() => send({ type: "RESET" })}
     >
       <ResetIcon />
     </TransportButton>
