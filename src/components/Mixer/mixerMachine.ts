@@ -151,7 +151,7 @@ export const mixerMachine = createMachine(
                 guard: "canStop?",
                 description: `Stop playing song.`,
               },
-              "SONG.ENDED": {
+              "SONG.END": {
                 actions: "stopClock",
 
                 description: `The song has reached its end position.
@@ -171,22 +171,19 @@ Stop **ticker** actor and target **stopped** state.`,
     types: {
       context: {} as InitialContext,
       events: {} as
-        | { type: "INITIALIZE.AUDIO" }
-        | { type: "SONG.LOAD"; song: SourceSong }
-        | { type: "SONG.ASSIGN" }
+        | { type: "BUILD.MIXER"; song: SourceSong }
         | { type: "SONG.START" }
         | { type: "SONG.PAUSE" }
         | { type: "SONG.RESET" }
         | { type: "SONG.SEEK"; direction: string; amount: number }
         | { type: "SONG.CHANGE_VOLUME"; volume: number }
-        | { type: "TRACKS.DISPOSE" }
-        | { type: "SONG.ENDED" },
+        | { type: "SONG.END" },
     },
 
     description: `A multitrack audio mixer with effects.`,
 
     on: {
-      "SONG.LOAD": {
+      "BUILD.MIXER": {
         target: ".building",
         description: `Initializes audio context and targets **building** state. Triggered by user selecting a song to mix. IMPORTANT: Browsers will not play audio until a user initializes the audio context by clicking on something.`,
       },
@@ -196,7 +193,7 @@ Stop **ticker** actor and target **stopped** state.`,
     actions: {
       buildMixer: assign(({ event }) => {
         console.log("message");
-        assertEvent(event, "SONG.LOAD");
+        assertEvent(event, "BUILD.MIXER");
         let players: Player[] = [];
         let meters: Meter[] = [];
         let channels: Channel[] = [];
