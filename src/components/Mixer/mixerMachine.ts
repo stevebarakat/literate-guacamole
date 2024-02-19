@@ -32,10 +32,7 @@ export const mixerMachine = createMachine(
         description: `Wait patiently for a song to be loaded.`,
       },
       error: {
-        after: {
-          2000: { actions: "disposeTracks" },
-        },
-        // entry: "disposeTracks",
+        entry: "disposeTracks",
       },
       loading: {
         entry: ["buildMixer"],
