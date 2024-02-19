@@ -5,7 +5,7 @@ import { Play as PlayIcon, Pause as PauseIcon } from "lucide-react";
 function Play() {
   const { send } = MixerContext.useActorRef();
   const canPause = MixerContext.useSelector((state) =>
-    state.matches("loaded.started")
+    state.matches("ready.started")
   );
 
   return (

@@ -3,7 +3,7 @@ import { MixerContext } from "@/components/Mixer/mixerMachine";
 const Loader = () => {
   const state = MixerContext.useSelector((state) => state);
   const isLoading = MixerContext.useSelector((state) =>
-    state.matches("building")
+    state.matches("loading")
   );
   if (!isLoading) return null;
 

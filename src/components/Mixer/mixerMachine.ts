@@ -50,8 +50,8 @@ export const mixerMachine = createMachine(
           input: ({ context }) => ({ sourceSong: context.sourceSong }),
           onDone: [
             {
-              target: "building",
-              actions: assign(({ event }) => ({ audioBuffers: event.output })),
+              target: "ready",
+              actions: ["getAudioBuffers", "buildMixer"],
             },
           ],
           onError: {
@@ -62,7 +62,7 @@ export const mixerMachine = createMachine(
 
       building: {
         entry: "buildMixer",
-        onDone: { target: "ready" },
+        target: "ready",
       },
 
       ready: {
@@ -201,6 +201,7 @@ export const mixerMachine = createMachine(
         assertEvent(event, "LOAD.AUDIO");
         return { sourceSong: event.song };
       }),
+      getAudioBuffers: assign(({ event }) => ({ audioBuffers: event.output })),
       buildMixer: assign(({ context, event }) => {
         console.log("EVENT!", event);
         console.log("CONTEXT!!", context);
