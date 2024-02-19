@@ -63,7 +63,7 @@ export const mixerMachine = createMachine(
 
       ready: {
         on: {
-          RESET: {
+          "SONG.RESET": {
             guard: "canStop?",
             target: ".stopped",
 
@@ -73,7 +73,7 @@ export const mixerMachine = createMachine(
 
             description: `Stop playing and return playhead to beginning of song.`,
           },
-          SEEK: {
+          "SONG.SEEK": {
             guard: "canSeek?",
 
             actions: {
@@ -82,7 +82,7 @@ export const mixerMachine = createMachine(
 
             description: `Move the playhead position forward or backward (the given amount of seconds).`,
           },
-          CHANGE_VOLUME: {
+          "SONG.CHANGE_VOLUME": {
             actions: {
               type: "setMainVolume",
             },
@@ -125,7 +125,7 @@ export const mixerMachine = createMachine(
         states: {
           stopped: {
             on: {
-              START: {
+              "SONG.START": {
                 target: "started",
                 guard: "canPlay?",
 
@@ -141,7 +141,7 @@ export const mixerMachine = createMachine(
           },
           started: {
             on: {
-              PAUSE: {
+              "SONG.PAUSE": {
                 target: "stopped",
 
                 actions: {
@@ -151,7 +151,7 @@ export const mixerMachine = createMachine(
                 guard: "canStop?",
                 description: `Stop playing song.`,
               },
-              END: {
+              "SONG.ENDED": {
                 actions: "stopClock",
 
                 description: `The song has reached its end position.
@@ -171,21 +171,22 @@ Stop **ticker** actor and target **stopped** state.`,
     types: {
       context: {} as InitialContext,
       events: {} as
-        | { type: "BUILD.MIXER"; song: SourceSong }
-        | { type: "ASSIGN" }
-        | { type: "START" }
-        | { type: "PAUSE" }
-        | { type: "RESET" }
-        | { type: "SEEK"; direction: string; amount: number }
-        | { type: "CHANGE_VOLUME"; volume: number }
+        | { type: "INITIALIZE.AUDIO" }
+        | { type: "SONG.LOAD"; song: SourceSong }
+        | { type: "SONG.ASSIGN" }
+        | { type: "SONG.START" }
+        | { type: "SONG.PAUSE" }
+        | { type: "SONG.RESET" }
+        | { type: "SONG.SEEK"; direction: string; amount: number }
+        | { type: "SONG.CHANGE_VOLUME"; volume: number }
         | { type: "TRACKS.DISPOSE" }
-        | { type: "END" },
+        | { type: "SONG.ENDED" },
     },
 
     description: `A multitrack audio mixer with effects.`,
 
     on: {
-      "BUILD.MIXER": {
+      "SONG.LOAD": {
         target: ".building",
         description: `Initializes audio context and targets **building** state. Triggered by user selecting a song to mix. IMPORTANT: Browsers will not play audio until a user initializes the audio context by clicking on something.`,
       },
@@ -195,7 +196,7 @@ Stop **ticker** actor and target **stopped** state.`,
     actions: {
       buildMixer: assign(({ event }) => {
         console.log("message");
-        assertEvent(event, "BUILD.MIXER");
+        assertEvent(event, "SONG.LOAD");
         let players: Player[] = [];
         let meters: Meter[] = [];
         let channels: Channel[] = [];
@@ -224,7 +225,7 @@ Stop **ticker** actor and target **stopped** state.`,
       play: () => t.start(),
       pause: () => t.pause(),
       seek: ({ event }) => {
-        assertEvent(event, "SEEK");
+        assertEvent(event, "SONG.SEEK");
         if (event.direction === "forward") {
           t.seconds = t.seconds + 10;
         } else {
@@ -233,7 +234,7 @@ Stop **ticker** actor and target **stopped** state.`,
       },
       stopSong: () => stopChild("ticker"),
       setMainVolume: assign(({ event }) => {
-        assertEvent(event, "CHANGE_VOLUME");
+        assertEvent(event, "SONG.CHANGE_VOLUME");
         const scaled = scale(logarithmically(event.volume));
         Destination.volume.value = scaled;
         return { volume: event.volume };
@@ -259,7 +260,7 @@ Stop **ticker** actor and target **stopped** state.`,
     },
     guards: {
       "canSeek?": ({ context, event }) => {
-        assertEvent(event, "SEEK");
+        assertEvent(event, "SONG.SEEK");
         return event.direction === "forward"
           ? t.seconds < context.sourceSong!.endPosition - event.amount
           : t.seconds > event.amount;

@@ -27,11 +27,13 @@ function Fader({ children }: Props) {
           onChange={(e) => {
             const value = parseFloat(e.currentTarget.value);
             send({
-              type: "CHANGE_VOLUME",
+              type: "SONG.CHANGE_VOLUME",
               volume: value,
             });
           }}
-          onDoubleClick={() => send({ type: "CHANGE_VOLUME", volume: -32 })}
+          onDoubleClick={() =>
+            send({ type: "SONG.CHANGE_VOLUME", volume: -32 })
+          }
         />
       </div>
     </>
