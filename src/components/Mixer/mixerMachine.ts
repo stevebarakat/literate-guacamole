@@ -5,6 +5,7 @@ import {
   Destination,
   Meter,
   Player,
+  getContext,
   loaded,
 } from "tone";
 import {
@@ -18,11 +19,13 @@ import {
 import { scale, logarithmically, formatMilliseconds } from "@/utils";
 import { InitialContext } from "@/App";
 import { createActorContext } from "@xstate/react";
+import { roxanne } from "@/assets/songs/roxanne";
 type Input = { input: InitialContext };
+
+const audioContext = getContext();
 
 export const mixerMachine = createMachine(
   {
-    /** @xstate-layout N4IgpgJg5mDOIC5QFsCWAPMAnAsgQwGMALVAOzADoAjAV1QBsIyoBiCAe3IrIDd2BrSmky5CJLrQZNSUBL3YE8AF1ScA2gAYAupq2JQAB3axUKzvpDpEAWgDMAdlsVbARgCcAFg0uAHB89ugfYANCAAnoiubhRu9gBs9hoATD4ArD6BLvEAvtmhwtj4xGSUkozMLNhY7FgUBvTKAGY1yBQFosUSdOUycqR8imakuroWRiZDFlYISS5JFPYeqW6p9hmpHilJoREILhqpFB4+CamuPi62Hh5xSbn5GIViJRRYYHgQYRSwSuwGBpAWABlADyADkAOIUIEAFQAggAlGGjJAgcamVSkKaIFyXCgJNxJDSeJJuWxuA4uHaIHy2OJHQm2JK2NIaOI3Hz3EDtIriShvD5fH54LBKQGgyEUAAKcIAqkCAKIowzGDHmVHTFL41LuJk+C6XexU8I43HRa643zeLypW1cnnPLgCz7fJQisUQYHgqEKsEAEQVfuVaNVkw1iA2TjitlSpMuvg87h81IQZJcFB8RNmtg0N1usftjw6fNe70+XslCIViuR2jGocx2IQdns8xZtw0TMSq3JcRT8XTraWHeOyzccULIl5L2dYQrUMVCoA0sH0WHQNM7McKPtfI4TvEDisUy4lhojklmb4XHF9rbUpOnp1+WW5xKoQBhAAScMhCoA+gAaiCAAyso4EqdaomujbhggXj0rMpJJB4LIkkkIQmnsZ4XpethdgcpIeI+xYlCwABCsoAJIgX6FA4FRAAaCoIquDbqhukSpPSt5xMscRpHSVzbFh1g3ue-izG47hEnEyQYbkeQgKQ7AQHAFgOs+9YTLBnHNhyzgnESBE9uOKbWKSPgZoSWT6p4VwJiR05cCpSgAASztpapYnBLbpucFIUrMiQOOZLgbPiNn2PYgSXisaROY6lBVDUXnrpYOJ+Du5I+Eaxy5blx5YUk3EUCV7itrE0bMvYiXPtQ3TSFAaW6RlzZ0lZBxsjq9i2p2twnue6waCNOaeJ2hF1SWnnQexPl6dYmznu2xkYQcjhmVhOrzHM1zsp2GSeFNM6vq6fwAhALUcW1Fl4ksni5VcyyxhsKaxMtVw3DerbBXcSmadNp3CqKkBXfNbX4YOyTErizJEtFb1uFZ-iZghMV5rYinZEAA */
     id: "mixerMachine",
 
     context: ({ input: initialContext }: Input) => ({
@@ -41,24 +44,24 @@ export const mixerMachine = createMachine(
         description: `Dispose the existing tracks and display an **error** message prompting user to choose a different song.`,
       },
 
-      building: {
-        entry: ["buildMixer"],
-
+      loading: {
         invoke: {
           src: "loader",
           onDone: [
             {
-              target: "ready",
-              description: `Mixer successfully finished **building** and **ready** to use.`,
+              target: "building",
+              actions: assign(({ event }) => ({ audioBuffers: event.output })),
             },
           ],
           onError: {
             target: "error",
-            description: `An **error** occurred loading one of the audio files (e.g. bad url).`,
           },
         },
+      },
 
-        description: `Get **ready**, load and connect audio buffers and nodes.`,
+      building: {
+        entry: "buildMixer",
+        onDone: { target: "ready" },
       },
 
       ready: {
@@ -154,9 +157,7 @@ export const mixerMachine = createMachine(
               "SONG.END": {
                 actions: "stopClock",
 
-                description: `The song has reached its end position.
-
-Stop **ticker** actor and target **stopped** state.`,
+                description: `The song has reached its end position. Stop **ticker** actor and target **stopped** state.`,
               },
             },
 
@@ -171,6 +172,7 @@ Stop **ticker** actor and target **stopped** state.`,
     types: {
       context: {} as InitialContext,
       events: {} as
+        | { type: "LOAD.AUDIO"; song: SourceSong }
         | { type: "BUILD.MIXER"; song: SourceSong }
         | { type: "SONG.START" }
         | { type: "SONG.PAUSE" }
@@ -183,21 +185,29 @@ Stop **ticker** actor and target **stopped** state.`,
     description: `A multitrack audio mixer with effects.`,
 
     on: {
+      "LOAD.AUDIO": {
+        target: ".loading",
+        actions: "setSourceSong",
+      },
       "BUILD.MIXER": {
         target: ".building",
-        description: `Initializes audio context and targets **building** state. Triggered by user selecting a song to mix. IMPORTANT: Browsers will not play audio until a user initializes the audio context by clicking on something.`,
       },
     },
   },
   {
     actions: {
-      buildMixer: assign(({ event }) => {
-        console.log("message");
-        assertEvent(event, "BUILD.MIXER");
+      setSourceSong: assign(({ event }) => {
+        assertEvent(event, "LOAD.AUDIO");
+        return { sourceSong: event.song };
+      }),
+      buildMixer: assign(({ context, event }) => {
+        console.log("EVENT!", event);
+        console.log("CONTEXT!!", context);
+        // assertEvent(event, "BUILD.MIXER");
         let players: Player[] = [];
         let meters: Meter[] = [];
         let channels: Channel[] = [];
-        event.song.tracks.forEach((track, i) => {
+        context.sourceSong?.tracks.forEach((track, i) => {
           meters = [...meters, new Meter()];
           channels = [...channels, new Channel().toDestination()];
           players = [
@@ -205,13 +215,13 @@ Stop **ticker** actor and target **stopped** state.`,
             new Player(track.path)
               .chain(channels[i], meters[i])
               .sync()
-              .start(0, event.song.startPosition),
+              .start(0, context.sourceSong?.startPosition),
           ];
         });
         const meter = new Meter();
         Destination.connect(meter);
         return {
-          sourceSong: event.song,
+          sourceSong: context.sourceSong,
           meter,
           channels,
           players,
@@ -252,7 +262,7 @@ Stop **ticker** actor and target **stopped** state.`,
       }),
     },
     actors: {
-      loader: fromPromise(async () => await loaded()),
+      loader: fromPromise(() => createAudioBuffers(roxanne.tracks)),
       ticker: fromObservable(() => interval(0, animationFrameScheduler)),
     },
     guards: {
@@ -268,5 +278,34 @@ Stop **ticker** actor and target **stopped** state.`,
     },
   }
 );
+
+async function fetchAndDecodeAudio(path: string) {
+  const response = await fetch(path);
+  return audioContext?.decodeAudioData(await response.arrayBuffer());
+}
+
+async function createAudioBuffers(tracks: SourceTrack[]) {
+  if (!tracks) return;
+  let loaded = 0;
+  let audioBuffers: (AudioBuffer | undefined)[] = [];
+  for (const track of tracks) {
+    try {
+      const buffer: AudioBuffer | undefined = await fetchAndDecodeAudio(
+        track.path
+      );
+      audioBuffers = [buffer, ...audioBuffers];
+    } catch (err) {
+      if (err instanceof Error)
+        console.error(`Error: ${err.message} for file at: ${track.path} `);
+    } finally {
+      const files = tracks.length * 0.01;
+      loaded = loaded + 1 / files;
+      console.log("loaded", loaded);
+      console.log("audioBuffers", audioBuffers);
+    }
+  }
+  loaded = 100;
+  return audioBuffers;
+}
 
 export const MixerContext = createActorContext(mixerMachine);

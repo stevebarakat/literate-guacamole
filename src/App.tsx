@@ -14,6 +14,7 @@ const sourceSong = undefined;
 const channels = [undefined];
 const meters = [undefined];
 const players = [undefined];
+const audioBuffers = [undefined];
 
 export type InitialContext = {
   currentTime: string;
@@ -24,6 +25,7 @@ export type InitialContext = {
   channels: (Channel | undefined)[];
   meters: (Meter | undefined)[];
   players: (Player | undefined)[];
+  audioBuffers: (AudioBuffer | undefined)[];
 };
 
 const initialContext: InitialContext = {
@@ -35,6 +37,7 @@ const initialContext: InitialContext = {
   meters,
   players,
   channels,
+  audioBuffers,
 };
 
 function App() {
