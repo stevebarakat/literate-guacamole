@@ -19,7 +19,6 @@ import {
 import { scale, logarithmically, formatMilliseconds } from "@/utils";
 import { InitialContext } from "@/App";
 import { createActorContext } from "@xstate/react";
-import { roxanne } from "@/assets/songs/roxanne";
 type Input = { input: InitialContext };
 
 const audioContext = getContext();
@@ -48,21 +47,14 @@ export const mixerMachine = createMachine(
         invoke: {
           src: "loader",
           input: ({ context }) => ({ sourceSong: context.sourceSong }),
-          onDone: [
-            {
-              target: "ready",
-              actions: ["getAudioBuffers", "buildMixer"],
-            },
-          ],
+          onDone: {
+            target: "ready",
+            actions: ["setAudioBuffers", "buildMixer"],
+          },
           onError: {
             target: "error",
           },
         },
-      },
-
-      building: {
-        entry: "buildMixer",
-        target: "ready",
       },
 
       ready: {
@@ -173,7 +165,8 @@ export const mixerMachine = createMachine(
     types: {
       context: {} as InitialContext,
       events: {} as
-        | { type: "LOAD.AUDIO"; song: SourceSong }
+        | { type: "LOAD.AUDIO"; song: SourceSong; output: AudioBuffer[] }
+        | { type: "onDone"; song: SourceSong; output: AudioBuffer[] }
         | { type: "BUILD.MIXER"; song: SourceSong }
         | { type: "SONG.START" }
         | { type: "SONG.PAUSE" }
@@ -190,9 +183,6 @@ export const mixerMachine = createMachine(
         target: ".loading",
         actions: "setSourceSong",
       },
-      "BUILD.MIXER": {
-        target: ".building",
-      },
     },
   },
   {
@@ -201,11 +191,11 @@ export const mixerMachine = createMachine(
         assertEvent(event, "LOAD.AUDIO");
         return { sourceSong: event.song };
       }),
-      getAudioBuffers: assign(({ event }) => ({ audioBuffers: event.output })),
-      buildMixer: assign(({ context, event }) => {
-        console.log("EVENT!", event);
-        console.log("CONTEXT!!", context);
-        // assertEvent(event, "BUILD.MIXER");
+      setAudioBuffers: assign(({ event }) => {
+        assertEvent(event, "onDone");
+        return { audioBuffers: event.output };
+      }),
+      buildMixer: assign(({ context }) => {
         let players: Player[] = [];
         let meters: Meter[] = [];
         let channels: Channel[] = [];
@@ -285,12 +275,18 @@ export const mixerMachine = createMachine(
 
 async function fetchAndDecodeAudio(path: string) {
   const response = await fetch(path);
+  const progressRef = document.getElementById("progress") as HTMLInputElement;
+  const outputRef = document.getElementById("output") as HTMLInputElement;
+  if (progressRef) {
+    progressRef.value = loaded.toString();
+    outputRef.innerHTML = loaded.toString();
+  }
   return audioContext?.decodeAudioData(await response.arrayBuffer());
 }
 
+let loaded = 0;
 async function createAudioBuffers(tracks: SourceTrack[]) {
   if (!tracks) return;
-  let loaded = 0;
   let audioBuffers: (AudioBuffer | undefined)[] = [];
   for (const track of tracks) {
     try {
@@ -304,11 +300,17 @@ async function createAudioBuffers(tracks: SourceTrack[]) {
     } finally {
       const files = tracks.length * 0.01;
       loaded = loaded + 1 / files;
-      console.log("loaded", loaded);
-      console.log("audioBuffers", audioBuffers);
+      const progressRef = document.getElementById(
+        "progress"
+      ) as HTMLInputElement;
+      const outputRef = document.getElementById("output") as HTMLInputElement;
+      if (progressRef) {
+        progressRef.value = loaded.toString();
+        outputRef.innerHTML = loaded.toString();
+      }
     }
   }
-  loaded = 100;
+  loaded = 0;
   return audioBuffers;
 }
 

@@ -14,16 +14,8 @@ const Loader = () => {
       <span>
         Loading: {song?.artist} - {song?.title}
       </span>
-      <div className="spinner">
-        <div />
-        <div />
-        <div />
-        <div />
-        <div />
-        <div />
-        <div />
-        <div />
-      </div>
+      <progress id="progress" max={100} value={0} />
+      <output id="output"></output>
     </div>
   );
 };
