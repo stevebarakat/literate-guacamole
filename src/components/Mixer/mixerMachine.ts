@@ -47,6 +47,7 @@ export const mixerMachine = createMachine(
       loading: {
         invoke: {
           src: "loader",
+          input: ({ context }) => ({ sourceSong: context.sourceSong }),
           onDone: [
             {
               target: "building",
@@ -262,7 +263,9 @@ export const mixerMachine = createMachine(
       }),
     },
     actors: {
-      loader: fromPromise(() => createAudioBuffers(roxanne.tracks)),
+      loader: fromPromise(({ input }) =>
+        createAudioBuffers(input.sourceSong.tracks)
+      ),
       ticker: fromObservable(() => interval(0, animationFrameScheduler)),
     },
     guards: {
