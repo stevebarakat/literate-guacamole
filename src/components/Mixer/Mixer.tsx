@@ -11,8 +11,11 @@ export default function Mixer() {
   const { channels, meters } = MixerContext.useSelector(
     (state) => state.context
   );
+  const state = MixerContext.useSelector((s) => s);
 
-  const isLoaded = MixerContext.useSelector((state) => state.matches("loaded"));
+  console.log("state.value", state.value);
+
+  const isLoaded = MixerContext.useSelector((state) => state.matches("ready"));
   if (!tracks) return null;
   if (!isLoaded) return null;
 
