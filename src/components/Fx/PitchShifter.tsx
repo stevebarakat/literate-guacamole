@@ -23,7 +23,7 @@ function PitchShifter({ pitchShift }: Props) {
           id="mix"
           onChange={(e) =>
             send({
-              type: "PITCH.CHANGE_MIX",
+              type: "CHANGE_MIX",
               mix: parseFloat(e.currentTarget.value),
               pitchShift,
             })
@@ -41,7 +41,7 @@ function PitchShifter({ pitchShift }: Props) {
           id="pitch"
           onChange={(e) =>
             send({
-              type: "PITCH.CHANGE_PITCH",
+              type: "CHANGE_PITCH",
               pitch: parseFloat(e.currentTarget.value),
               pitchShift,
             })
