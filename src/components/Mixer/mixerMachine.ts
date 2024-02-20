@@ -6,7 +6,6 @@ import {
   Meter,
   Player,
   getContext,
-  loaded,
 } from "tone";
 import {
   assertEvent,
@@ -34,26 +33,29 @@ export const mixerMachine = createMachine(
     initial: "not ready",
 
     states: {
-      "not ready": {
-        description: `The initial state of the app. Nothing happens in this state other than waiting for mixer to begin **building**.`,
-      },
+      "not ready": {},
 
       error: {
         entry: "disposeTracks",
-        description: `Dispose the existing tracks and display an **error** message prompting user to choose a different song.`,
       },
 
-      loading: {
+      building: {
         invoke: {
-          src: "loader",
+          src: "builder",
           input: ({ context }) => ({ sourceSong: context.sourceSong }),
           onDone: {
-            target: "ready",
+            target: "100%",
             actions: ["setAudioBuffers", "buildMixer"],
           },
           onError: {
             target: "error",
           },
+        },
+      },
+
+      "100%": {
+        after: {
+          1000: { target: "ready" },
         },
       },
 
@@ -66,8 +68,6 @@ export const mixerMachine = createMachine(
             actions: {
               type: "reset",
             },
-
-            description: `Stop playing and return playhead to beginning of song.`,
           },
           "SONG.SEEK": {
             guard: "canSeek?",
@@ -75,15 +75,11 @@ export const mixerMachine = createMachine(
             actions: {
               type: "seek",
             },
-
-            description: `Move the playhead position forward or backward (the given amount of seconds).`,
           },
           "SONG.CHANGE_VOLUME": {
             actions: {
               type: "setMainVolume",
             },
-
-            description: `Change the playback volume (the given amount of dB).`,
           },
         },
 
@@ -128,12 +124,8 @@ export const mixerMachine = createMachine(
                 actions: {
                   type: "play",
                 },
-
-                description: `Start playing song.`,
               },
             },
-
-            description: `Song is not playing.`,
           },
           started: {
             on: {
@@ -145,28 +137,19 @@ export const mixerMachine = createMachine(
                 },
 
                 guard: "canStop?",
-                description: `Stop playing song.`,
               },
               "SONG.END": {
                 actions: "stopClock",
-
-                description: `The song has reached its end position. Stop **ticker** actor and target **stopped** state.`,
               },
             },
-
-            description: `Song is playing.`,
           },
         },
-
-        description: `Mixer displaying in UI, begins in **stopped** state, **ready** to be **started**.`,
       },
     },
 
     types: {
       context: {} as InitialContext,
       events: {} as
-        | { type: "LOAD.AUDIO"; song: SourceSong; output: AudioBuffer[] }
-        | { type: "onDone"; song: SourceSong; output: AudioBuffer[] }
         | { type: "BUILD.MIXER"; song: SourceSong }
         | { type: "SONG.START" }
         | { type: "SONG.PAUSE" }
@@ -176,11 +159,9 @@ export const mixerMachine = createMachine(
         | { type: "SONG.END" },
     },
 
-    description: `A multitrack audio mixer with effects.`,
-
     on: {
-      "LOAD.AUDIO": {
-        target: ".loading",
+      "BUILD.MIXER": {
+        target: ".building",
         actions: "setSourceSong",
       },
     },
@@ -188,23 +169,23 @@ export const mixerMachine = createMachine(
   {
     actions: {
       setSourceSong: assign(({ event }) => {
-        assertEvent(event, "LOAD.AUDIO");
+        assertEvent(event, "BUILD.MIXER");
         return { sourceSong: event.song };
       }),
-      setAudioBuffers: assign(({ event }) => {
-        assertEvent(event, "onDone");
-        return { audioBuffers: event.output };
-      }),
+      setAudioBuffers: assign(({ event }) => ({
+        audioBuffers: event.output,
+      })),
       buildMixer: assign(({ context }) => {
         let players: Player[] = [];
         let meters: Meter[] = [];
         let channels: Channel[] = [];
-        context.sourceSong?.tracks.forEach((track, i) => {
+        console.log("context.audioBuffers", context.audioBuffers);
+        context.audioBuffers.forEach((buffer, i) => {
           meters = [...meters, new Meter()];
           channels = [...channels, new Channel().toDestination()];
           players = [
             ...players,
-            new Player(track.path)
+            new Player(buffer)
               .chain(channels[i], meters[i])
               .sync()
               .start(0, context.sourceSong?.startPosition),
@@ -254,7 +235,7 @@ export const mixerMachine = createMachine(
       }),
     },
     actors: {
-      loader: fromPromise(({ input }) =>
+      builder: fromPromise(({ input }) =>
         createAudioBuffers(input.sourceSong.tracks)
       ),
       ticker: fromObservable(() => interval(0, animationFrameScheduler)),
@@ -273,44 +254,34 @@ export const mixerMachine = createMachine(
   }
 );
 
-async function fetchAndDecodeAudio(path: string) {
+async function fetchAndDecodeAudio(path: string, progress: number) {
   const response = await fetch(path);
-  const progressRef = document.getElementById("progress") as HTMLInputElement;
-  const outputRef = document.getElementById("output") as HTMLInputElement;
-  if (progressRef) {
-    progressRef.value = loaded.toString();
-    outputRef.innerHTML = loaded.toString();
-  }
+  const progRef = document.getElementById("progress") as HTMLInputElement;
+  if (progRef) progRef.value = progress.toString();
   return audioContext?.decodeAudioData(await response.arrayBuffer());
 }
 
-let loaded = 0;
 async function createAudioBuffers(tracks: SourceTrack[]) {
   if (!tracks) return;
+  let progress = 0;
   let audioBuffers: (AudioBuffer | undefined)[] = [];
   for (const track of tracks) {
     try {
       const buffer: AudioBuffer | undefined = await fetchAndDecodeAudio(
-        track.path
+        track.path,
+        progress
       );
       audioBuffers = [buffer, ...audioBuffers];
     } catch (err) {
-      if (err instanceof Error)
-        console.error(`Error: ${err.message} for file at: ${track.path} `);
+      throw Error();
     } finally {
       const files = tracks.length * 0.01;
-      loaded = loaded + 1 / files;
-      const progressRef = document.getElementById(
-        "progress"
-      ) as HTMLInputElement;
-      const outputRef = document.getElementById("output") as HTMLInputElement;
-      if (progressRef) {
-        progressRef.value = loaded.toString();
-        outputRef.innerHTML = loaded.toString();
-      }
+      progress = progress + 1 / files;
+      const progRef = document.getElementById("progress") as HTMLInputElement;
+      if (progRef) progRef.value = progress.toString();
     }
   }
-  loaded = 0;
+  progress = 0;
   return audioBuffers;
 }
 

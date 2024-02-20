@@ -2,10 +2,10 @@ import { MixerContext } from "@/components/Mixer/mixerMachine";
 
 const Loader = () => {
   const state = MixerContext.useSelector((state) => state);
-  const isLoading = MixerContext.useSelector((state) =>
-    state.matches("loading")
+  const isBuilding = MixerContext.useSelector(
+    (state) => state.matches("building") || state.matches("100%")
   );
-  if (!isLoading) return null;
+  if (!isBuilding) return null;
 
   const song = state.context.sourceSong;
 

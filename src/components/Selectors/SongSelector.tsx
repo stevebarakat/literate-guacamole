@@ -5,13 +5,13 @@ export function SongSelector() {
   const slug = MixerContext.useSelector(
     (state) => state.context.sourceSong?.slug || ""
   );
-  const disabled = MixerContext.useSelector((s) => s.matches("loading"));
+  const disabled = MixerContext.useSelector((s) => s.matches("building"));
   const { send } = MixerContext.useActorRef();
 
   function handleSongSelect(event: React.ChangeEvent<HTMLSelectElement>) {
     const song = songs.find((song) => song.slug === event.target.value);
     if (song) {
-      send({ type: "LOAD.AUDIO", song });
+      send({ type: "BUILD.MIXER", song });
     }
   }
 
