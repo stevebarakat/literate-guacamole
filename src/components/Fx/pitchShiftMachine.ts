@@ -12,6 +12,7 @@ export const pitchShiftMachine = setup({
       pitch: number;
       feedback: number;
       delayTime: number;
+      data: Map<number, { id: number; value: number; time: number }>;
     },
     events: {} as
       | { type: "READ" }
@@ -47,7 +48,7 @@ export const pitchShiftMachine = setup({
     pitch: 0,
     feedback: 5,
     delayTime: 5,
-    data: new Map<number, { id: number; value: number; time: number }>(),
+    data: new Map(),
   },
   id: "pitchShiftMachine",
   initial: "off",
