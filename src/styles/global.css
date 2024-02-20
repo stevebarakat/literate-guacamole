@@ -55,7 +55,7 @@ body {
   font-family: "Bricolage Grotesque", sans-serif;
   font-family: system-ui, Helvetica, Arial, sans-serif;
   color: var(--white);
-  background-color: #242424;
+  background-color: hsl(270 50% 8%);
 }
 
 #root {
@@ -163,41 +163,4 @@ select[name="song-select"] {
   box-shadow: var(--shadow-elevation-medium);
   border: 1px solid hsl(0, 0%, 35%);
   border-radius: 4px;
-}
-
-progress:after {
-  content: attr(value) "%";
-  position: relative;
-  top: -1.15em;
-}
-
-progress {
-  width: 400px;
-  border: 0; /* for IE */
-  height: 60px;
-  background-color: white;
-  border: 1px solid blue;
-  overflow: hidden;
-}
-
-/* necessary to style the progress bar background */
-::-webkit-progress-bar {
-  background-color: white;
-}
-
-/** ---------
-    ANIMATED
-*/
-progress::-webkit-progress-value {
-  transition: width 1s;
-  background-color: blue;
-}
-progress::-moz-progress-bar {
-  transition: padding-bottom 1s;
-  padding-left: 60px;
-  padding-bottom: var(--value);
-  background-color: blue;
-  height: 0;
-  transform-origin: 0 0;
-  transform: rotate(-90deg) translateX(-60px);
 }

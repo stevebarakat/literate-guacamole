@@ -15,7 +15,6 @@ const Loader = () => {
         Loading: {song?.artist} - {song?.title}
       </span>
       <progress id="progress" max={100} value={0} />
-      <output id="output"></output>
     </div>
   );
 };

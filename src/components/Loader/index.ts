@@ -1,4 +1,4 @@
 import Loader from "./Loader";
-import "./styles.css";
+import "./Loader.css";
 
 export { Loader };

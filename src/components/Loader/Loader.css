@@ -1,0 +1,39 @@
+.loader {
+  display: grid;
+  place-items: center;
+  gap: 24px;
+  margin-bottom: 8px;
+}
+.loader > span {
+  font-size: 2.25rem;
+}
+
+/** ---------
+    PROGRESS
+*/
+
+progress {
+  width: 80%;
+  height: 40px;
+  border: 2px solid rebeccapurple;
+  overflow: hidden;
+  border-radius: 8px;
+  color: var(--off-black);
+}
+
+progress:after {
+  content: attr(value) "%";
+  position: relative;
+  bottom: 1.75rem;
+}
+
+/* necessary to style the progress bar background */
+::-webkit-progress-bar {
+  background-color: white;
+  background-color: #dedede;
+}
+
+progress::-webkit-progress-value {
+  transition: width 1s ease-out;
+  background-color: hotpink;
+}

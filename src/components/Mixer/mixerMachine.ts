@@ -1,12 +1,5 @@
 import { animationFrameScheduler, interval } from "rxjs";
-import {
-  Transport as t,
-  Channel,
-  Destination,
-  Meter,
-  Player,
-  getContext,
-} from "tone";
+import { Transport as t, Channel, Destination, Meter, Player } from "tone";
 import {
   assertEvent,
   assign,
@@ -19,8 +12,6 @@ import { scale, logarithmically, formatMilliseconds } from "@/utils";
 import { InitialContext } from "@/App";
 import { createActorContext } from "@xstate/react";
 type Input = { input: InitialContext };
-
-const audioContext = getContext();
 
 export const mixerMachine = createMachine(
   {
@@ -40,6 +31,7 @@ export const mixerMachine = createMachine(
       },
 
       building: {
+        entry: "disposeTracks",
         invoke: {
           src: "builder",
           input: ({ context }) => ({ sourceSong: context.sourceSong }),
@@ -49,6 +41,9 @@ export const mixerMachine = createMachine(
           },
           onError: {
             target: "error",
+            actions: ({ event }) => {
+              console.error(event.error);
+            },
           },
         },
       },
@@ -173,7 +168,7 @@ export const mixerMachine = createMachine(
         return { sourceSong: event.song };
       }),
       setAudioBuffers: assign(({ event }) => ({
-        audioBuffers: event.output,
+        audioBuffers: event.output.reverse(),
       })),
       buildMixer: assign(({ context }) => {
         let players: Player[] = [];
@@ -255,16 +250,18 @@ export const mixerMachine = createMachine(
 );
 
 async function fetchAndDecodeAudio(path: string, progress: number) {
-  const response = await fetch(path);
   const progRef = document.getElementById("progress") as HTMLInputElement;
-  if (progRef) progRef.value = progress.toString();
-  return audioContext?.decodeAudioData(await response.arrayBuffer());
+  if (progRef && progress === 0) progRef.value = progress.toString();
+  const response = await fetch(path);
+  const audioContext = new AudioContext();
+  return audioContext.decodeAudioData(await response.arrayBuffer());
 }
 
 async function createAudioBuffers(tracks: SourceTrack[]) {
   if (!tracks) return;
   let progress = 0;
   let audioBuffers: (AudioBuffer | undefined)[] = [];
+
   for (const track of tracks) {
     try {
       const buffer: AudioBuffer | undefined = await fetchAndDecodeAudio(
@@ -273,12 +270,12 @@ async function createAudioBuffers(tracks: SourceTrack[]) {
       );
       audioBuffers = [buffer, ...audioBuffers];
     } catch (err) {
-      throw Error();
+      if (err instanceof Error) throw new Error(err.message);
     } finally {
       const files = tracks.length * 0.01;
       progress = progress + 1 / files;
       const progRef = document.getElementById("progress") as HTMLInputElement;
-      if (progRef) progRef.value = progress.toString();
+      if (progRef) progRef.value = Math.ceil(progress).toString();
     }
   }
   progress = 0;
