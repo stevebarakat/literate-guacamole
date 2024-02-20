@@ -15,7 +15,7 @@
 progress {
   width: 80%;
   height: 40px;
-  border: 2px solid rebeccapurple;
+  border: 2px solid var(--secondary-color);
   overflow: hidden;
   border-radius: 8px;
   color: var(--off-black);
@@ -30,10 +30,10 @@ progress:after {
 /* necessary to style the progress bar background */
 ::-webkit-progress-bar {
   background-color: white;
-  background-color: #dedede;
+  background-color: var(--white);
 }
 
 progress::-webkit-progress-value {
   transition: width 1s ease-out;
-  background-color: hotpink;
+  background-color: var(--primary-color);
 }

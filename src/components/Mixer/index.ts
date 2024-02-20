@@ -1,4 +1,4 @@
 import Mixer from "./Mixer";
-import "./mixer.css";
+import "./Mixer.css";
 
 export default Mixer;

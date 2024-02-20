@@ -11,6 +11,7 @@
   font-family: inherit;
   cursor: pointer;
   transition: all 0.25s;
+  border: 1px solid var(--secondary-color);
 }
 .transport-button:hover {
   border: 1px solid var(--primary-color);
