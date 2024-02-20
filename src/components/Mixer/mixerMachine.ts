@@ -174,7 +174,6 @@ export const mixerMachine = createMachine(
         let players: Player[] = [];
         let meters: Meter[] = [];
         let channels: Channel[] = [];
-        console.log("context.audioBuffers", context.audioBuffers);
         context.audioBuffers.forEach((buffer, i) => {
           meters = [...meters, new Meter()];
           channels = [...channels, new Channel().toDestination()];

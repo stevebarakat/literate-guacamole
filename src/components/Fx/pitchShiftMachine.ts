@@ -1,63 +1,93 @@
 import { createActorContext } from "@xstate/react";
 import { PitchShift } from "tone";
-import { createMachine, assign, assertEvent } from "xstate";
+import { setup, assign, assertEvent } from "xstate";
 
-export const pitchShiftMachine = createMachine(
-  {
-    /** @xstate-layout N4IgpgJg5mDOIC5QAcCWAXAxgCwMrdQDN0BZAQx1QDswA6AJzDIgE8BiABQEkAVAYQAStQQEEAcgHEAogH0SXABoBtAAwBdRCgD2sDKi1VNIAB6IAjAA4ArLQBsAdkv2rAGhAtEAJitmAvr7c0LDwCYnJKGgYmVk5eQWEBcWkZbn4BVQ0kEGQdPQMjUwRLGwcnV3dEABZPAGZ-AJAqLQg4IyCcfCJSCgIaNtz0fUMswoBaSos3DwRR2oBOf0CMDtDuiLpGZmntXUH8kcRbFSmvCxraT1sr65urq3rfIA */
-    id: "pitchShiftMachine",
-    context: {
-      mix: 0.5,
-      pitch: 0,
-      feedback: 5,
-      delayTime: 5,
+export const pitchShiftMachine = setup({
+  types: {
+    context: {} as {
+      mix: number;
+      pitch: number;
+      feedback: number;
+      delayTime: number;
     },
-    initial: "ready",
-    states: {
-      ready: {
-        on: {
-          "PITCH.CHANGE_MIX": {
-            actions: {
-              type: "setMix",
-            },
-          },
-          "PITCH.CHANGE_PITCH": {
-            actions: {
-              type: "setPitch",
-            },
-          },
+    events: {} as
+      | { type: "READ" }
+      | { type: "WRITE" }
+      | { type: "BYPASS" }
+      | { type: "CHANGE_MIX"; mix: number; pitchShift: PitchShift }
+      | {
+          type: "CHANGE_PITCH";
+          pitch: number;
+          pitchShift: PitchShift;
+        },
+  },
+  actions: {
+    setMix: assign(({ event }) => {
+      assertEvent(event, "CHANGE_MIX");
+      const mix = event.mix;
+      event.pitchShift.wet.value = mix;
+      return { mix };
+    }),
+    setPitch: assign(({ event }) => {
+      assertEvent(event, "CHANGE_PITCH");
+      const pitch = event.pitch;
+      event.pitchShift.pitch = pitch;
+      return { pitch };
+    }),
+  },
+}).createMachine({
+  context: {
+    mix: 0.5,
+    pitch: 0,
+    feedback: 5,
+    delayTime: 5,
+  },
+  id: "pitchShiftMachine",
+  initial: "off",
+  on: {
+    CHANGE_MIX: {
+      actions: {
+        type: "setMix",
+      },
+    },
+    CHANGE_PITCH: {
+      actions: {
+        type: "setPitch",
+      },
+    },
+  },
+  states: {
+    off: {
+      on: {
+        READ: {
+          target: "reading",
+        },
+        WRITE: {
+          target: "writing",
         },
       },
     },
-    types: {
-      events: {} as
-        | { type: "PITCH.CHANGE_MIX"; mix: number; pitchShift: PitchShift }
-        | {
-            type: "PITCH.CHANGE_PITCH";
-            pitch: number;
-            pitchShift: PitchShift;
-          },
+    reading: {
+      on: {
+        WRITE: {
+          target: "writing",
+        },
+        BYPASS: {
+          target: "off",
+        },
+      },
+    },
+    writing: {
+      on: {
+        READ: {
+          target: "reading",
+        },
+        BYPASS: {
+          target: "off",
+        },
+      },
     },
   },
-  {
-    actions: {
-      setMix: assign(({ event }) => {
-        assertEvent(event, "PITCH.CHANGE_MIX");
-        const mix = event.mix;
-        event.pitchShift.wet.value = mix;
-        return { mix };
-      }),
-      setPitch: assign(({ event }) => {
-        assertEvent(event, "PITCH.CHANGE_PITCH");
-        const pitch = event.pitch;
-        event.pitchShift.pitch = pitch;
-        return { pitch };
-      }),
-    },
-    actors: {},
-    guards: {},
-    delays: {},
-  }
-);
+});
 
 export const PitchContext = createActorContext(pitchShiftMachine);
