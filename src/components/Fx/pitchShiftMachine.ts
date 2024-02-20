@@ -1,7 +1,13 @@
 import { createActorContext } from "@xstate/react";
 import { PitchShift } from "tone";
-import { localStorageSet, roundFourth, localStorageGet } from "@/utils";
-import { animationFrameScheduler, interval } from "rxjs";
+import {
+  localStorageSet,
+  roundFourth,
+  localStorageGet,
+  mapToObject,
+  objectToMap,
+} from "@/utils";
+import { animationFrameScheduler, from, interval } from "rxjs";
 import { Transport as t } from "tone";
 import { assign, assertEvent, fromObservable, setup } from "xstate";
 
@@ -10,8 +16,6 @@ export const pitchShiftMachine = setup({
     context: {} as {
       mix: number;
       pitch: number;
-      feedback: number;
-      delayTime: number;
       data: Map<number, { id: number; value: number; time: number }>;
     },
     events: {} as
@@ -38,6 +42,22 @@ export const pitchShiftMachine = setup({
       event.pitchShift.pitch = pitch;
       return { pitch };
     }),
+    readData: ({ context, event }) => {
+      assertEvent(event, "READ");
+      console.log("context", context);
+      console.log("event", event);
+      const setParam = (data: { time: number; value: number }) => {
+        t.schedule(() => {
+          console.log("data.value", data.value);
+          context.pitch = data.value;
+        }, data.time);
+      };
+      const pitchData = localStorageGet("pitchData");
+      const pitchMap = objectToMap(pitchData);
+      for (const value of pitchMap) {
+        setParam(value[1]);
+      }
+    },
   },
   actors: {
     WRITER: fromObservable(() => interval(0, animationFrameScheduler)),
@@ -46,8 +66,6 @@ export const pitchShiftMachine = setup({
   context: {
     mix: 0.5,
     pitch: 0,
-    feedback: 5,
-    delayTime: 5,
     data: new Map(),
   },
   id: "pitchShiftMachine",
@@ -76,6 +94,7 @@ export const pitchShiftMachine = setup({
       },
     },
     reading: {
+      entry: "readData",
       on: {
         WRITE: {
           target: "writing",
@@ -101,8 +120,6 @@ export const pitchShiftMachine = setup({
                     time,
                     value: context.pitch,
                   });
-                  const mapToObject = (map: typeof data) =>
-                    Object.fromEntries(map.entries());
                   const newData = mapToObject(data);
                   localStorageSet("pitchData", newData);
                 },

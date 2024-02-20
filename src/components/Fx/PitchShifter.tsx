@@ -19,7 +19,7 @@ function PitchShifter({ pitchShift, trackId }: Props) {
             case "off":
               return send({ type: "BYPASS" });
             case "read":
-              return send({ type: "READ" });
+              return send({ type: "READ", id: trackId });
             case "write":
               return send({ type: "WRITE", id: trackId });
             default:

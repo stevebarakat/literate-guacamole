@@ -52,3 +52,13 @@ export function localStorageGet(item: string) {
 export function array(length: number, filler?: unknown) {
   return Array(length).fill(filler || null);
 }
+
+export function mapToObject(
+  map: Map<number, { id: number; value: number; time: number }>
+) {
+  return Object.fromEntries(map.entries());
+}
+
+export function objectToMap(obj: object) {
+  return new Map(Object.entries(obj));
+}
