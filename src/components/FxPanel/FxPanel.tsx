@@ -49,6 +49,7 @@ function FxPanel({ trackId }: { trackId: number }) {
                 <PitchContext.Provider key="pitchShift">
                   <PitchShifter
                     pitchShift={pitchIndex !== -1 && fx[pitchIndex]}
+                    trackId={trackId}
                   />
                 </PitchContext.Provider>
               </Rnd>

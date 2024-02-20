@@ -13,7 +13,7 @@ export function formatMilliseconds(seconds: number): string {
   return str;
 }
 
-// Convert a value from one scale to another
+// convert a value from one scale to another
 // e.g. scale(-96, -192, 0, 0, 100) to convert
 // -96 from dB (-192 - 0) to percentage (0 - 100)
 
@@ -27,16 +27,28 @@ export const convert = function (
   return ((val - from1) * (to2 - to1)) / (from2 - from1) + to1;
 };
 
-// Convert decibels to a percentage
+// convert decibels to a percentage
 export const scale = function (dB: number) {
   return convert(dB, 0, 1, -100, 0);
 };
 
-// Make scale logarithmic
+// make scale logarithmic
 export const logarithmically = (value: number) =>
   Math.log(value + 100) / Math.log(100);
 
-// Array maker
+export function roundFourth(num: number): number {
+  return parseFloat((Math.round(num * 4) / 4).toFixed(2));
+}
+
+export function localStorageSet(item: string, data: string | number | object) {
+  return localStorage.setItem(item, JSON.stringify(data));
+}
+
+export function localStorageGet(item: string) {
+  const stringified = localStorage.getItem(item);
+  return stringified && JSON.parse(stringified);
+}
+
 export function array(length: number, filler?: unknown) {
   return Array(length).fill(filler || null);
 }

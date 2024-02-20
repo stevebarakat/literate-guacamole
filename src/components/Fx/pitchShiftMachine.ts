@@ -1,6 +1,9 @@
 import { createActorContext } from "@xstate/react";
 import { PitchShift } from "tone";
-import { setup, assign, assertEvent } from "xstate";
+import { localStorageSet, roundFourth, localStorageGet } from "@/utils";
+import { animationFrameScheduler, interval } from "rxjs";
+import { Transport as t } from "tone";
+import { assign, assertEvent, fromObservable, setup } from "xstate";
 
 export const pitchShiftMachine = setup({
   types: {
@@ -12,7 +15,7 @@ export const pitchShiftMachine = setup({
     },
     events: {} as
       | { type: "READ" }
-      | { type: "WRITE" }
+      | { type: "WRITE"; id: number }
       | { type: "BYPASS" }
       | { type: "CHANGE_MIX"; mix: number; pitchShift: PitchShift }
       | {
@@ -35,12 +38,16 @@ export const pitchShiftMachine = setup({
       return { pitch };
     }),
   },
+  actors: {
+    WRITER: fromObservable(() => interval(0, animationFrameScheduler)),
+  },
 }).createMachine({
   context: {
     mix: 0.5,
     pitch: 0,
     feedback: 5,
     delayTime: 5,
+    data: new Map<number, { id: number; value: number; time: number }>(),
   },
   id: "pitchShiftMachine",
   initial: "off",
@@ -78,6 +85,33 @@ export const pitchShiftMachine = setup({
       },
     },
     writing: {
+      invoke: {
+        src: "WRITER",
+        onSnapshot: [
+          {
+            actions: assign(({ context, event }) => {
+              // console.log("context", context);
+              const data = context.data;
+              t.scheduleRepeat(
+                () => {
+                  const time: number = roundFourth(t.seconds);
+                  data.set(time, {
+                    id: event.trackId,
+                    time,
+                    value: context.pitch,
+                  });
+                  const mapToObject = (map: typeof data) =>
+                    Object.fromEntries(map.entries());
+                  const newData = mapToObject(data);
+                  localStorageSet("pitchData", newData);
+                },
+                0.25,
+                0
+              );
+            }),
+          },
+        ],
+      },
       on: {
         READ: {
           target: "reading",
