@@ -1,3 +1,3 @@
-import VuMeter from "./VuMeter";
+import VuMeter from "./Meter";
 
 export default VuMeter;

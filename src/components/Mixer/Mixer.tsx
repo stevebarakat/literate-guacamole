@@ -8,9 +8,7 @@ export default function Mixer() {
   const tracks = MixerContext.useSelector(
     (state) => state.context.sourceSong?.tracks
   );
-  const { channels, meters } = MixerContext.useSelector(
-    (state) => state.context
-  );
+  const { channels } = MixerContext.useSelector((state) => state.context);
 
   // const state = MixerContext.useSelector((s) => s);
   // console.log("state.value", state.value);
@@ -29,7 +27,6 @@ export default function Mixer() {
               options={{
                 input: {
                   track,
-                  meter: meters[i],
                   channel: channels[i],
                 },
               }}

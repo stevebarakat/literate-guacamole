@@ -1,4 +1,5 @@
 import { useRef, useEffect } from "react";
+import { Meter } from "tone";
 const MAX_BOX_COUNT = 100;
 
 // Colors
@@ -19,16 +20,22 @@ type Options = {
 };
 
 type MeterProps = {
-  meterLevel: number | undefined;
+  channel: Channel | Destination;
   options?: Options;
 };
 
-function VuMeter({ meterLevel, options }: MeterProps) {
+function VuMeter({ channel, options }: MeterProps) {
   const canvas = useRef<HTMLCanvasElement | null>(null);
   const painter = useRef<number | null>(null);
+  const meter = useRef<Meter | undefined>();
 
   const width = options?.width ?? 12;
   const height = (options?.height || 200) - 4;
+
+  useEffect(() => {
+    meter.current = new Meter();
+    channel?.connect(meter.current);
+  }, [channel]);
 
   useEffect(() => {
     const paint = canvas.current?.getContext("2d");
@@ -100,7 +107,7 @@ function VuMeter({ meterLevel, options }: MeterProps) {
       ref={canvas}
       width={width}
       height={height}
-      data-meterlevel={meterLevel}
+      data-meterlevel={meter.current?.getValue()}
     />
   );
 }

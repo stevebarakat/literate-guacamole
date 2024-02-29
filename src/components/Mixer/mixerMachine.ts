@@ -1,5 +1,5 @@
 import { animationFrameScheduler, interval } from "rxjs";
-import { Transport as t, Channel, Destination, Meter, Player } from "tone";
+import { Transport as t, Channel, Destination, Player } from "tone";
 import {
   assertEvent,
   assign,
@@ -91,14 +91,9 @@ export const mixerMachine = createMachine(
                 ),
             },
             {
-              actions: assign(({ context }) => {
+              actions: assign(() => {
                 const currentTime = formatMilliseconds(t.seconds);
-                let meterLevel = context.meter?.getValue();
-                if (typeof meterLevel !== "number") {
-                  meterLevel = 0;
-                }
                 return {
-                  meterLevel,
                   currentTime,
                 };
               }),
@@ -172,27 +167,21 @@ export const mixerMachine = createMachine(
       })),
       buildMixer: assign(({ context }) => {
         let players: Player[] = [];
-        let meters: Meter[] = [];
         let channels: Channel[] = [];
         context.audioBuffers.forEach((buffer, i) => {
-          meters = [...meters, new Meter()];
           channels = [...channels, new Channel().toDestination()];
           players = [
             ...players,
             new Player(buffer)
-              .chain(channels[i], meters[i])
+              .chain(channels[i])
               .sync()
               .start(0, context.sourceSong?.startPosition),
           ];
         });
-        const meter = new Meter();
-        Destination.connect(meter);
         return {
           sourceSong: context.sourceSong,
-          meter,
           channels,
           players,
-          meters,
         };
       }),
       reset: () => t.stop(),
@@ -217,14 +206,10 @@ export const mixerMachine = createMachine(
         context.channels?.forEach((channel: Channel | undefined, i: number) => {
           channel?.dispose();
           context.players[i]?.dispose();
-          context.meters[i]?.dispose();
-          context.meter?.dispose();
         });
         return {
           channels: [],
           players: [],
-          meters: [],
-          meter: undefined,
         };
       }),
     },

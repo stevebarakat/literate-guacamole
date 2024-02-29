@@ -1,7 +1,6 @@
 import { scale, logarithmically } from "@/utils";
 import { createActorContext } from "@xstate/react";
 import { interval, animationFrameScheduler } from "rxjs";
-import { Meter } from "tone";
 import { produce } from "immer";
 import { FeedbackDelay, PitchShift } from "tone";
 import { createMachine, assign, fromObservable, assertEvent } from "xstate";
@@ -15,8 +14,6 @@ export const trackMachine = createMachine(
       pan: 0,
       track: input.track,
       channel: input.channel,
-      meter: input.meter,
-      meterLevel: new Float32Array(),
       fx: [],
       fxNames: [],
     }),
@@ -38,14 +35,6 @@ export const trackMachine = createMachine(
                 target: "fxPanelOpen",
               },
             },
-          },
-        },
-        invoke: {
-          src: "ticker",
-          onSnapshot: {
-            actions: assign(({ context }) => ({
-              meterLevel: context.meter.getValue(),
-            })),
           },
         },
         on: {
@@ -91,7 +80,6 @@ export const trackMachine = createMachine(
       input: {} as {
         track: SourceTrack;
         channel: Channel | undefined;
-        meter: Meter | undefined;
       },
     },
   },

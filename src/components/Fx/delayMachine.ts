@@ -4,7 +4,6 @@ import { createMachine, assign, assertEvent } from "xstate";
 
 export const delayMachine = createMachine(
   {
-    /** @xstate-layout N4IgpgJg5mDOIC5QTAGwIYE8Cy6DGAFgJYB2YAdAE5joSYDEAIgKIAyAggJrkDCAEuwByAcWYB9bAEkAGgG0ADAF1EoAA4B7WEQAuRdSRUgAHogCMATgCs5AGwB2UwA47lgDQhMiAMznzAXz93FAwcfGIyKho6JjYuXgERcQAVSWxmBWUkEA0tXX1DEwQLa3snF3dPBEsHAKC0LFxCUgpqWgYWDm5+IVExADFmZkYAIXYeAGkMwxydPQMswuLbB2c3D0QAJg27AMCQEnUUeCzghrDm6c1Z-IXEAFoAFkcK+43TS1qQU9CmiNa6S65OYFRA2eQvBAbGymWw2OHwhH2XZ+IA */
     id: "delayMachine",
     context: {
       mix: 0.5,

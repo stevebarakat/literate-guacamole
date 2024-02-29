@@ -1,20 +1,14 @@
 import { TrackContext } from "@/components/Track/trackMachine";
 import { Pan, Fader, SoloMute } from ".";
-import VuMeter from "../Meter";
+import Meter from "../Meter";
 import ChannelLabel from "../ChannelLabel";
 import { FxPanel } from "../FxPanel";
 import { FxSelector } from "../Selectors";
 
 export default function Track({ trackId }: { trackId: number }) {
-  // Get these separately to prevent others from re-rendering when meterLevel changes
-  const meterLevel = TrackContext.useSelector(
-    (state) => state.context.meterLevel
+  const { track, fx, channel } = TrackContext.useSelector(
+    (state) => state.context
   );
-  const {
-    track: { name },
-    fx,
-    channel,
-  } = TrackContext.useSelector((state) => state.context);
 
   fx && channel.chain(...fx);
 
@@ -26,10 +20,10 @@ export default function Track({ trackId }: { trackId: number }) {
         <div className="channel">
           <Pan />
           <Fader>
-            <VuMeter meterLevel={meterLevel} />
+            <Meter channel={channel} />
           </Fader>
           <SoloMute />
-          <ChannelLabel name={name} />
+          <ChannelLabel name={track.name} />
         </div>
       </div>
     </>
