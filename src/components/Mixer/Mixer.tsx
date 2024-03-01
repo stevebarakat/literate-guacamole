@@ -5,29 +5,32 @@ import { TrackContext } from "@/components/Track/trackMachine";
 import { MixerContext } from "./mixerMachine";
 
 export default function Mixer() {
-  const tracks = MixerContext.useSelector(
-    (state) => state.context.sourceSong?.tracks
-  );
-  const { channels } = MixerContext.useSelector((state) => state.context);
+  // const tracks = MixerContext.useSelector(
+  //   (state) => state.context.sourceSong?.tracks
+  // );
+  // const { channels } = MixerContext.useSelector((state) => state.context);
 
-  // const state = MixerContext.useSelector((s) => s);
-  // console.log("state.value", state.value);
+  const state = MixerContext.useSelector((s) => s);
+
+  console.log("state.context.trackMachineRefs", state.context.trackMachineRefs);
+
+  return null;
 
   const isLoaded = MixerContext.useSelector((state) => state.matches("ready"));
-  if (!tracks) return null;
   if (!isLoaded) return null;
 
   return (
     <>
       <div className="channels">
+        return (
         {tracks.map((track: SourceTrack, i: number) => {
           return (
             <TrackContext.Provider
               key={track.id}
               options={{
                 input: {
-                  track,
-                  channel: channels[i],
+                  track: data[i].track,
+                  channel: data[i].channel,
                 },
               }}
             >
@@ -35,6 +38,7 @@ export default function Mixer() {
             </TrackContext.Provider>
           );
         })}
+        );
         <Main />
       </div>
       <Transport />

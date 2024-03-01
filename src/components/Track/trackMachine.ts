@@ -12,8 +12,8 @@ export const trackMachine = createMachine(
     context: ({ input }) => ({
       volume: -32,
       pan: 0,
-      track: input.track,
-      channel: input.channel,
+      // track: input.track,
+      // channel: input.channel,
       fx: [],
       fxNames: [],
     }),

@@ -11,6 +11,7 @@ import {
 import { scale, logarithmically, formatMilliseconds } from "@/utils";
 import { InitialContext } from "@/App";
 import { createActorContext } from "@xstate/react";
+import { trackMachine } from "../Track/trackMachine";
 type Input = { input: InitialContext };
 
 export const mixerMachine = createMachine(
@@ -165,9 +166,10 @@ export const mixerMachine = createMachine(
       setAudioBuffers: assign(({ event }) => ({
         audioBuffers: event.output.reverse(),
       })),
-      buildMixer: assign(({ context }) => {
+      buildMixer: assign(({ context, spawn }) => {
         let players: Player[] = [];
         let channels: Channel[] = [];
+        let trackMachineRefs = [];
         context.audioBuffers.forEach((buffer, i) => {
           channels = [...channels, new Channel().toDestination()];
           players = [
@@ -177,11 +179,20 @@ export const mixerMachine = createMachine(
               .sync()
               .start(0, context.sourceSong?.startPosition),
           ];
+          trackMachineRefs = [
+            spawn(trackMachine, {
+              systemId: `track-${i}`,
+              id: `track-${i}`,
+              input: {
+                channel: channels[i],
+                track: context.sourceSong!.tracks[i],
+              },
+            }),
+            ...trackMachineRefs,
+          ];
         });
         return {
-          sourceSong: context.sourceSong,
-          channels,
-          players,
+          trackMachineRefs,
         };
       }),
       reset: () => t.stop(),
