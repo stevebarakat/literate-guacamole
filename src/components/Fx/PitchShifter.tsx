@@ -3,34 +3,14 @@ import { PitchShift } from "tone";
 
 type Props = {
   pitchShift: PitchShift;
-  trackId: number;
 };
 
-function PitchShifter({ pitchShift, trackId }: Props) {
+function PitchShifter({ pitchShift }: Props) {
   const { send } = PitchContext.useActorRef();
 
   return (
     <div>
       <h3>PitchShifter</h3>
-      <select
-        onChange={(e) => {
-          const value = e.target.value;
-          switch (value) {
-            case "off":
-              return send({ type: "BYPASS" });
-            case "read":
-              return send({ type: "READ", id: trackId });
-            case "write":
-              return send({ type: "WRITE", id: trackId });
-            default:
-              break;
-          }
-        }}
-      >
-        <option value="off">off</option>
-        <option value="read">read</option>
-        <option value="write">write</option>
-      </select>
 
       <div className="flex-y">
         <label htmlFor="mix">Mix:</label>
