@@ -7,13 +7,12 @@ import { createMachine, assign, fromObservable, assertEvent } from "xstate";
 
 export const trackMachine = createMachine(
   {
-    /** @xstate-layout N4IgpgJg5mDOIC5QBcBOBDAxgawLJYAsBLAOzADpUx0IBPcgMwA8AFdMgGwHkAHMEgMQAVAEoBBAMIBpckK4BxeQBkAogH0AYgA01LMQDkVSgNoAGALqJQPAPawiyIjZJWQTRACYAHF-IeAnABsXoEArADMXv4eAIz+oQA0ILSIkQDsfjEepmnZHqFesfEAvsVJaFh4hKQUVDT0zGycEhx2kMLi0rIKyuraugZGZpZIILb2js6u7gjevgHBYZHRcYnJnv4ZsdkRHgAsoTHBMXul5Rg4+JjEZJTUdB2SMhIAEgby6gBqXEoAqrgqYaucYOJwuUYzEL+chhQKmA5wmJpTZrFIIOGBcimbGmfaFUKBfJeM4gCqXaq3OoPURPci-FgAETEQj6On0YgBAGUgaMQZNwaBIYFobD4QTTEiUUk0Wk0r4cfDwkE0nswiSyVVrjU7vVHl1Xu91Hp9DzrHZQVMIYgoTDxQiJci0qjrdD-G7lXtsTFTF5TOF1RdNTdavdaHqZHJFKo1JyflxTWNzfzptbhba4fbJU7pZ5AjFyO7-CFQns4ntcqcyqTA1dgzrqZ0Iz1o7hfiyE3ywSmEDbRZnHc6EHtwnssQqCV5wnK1SSSDYIHBXBrazVgUmu1aEFkc1uPGPsWklR40oFwgUzwHKivKaG1xMN4LEHCd0FMh536YgkFS6rL+StTe9SMKw7BgNwfACom96Wo+W4+ju4R+m+pjBLKERIl4oR-kG2pUg0IHNK0sCQHeFqQTMBTQt6-jhKsHhwriXgIUh2woV4aG0XKWGlMUQA */
     id: "trackMachine",
     context: ({ input }) => ({
       volume: -32,
       pan: 0,
-      // track: input.track,
-      // channel: input.channel,
+      track: input.track,
+      channel: input.channel,
       fx: [],
       fxNames: [],
     }),
