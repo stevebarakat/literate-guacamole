@@ -2,7 +2,7 @@ import { scale, logarithmically } from "@/utils";
 import { createActorContext } from "@xstate/react";
 import { interval, animationFrameScheduler } from "rxjs";
 import { produce } from "immer";
-import { FeedbackDelay, PitchShift } from "tone";
+import { Channel, FeedbackDelay, PitchShift, Player } from "tone";
 import { createMachine, assign, fromObservable, assertEvent } from "xstate";
 import { toggleMachine } from "@/machines/toggleMachine";
 
@@ -13,7 +13,8 @@ export const trackMachine = createMachine(
       volume: -32,
       pan: 0,
       track: input.track,
-      channel: input.channel,
+      channel: undefined,
+      buffer: input.buffer,
       trackId: input.trackId,
       fx: [],
       fxNames: [],
@@ -21,6 +22,9 @@ export const trackMachine = createMachine(
     initial: "ready",
     entry: assign(({ context, spawn }) => {
       console.log("context.trackId", context.trackId);
+      const channel = new Channel().toDestination();
+      const player = new Player(context.buffer).sync().start();
+      player.connect(channel);
       const toggleMachineRef = spawn(toggleMachine, {
         systemId: `toggle-machine-${crypto.randomUUID()}`,
         id: `toggle-machine-${context.trackId}`,
@@ -30,6 +34,7 @@ export const trackMachine = createMachine(
       });
       return {
         toggleMachineRef,
+        channel,
       };
     }),
     states: {
@@ -94,7 +99,7 @@ export const trackMachine = createMachine(
       input: {} as {
         track: SourceTrack;
         trackId: number;
-        channel: Channel | undefined;
+        buffer: AudioBuffer | undefined;
       },
     },
   },

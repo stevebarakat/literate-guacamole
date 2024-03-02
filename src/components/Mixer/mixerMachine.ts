@@ -27,16 +27,7 @@ export const mixerMachine = createMachine(
     initial: "not ready",
 
     states: {
-      "not ready": {
-        invoke: {
-          src: "initializer",
-        },
-      },
-      on: {
-        "INITIALIZE.AUDIO": {
-          target: "ready",
-        },
-      },
+      "not ready": {},
 
       error: {
         entry: "disposeTracks",
@@ -178,8 +169,8 @@ export const mixerMachine = createMachine(
       })),
       buildMixer: assign(({ context, spawn }) => {
         start();
-        let players: Player[] = [];
-        let channels: Channel[] = [];
+        const players: Player[] = [];
+        const channels: Channel[] = [];
         let trackMachineRefs = [];
         const clockMachineRef = spawn(clockMachine, {
           id: "clock-machine",
@@ -188,22 +179,24 @@ export const mixerMachine = createMachine(
           },
         });
         context.audioBuffers.forEach((buffer, i) => {
-          channels = [...channels, new Channel().toDestination()];
-          players = [
-            ...players,
-            new Player(buffer)
-              .chain(channels[i])
-              .sync()
-              .start(0, context.sourceSong?.startPosition),
-          ];
+          // channels = [...channels, new Channel().toDestination()];
+          // players = [
+          //   ...players,
+          //   new Player(buffer)
+          //     .chain(channels[i])
+          //     .sync()
+          //     .start(0, context.sourceSong?.startPosition),
+          // ];
 
           trackMachineRefs = [
             ...trackMachineRefs,
             spawn(trackMachine, {
               id: `track-${i}`,
               input: {
-                channel: channels[i],
+                // channel: channels[i],
+                buffer,
                 track: context.sourceSong!.tracks[i],
+                trackId: i,
               },
             }),
           ];
@@ -247,16 +240,6 @@ export const mixerMachine = createMachine(
         createAudioBuffers(input.sourceSong.tracks)
       ),
       ticker: fromObservable(() => interval(0, animationFrameScheduler)),
-      initializer: fromCallback(({ sendBack }) => {
-        function handler() {
-          start();
-          sendBack({ type: "INITIALIZE.AUDIO" });
-        }
-        document.body.addEventListener("click", handler);
-        return () => {
-          document.body.removeEventListener("click", handler);
-        };
-      }),
     },
     guards: {
       "canSeek?": ({ context, event }) => {

@@ -12,9 +12,6 @@ export default function Track({ trackId }: { trackId: number }) {
 
   fx && channel.chain(...fx);
 
-  const state = TrackContext.useSelector((s) => s);
-  console.log("state", state);
-
   return (
     <>
       <FxPanel trackId={trackId} />
