@@ -9,13 +9,14 @@ export default function Mixer() {
     "MixerContext",
     MixerContext.useSelector((state) => state.context)
   );
-  const state = MixerContext.useSelector((s) => s);
+  const refs = MixerContext.useSelector((s) => s.context.trackMachineRefs);
 
-  const refs = state.context.trackMachineRefs;
+  // const refs = state.context.trackMachineRefs;
 
   const tracks = refs && refs.map((ref) => ref.options.input.track);
   const channels = refs && refs.map((ref) => ref.options.input.channel);
 
+  // return null;
   const isLoaded = MixerContext.useSelector((state) => state.matches("ready"));
   if (!isLoaded) return null;
 

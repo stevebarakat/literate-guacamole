@@ -1,9 +1,10 @@
 import { animationFrameScheduler, interval } from "rxjs";
-import { Transport as t, Channel, Destination, Player } from "tone";
+import { Transport as t, Channel, Destination, Player, start } from "tone";
 import {
   assertEvent,
   assign,
   createMachine,
+  fromCallback,
   fromObservable,
   fromPromise,
   stopChild,
@@ -12,6 +13,7 @@ import { scale, logarithmically, formatMilliseconds } from "@/utils";
 import { InitialContext } from "@/App";
 import { createActorContext } from "@xstate/react";
 import { trackMachine } from "../Track/trackMachine";
+import { clockMachine } from "../Transport/clockMachine";
 type Input = { input: InitialContext };
 
 export const mixerMachine = createMachine(
@@ -25,7 +27,16 @@ export const mixerMachine = createMachine(
     initial: "not ready",
 
     states: {
-      "not ready": {},
+      "not ready": {
+        invoke: {
+          src: "initializer",
+        },
+      },
+      on: {
+        "INITIALIZE.AUDIO": {
+          target: "ready",
+        },
+      },
 
       error: {
         entry: "disposeTracks",
@@ -54,7 +65,6 @@ export const mixerMachine = createMachine(
           1000: { target: "ready" },
         },
       },
-
       ready: {
         on: {
           "SONG.RESET": {
@@ -79,28 +89,28 @@ export const mixerMachine = createMachine(
           },
         },
 
-        invoke: {
-          src: "ticker",
-          id: "ticker",
-          onSnapshot: [
-            {
-              target: ".stopped",
-              guard: ({ context }) =>
-                Boolean(
-                  context.sourceSong &&
-                    t.seconds > context.sourceSong.endPosition
-                ),
-            },
-            {
-              actions: assign(() => {
-                const currentTime = formatMilliseconds(t.seconds);
-                return {
-                  currentTime,
-                };
-              }),
-            },
-          ],
-        },
+        // invoke: {
+        //   src: "ticker",
+        //   id: "ticker",
+        //   onSnapshot: [
+        //     {
+        //       target: ".stopped",
+        //       guard: ({ context }) =>
+        //         Boolean(
+        //           context.sourceSong &&
+        //             t.seconds > context.sourceSong.endPosition
+        //         ),
+        //     },
+        //     {
+        //       actions: assign(() => {
+        //         const currentTime = formatMilliseconds(t.seconds);
+        //         return {
+        //           currentTime,
+        //         };
+        //       }),
+        //     },
+        //   ],
+        // },
 
         exit: ["reset", "disposeTracks"],
         initial: "stopped",
@@ -167,9 +177,16 @@ export const mixerMachine = createMachine(
         audioBuffers: event.output.reverse(),
       })),
       buildMixer: assign(({ context, spawn }) => {
+        start();
         let players: Player[] = [];
         let channels: Channel[] = [];
         let trackMachineRefs = [];
+        const clockMachineRef = spawn(clockMachine, {
+          id: "clock-machine",
+          input: {
+            sourceSong: context.sourceSong,
+          },
+        });
         context.audioBuffers.forEach((buffer, i) => {
           channels = [...channels, new Channel().toDestination()];
           players = [
@@ -179,9 +196,9 @@ export const mixerMachine = createMachine(
               .sync()
               .start(0, context.sourceSong?.startPosition),
           ];
+
           trackMachineRefs = [
             spawn(trackMachine, {
-              systemId: `track-${i}`,
               id: `track-${i}`,
               input: {
                 channel: channels[i],
@@ -193,6 +210,7 @@ export const mixerMachine = createMachine(
         });
         return {
           trackMachineRefs,
+          clockMachineRef,
         };
       }),
       reset: () => t.stop(),
@@ -229,6 +247,16 @@ export const mixerMachine = createMachine(
         createAudioBuffers(input.sourceSong.tracks)
       ),
       ticker: fromObservable(() => interval(0, animationFrameScheduler)),
+      initializer: fromCallback(({ sendBack }) => {
+        function handler() {
+          start();
+          sendBack({ type: "INITIALIZE.AUDIO" });
+        }
+        document.body.addEventListener("click", handler);
+        return () => {
+          document.body.removeEventListener("click", handler);
+        };
+      }),
     },
     guards: {
       "canSeek?": ({ context, event }) => {

@@ -1,8 +1,8 @@
-import { MixerContext } from "@/components/Mixer/mixerMachine";
 import "./clock.css";
+import { ClockContext } from "./clockMachine";
 
 function Clock() {
-  const { currentTime } = MixerContext.useSelector((state) => state.context);
+  const { currentTime } = ClockContext.useSelector((state) => state.context);
 
   return (
     <div className="clock">
