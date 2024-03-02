@@ -169,8 +169,7 @@ export const mixerMachine = createMachine(
       })),
       buildMixer: assign(({ context, spawn }) => {
         start();
-        const players: Player[] = [];
-        const channels: Channel[] = [];
+
         let trackMachineRefs = [];
         const clockMachineRef = spawn(clockMachine, {
           id: "clock-machine",
@@ -179,15 +178,6 @@ export const mixerMachine = createMachine(
           },
         });
         context.audioBuffers.forEach((buffer, i) => {
-          // channels = [...channels, new Channel().toDestination()];
-          // players = [
-          //   ...players,
-          //   new Player(buffer)
-          //     .chain(channels[i])
-          //     .sync()
-          //     .start(0, context.sourceSong?.startPosition),
-          // ];
-
           trackMachineRefs = [
             ...trackMachineRefs,
             spawn(trackMachine, {
@@ -224,16 +214,9 @@ export const mixerMachine = createMachine(
         Destination.volume.value = scaled;
         return { volume: event.volume };
       }),
-      disposeTracks: assign(({ context }) => {
-        context.channels?.forEach((channel: Channel | undefined, i: number) => {
-          channel?.dispose();
-          context.players[i]?.dispose();
-        });
-        return {
-          channels: [],
-          players: [],
-        };
-      }),
+      disposeTracks: assign(() => ({
+        buffer: undefined,
+      })),
     },
     actors: {
       builder: fromPromise(({ input }) =>
