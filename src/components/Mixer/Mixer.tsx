@@ -5,6 +5,10 @@ import { TrackContext } from "@/components/Track/trackMachine";
 import { MixerContext } from "./mixerMachine";
 
 export default function Mixer() {
+  console.log(
+    "MixerContext",
+    MixerContext.useSelector((state) => state.context)
+  );
   const state = MixerContext.useSelector((s) => s);
 
   const refs = state.context.trackMachineRefs;
