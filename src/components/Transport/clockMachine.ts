@@ -26,7 +26,7 @@ export const clockMachine = setup({
         id: "ticker",
         onSnapshot: [
           {
-            // target: "#mixerMachine.stopped",
+            // target: "stopped",
 
             guard: ({ context }) =>
               Boolean(

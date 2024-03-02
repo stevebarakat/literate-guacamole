@@ -2,23 +2,9 @@ import { createMachine } from "xstate";
 
 export const toggleMachine = createMachine({
   id: "toggle",
-  initial: "active",
+  initial: "inactive",
   states: {
-    inactive: {
-      on: {
-        TOGGLE: () => {
-          console.log("message");
-          return "active";
-        },
-      },
-    },
-    active: {
-      on: {
-        TOGGLE: () => {
-          console.log("message");
-          return "active";
-        },
-      },
-    },
+    inactive: { on: { TOGGLE: "active" } },
+    active: { on: { TOGGLE: "inactive" } },
   },
 });

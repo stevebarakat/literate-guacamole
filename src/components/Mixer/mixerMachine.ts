@@ -174,7 +174,7 @@ export const mixerMachine = createMachine(
         return { sourceSong: event.song };
       }),
       setAudioBuffers: assign(({ event }) => ({
-        audioBuffers: event.output.reverse(),
+        audioBuffers: event.output,
       })),
       buildMixer: assign(({ context, spawn }) => {
         start();
@@ -198,6 +198,7 @@ export const mixerMachine = createMachine(
           ];
 
           trackMachineRefs = [
+            ...trackMachineRefs,
             spawn(trackMachine, {
               id: `track-${i}`,
               input: {
@@ -205,7 +206,6 @@ export const mixerMachine = createMachine(
                 track: context.sourceSong!.tracks[i],
               },
             }),
-            ...trackMachineRefs,
           ];
         });
         return {
@@ -291,7 +291,7 @@ async function createAudioBuffers(tracks: SourceTrack[]) {
         track.path,
         progress
       );
-      audioBuffers = [buffer, ...audioBuffers];
+      audioBuffers = [...audioBuffers, buffer];
     } catch (err) {
       if (err instanceof Error) throw new Error(err.message);
     } finally {

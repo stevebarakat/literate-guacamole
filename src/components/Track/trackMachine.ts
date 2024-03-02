@@ -4,6 +4,7 @@ import { interval, animationFrameScheduler } from "rxjs";
 import { produce } from "immer";
 import { FeedbackDelay, PitchShift } from "tone";
 import { createMachine, assign, fromObservable, assertEvent } from "xstate";
+import { toggleMachine } from "@/machines/toggleMachine";
 
 export const trackMachine = createMachine(
   {
@@ -13,10 +14,24 @@ export const trackMachine = createMachine(
       pan: 0,
       track: input.track,
       channel: input.channel,
+      trackId: input.trackId,
       fx: [],
       fxNames: [],
     }),
     initial: "ready",
+    entry: assign(({ context, spawn }) => {
+      console.log("context.trackId", context.trackId);
+      const toggleMachineRef = spawn(toggleMachine, {
+        systemId: `toggle-machine-${crypto.randomUUID()}`,
+        id: `toggle-machine-${context.trackId}`,
+        input: {
+          sourceSong: context.sourceSong,
+        },
+      });
+      return {
+        toggleMachineRef,
+      };
+    }),
     states: {
       ready: {
         initial: "fxPanelOpen",
@@ -78,6 +93,7 @@ export const trackMachine = createMachine(
         | { type: "TRACK.TOGGLE_MUTE"; checked: boolean },
       input: {} as {
         track: SourceTrack;
+        trackId: number;
         channel: Channel | undefined;
       },
     },

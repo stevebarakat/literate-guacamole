@@ -5,13 +5,7 @@ import { TrackContext } from "@/components/Track/trackMachine";
 import { MixerContext } from "./mixerMachine";
 
 export default function Mixer() {
-  console.log(
-    "MixerContext",
-    MixerContext.useSelector((state) => state.context)
-  );
   const refs = MixerContext.useSelector((s) => s.context.trackMachineRefs);
-
-  // const refs = state.context.trackMachineRefs;
 
   const tracks = refs && refs.map((ref) => ref.options.input.track);
   const channels = refs && refs.map((ref) => ref.options.input.channel);
@@ -29,6 +23,7 @@ export default function Mixer() {
             options={{
               input: {
                 track,
+                trackId: i,
                 channel: channels[i],
               },
             }}
