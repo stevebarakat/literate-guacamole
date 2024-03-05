@@ -9,10 +9,18 @@ import {
   stopChild,
 } from "xstate";
 import { scale, logarithmically } from "@/utils";
-import { InitialContext } from "@/App";
 import { createActorContext } from "@xstate/react";
 import { trackMachine } from "../Track/trackMachine";
 import { clockMachine } from "../Transport/clockMachine";
+
+type InitialContext = {
+  currentTime: number;
+  volume: number;
+  sourceSong?: SourceSong | undefined;
+  players: (Player | undefined)[];
+  channels: (Channel | undefined)[];
+  audioBuffers: (AudioBuffer | undefined)[];
+};
 
 export const mixerMachine = createMachine(
   {
@@ -22,6 +30,8 @@ export const mixerMachine = createMachine(
       volume: -32,
       currentTime: 0,
       sourceSong: undefined,
+      players: [undefined],
+      channels: [undefined],
       audioBuffers: [undefined],
     },
 
@@ -80,29 +90,6 @@ export const mixerMachine = createMachine(
             },
           },
         },
-
-        // invoke: {
-        //   src: "ticker",
-        //   id: "ticker",
-        //   onSnapshot: [
-        //     {
-        //       target: ".stopped",
-        //       guard: ({ context }) =>
-        //         Boolean(
-        //           context.sourceSong &&
-        //             t.seconds > context.sourceSong.endPosition
-        //         ),
-        //     },
-        //     {
-        //       actions: assign(() => {
-        //         const currentTime = formatMilliseconds(t.seconds);
-        //         return {
-        //           currentTime,
-        //         };
-        //       }),
-        //     },
-        //   ],
-        // },
 
         exit: ["reset", "disposeTracks"],
         initial: "stopped",
@@ -179,13 +166,17 @@ export const mixerMachine = createMachine(
           },
         });
         context.audioBuffers.forEach((buffer, i) => {
+          const players = [];
+          const channels = [];
+          players[i] = new Player(buffer).sync().start();
+          channels[i] = new Channel().toDestination();
+          players[i].connect(channels[i]);
           trackMachineRefs = [
             ...trackMachineRefs,
             spawn(trackMachine, {
               id: `track-${i}`,
               input: {
-                // channel: channels[i],
-                buffer,
+                channel: channels[i],
                 track: context.sourceSong!.tracks[i],
                 trackId: i,
               },

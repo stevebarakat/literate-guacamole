@@ -2,9 +2,8 @@ import { scale, logarithmically } from "@/utils";
 import { createActorContext } from "@xstate/react";
 import { interval, animationFrameScheduler } from "rxjs";
 import { produce } from "immer";
-import { Channel, FeedbackDelay, PitchShift, Player } from "tone";
+import { FeedbackDelay, PitchShift } from "tone";
 import { createMachine, assign, fromObservable, assertEvent } from "xstate";
-import { toggleMachine } from "@/machines/toggleMachine";
 
 export const trackMachine = createMachine(
   {
@@ -13,44 +12,13 @@ export const trackMachine = createMachine(
       volume: -32,
       pan: 0,
       track: input.track,
-      buffer: input.buffer,
-      trackId: input.trackId,
+      channel: input.channel,
       fx: [],
       fxNames: [],
     }),
-    initial: "not ready",
+    initial: "ready",
     states: {
-      "not ready": {
-        entry: [
-          "ready",
-          assign(({ context }) => {
-            console.log("context.trackId", context.trackId);
-            context.player?.dispose();
-            const channel = new Channel().toDestination();
-            const player = new Player(context.buffer).sync().start();
-            player.connect(channel);
-
-            return {
-              player,
-              channel,
-            };
-          }),
-        ],
-      },
       ready: {
-        entry: assign(({ context, spawn }) => {
-          console.log("context.trackId", context.trackId);
-          const toggleMachineRef = spawn(toggleMachine, {
-            systemId: `toggle-machine-${crypto.randomUUID()}`,
-            id: `toggle-machine-${context.trackId}`,
-            input: {
-              sourceSong: context.sourceSong,
-            },
-          });
-          return {
-            toggleMachineRef,
-          };
-        }),
         initial: "fxPanelOpen",
         states: {
           fxPanelOpen: {
@@ -110,8 +78,7 @@ export const trackMachine = createMachine(
         | { type: "TRACK.TOGGLE_MUTE"; checked: boolean },
       input: {} as {
         track: SourceTrack;
-        trackId: number;
-        buffer: AudioBuffer | undefined;
+        channel: Channel | undefined;
       },
     },
   },
