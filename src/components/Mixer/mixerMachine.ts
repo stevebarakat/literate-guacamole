@@ -4,25 +4,26 @@ import {
   assertEvent,
   assign,
   createMachine,
-  fromCallback,
   fromObservable,
   fromPromise,
   stopChild,
 } from "xstate";
-import { scale, logarithmically, formatMilliseconds } from "@/utils";
+import { scale, logarithmically } from "@/utils";
 import { InitialContext } from "@/App";
 import { createActorContext } from "@xstate/react";
 import { trackMachine } from "../Track/trackMachine";
 import { clockMachine } from "../Transport/clockMachine";
-type Input = { input: InitialContext };
 
 export const mixerMachine = createMachine(
   {
     id: "mixerMachine",
 
-    context: ({ input: initialContext }: Input) => ({
-      ...initialContext,
-    }),
+    context: {
+      volume: -32,
+      currentTime: 0,
+      sourceSong: undefined,
+      audioBuffers: [undefined],
+    },
 
     initial: "not ready",
 

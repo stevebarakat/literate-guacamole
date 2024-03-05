@@ -10,7 +10,10 @@ export default function Track({ trackId }: { trackId: number }) {
     (state) => state.context
   );
 
-  fx && channel.chain(...fx);
+  // fx && channel?.chain(...fx);
+
+  const state = TrackContext.useSelector((s) => s);
+  console.log("state", state.value);
 
   return (
     <>
