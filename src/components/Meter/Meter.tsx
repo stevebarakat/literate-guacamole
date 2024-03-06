@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useCallback, useState } from "react";
 import { Meter } from "tone";
 const MAX_BOX_COUNT = 100;
 
@@ -101,13 +101,34 @@ function VuMeter({ channel, options }: MeterProps) {
     };
   }, [options, width, height]);
 
+  const [meterVals, setMeterVals] = useState<Float32Array>(
+    () => new Float32Array()
+  );
+  const animation = useRef<number | null>(null);
+
+  // loop recursively to amimateMeters
+  const animateMeter = useCallback(() => {
+    const val = meter.current?.getValue();
+    if (typeof val === "number") {
+      setMeterVals(val);
+    }
+    animation.current = requestAnimationFrame(animateMeter);
+  }, []);
+
+  useEffect(() => {
+    animation.current = requestAnimationFrame(animateMeter);
+    return () => {
+      animation.current && cancelAnimationFrame(animation.current);
+    };
+  }, []);
+
   return (
     <canvas
       className="meter-wrap"
       ref={canvas}
       width={width}
       height={height}
-      data-meterlevel={meter.current?.getValue()}
+      data-meterlevel={meterVals}
     />
   );
 }
