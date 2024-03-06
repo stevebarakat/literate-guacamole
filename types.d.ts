@@ -96,4 +96,18 @@ declare global {
     mix: number | undefined;
     pitch: number | undefined;
   };
+
+  type MeterProps = {
+    channel: Channel | Destination;
+    options?: MeterOptions;
+  };
+
+  type MeterOptions = {
+    width?: number;
+    height?: number;
+    gap?: number;
+    highCount?: number;
+    midCount?: number;
+    total?: number;
+  };
 }
