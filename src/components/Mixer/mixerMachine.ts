@@ -207,8 +207,6 @@ export const mixerMachine = createMachine(
       }),
       disposeTracks: assign(({ context }) => {
         context.players?.forEach((player: Player | undefined, i: number) => {
-          console.log("disposing tracks!!!");
-          console.log("context", context);
           player?.dispose();
           context.channels[i]?.dispose();
         });

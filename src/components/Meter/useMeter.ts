@@ -18,12 +18,13 @@ type Props = {
 };
 
 function useMeter({ channel, canvas, options }: Props) {
+  const [meterVals, setMeterVals] = useState<number>();
   const meter = useRef<Meter | undefined>();
   const painter = useRef<number | null>(null);
   const animation = useRef<number | null>(null);
 
   useEffect(() => {
-    meter.current = new Meter();
+    meter.current = new Meter({ channels: 2 });
     channel?.connect(meter.current);
   }, [channel]);
 
@@ -93,16 +94,14 @@ function useMeter({ channel, canvas, options }: Props) {
     };
   }, [options, canvas]);
 
-  const [meterVals, setMeterVals] = useState<Float32Array>(
-    () => new Float32Array()
-  );
-
   // loop recursively to amimateMeters
   const animateMeter = useCallback(() => {
-    const val = meter.current?.getValue();
-    if (typeof val === "number") {
+    const vals = meter.current?.getValue();
+    if (typeof vals === "number") return;
+    vals?.forEach((val) => {
       setMeterVals(val);
-    }
+    });
+
     animation.current = requestAnimationFrame(animateMeter);
   }, []);
 
