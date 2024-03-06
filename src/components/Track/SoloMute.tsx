@@ -34,7 +34,8 @@ function SoloMute() {
         id={`trackMute${id}`}
         className="mute"
         checked={state.context.active}
-        onChange={() => {
+        onChange={(e) => {
+          channel.mute = e.currentTarget.checked;
           send({
             type: "TOGGLE",
           });
