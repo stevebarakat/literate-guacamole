@@ -106,12 +106,7 @@ function useMeter({ channel, canvas, options }: Props) {
     animation.current = requestAnimationFrame(animateMeter);
   }, []);
 
-  useEffect(() => {
-    animation.current = requestAnimationFrame(animateMeter);
-    return () => {
-      animation.current && cancelAnimationFrame(animation.current);
-    };
-  }, []);
+  requestAnimationFrame(animateMeter);
 
   return meterVals;
 }
