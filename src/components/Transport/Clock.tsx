@@ -1,3 +1,4 @@
+import { formatMilliseconds } from "@/utils";
 import "./clock.css";
 import { ClockContext } from "./clockMachine";
 
@@ -7,7 +8,7 @@ function Clock() {
   return (
     <div className="clock">
       <div className="ghost">88:88:88</div>
-      {currentTime}
+      {formatMilliseconds(currentTime)}
     </div>
   );
 }

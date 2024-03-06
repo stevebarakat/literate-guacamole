@@ -69,7 +69,7 @@ export const mixerMachine = createMachine(
       },
       ready: {
         on: {
-          "SONG.RESET": {
+          RESET: {
             guard: "canStop?",
             target: ".stopped",
 
@@ -77,14 +77,14 @@ export const mixerMachine = createMachine(
               type: "reset",
             },
           },
-          "SONG.SEEK": {
+          SEEK: {
             guard: "canSeek?",
 
             actions: {
               type: "seek",
             },
           },
-          "SONG.CHANGE_VOLUME": {
+          CHANGE_VOLUME: {
             actions: {
               type: "setMainVolume",
             },
@@ -97,7 +97,7 @@ export const mixerMachine = createMachine(
         states: {
           stopped: {
             on: {
-              "SONG.START": {
+              START: {
                 target: "started",
                 guard: "canPlay?",
 
@@ -109,7 +109,7 @@ export const mixerMachine = createMachine(
           },
           started: {
             on: {
-              "SONG.PAUSE": {
+              PAUSE: {
                 target: "stopped",
 
                 actions: {
@@ -118,7 +118,7 @@ export const mixerMachine = createMachine(
 
                 guard: "canStop?",
               },
-              "SONG.END": {
+              END: {
                 actions: "stopClock",
               },
             },
@@ -131,12 +131,12 @@ export const mixerMachine = createMachine(
       context: {} as InitialContext,
       events: {} as
         | { type: "BUILD.MIXER"; song: SourceSong }
-        | { type: "SONG.START" }
-        | { type: "SONG.PAUSE" }
-        | { type: "SONG.RESET" }
-        | { type: "SONG.SEEK"; direction: string; amount: number }
-        | { type: "SONG.CHANGE_VOLUME"; volume: number }
-        | { type: "SONG.END" },
+        | { type: "START" }
+        | { type: "PAUSE" }
+        | { type: "RESET" }
+        | { type: "SEEK"; direction: string; amount: number }
+        | { type: "CHANGE_VOLUME"; volume: number }
+        | { type: "END" },
     },
 
     on: {
@@ -191,7 +191,7 @@ export const mixerMachine = createMachine(
       play: () => t.start(),
       pause: () => t.pause(),
       seek: ({ event }) => {
-        assertEvent(event, "SONG.SEEK");
+        assertEvent(event, "SEEK");
         if (event.direction === "forward") {
           t.seconds = t.seconds + 10;
         } else {
@@ -200,7 +200,7 @@ export const mixerMachine = createMachine(
       },
       stopSong: () => stopChild("ticker"),
       setMainVolume: assign(({ event }) => {
-        assertEvent(event, "SONG.CHANGE_VOLUME");
+        assertEvent(event, "CHANGE_VOLUME");
         const scaled = scale(logarithmically(event.volume));
         Destination.volume.value = scaled;
         return { volume: event.volume };
@@ -224,7 +224,7 @@ export const mixerMachine = createMachine(
     },
     guards: {
       "canSeek?": ({ context, event }) => {
-        assertEvent(event, "SONG.SEEK");
+        assertEvent(event, "SEEK");
         return event.direction === "forward"
           ? t.seconds < context.sourceSong!.endPosition - event.amount
           : t.seconds > event.amount;

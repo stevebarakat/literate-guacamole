@@ -1,17 +1,25 @@
 import { MixerContext } from "@/components/Mixer/mixerMachine";
 import { TransportButton } from "../Buttons";
 import { Play as PlayIcon, Pause as PauseIcon } from "lucide-react";
+import { ClockContext } from "./clockMachine";
 
 function Play() {
   const { send } = MixerContext.useActorRef();
+  const { currentTime, sourceSong } = ClockContext.useSelector(
+    (state) => state.context
+  );
   const canPause = MixerContext.useSelector((state) =>
     state.matches("ready.started")
   );
 
+  if (sourceSong && currentTime > sourceSong.endPosition) {
+    send({ type: "RESET" });
+  }
+
   return (
     <TransportButton
       onClick={() =>
-        canPause ? send({ type: "SONG.PAUSE" }) : send({ type: "SONG.START" })
+        canPause ? send({ type: "PAUSE" }) : send({ type: "START" })
       }
     >
       {canPause ? <PauseIcon /> : <PlayIcon />}

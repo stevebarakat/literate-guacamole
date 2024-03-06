@@ -12,7 +12,15 @@ const Transport = () => {
       <div className="flex gap2">
         <Reset />
         <Seek direction="backward" amount={10} />
-        <Play />
+        <ClockContext.Provider
+          options={{
+            input: {
+              sourceSong,
+            },
+          }}
+        >
+          <Play />
+        </ClockContext.Provider>
         <Seek direction="forward" amount={10} />
       </div>
       <ClockContext.Provider
