@@ -4,6 +4,7 @@ import Meter from "../Meter";
 import ChannelLabel from "../ChannelLabel";
 import { FxPanel } from "../FxPanel";
 import { FxSelector } from "../Selectors";
+import { ToggleContext } from "@/machines/toggleMachine";
 
 export default function Track({ trackId }: { trackId: number }) {
   const { track, fx, channel } = TrackContext.useSelector(
@@ -14,9 +15,11 @@ export default function Track({ trackId }: { trackId: number }) {
 
   return (
     <>
-      <FxPanel trackId={trackId} />
       <div className="channel-wrap">
-        <FxSelector trackId={trackId} />
+        <ToggleContext.Provider>
+          <FxPanel trackId={trackId} />
+          <FxSelector trackId={trackId} />
+        </ToggleContext.Provider>
         <div className="channel">
           <Pan />
           <Fader>

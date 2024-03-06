@@ -1,8 +1,10 @@
 import { array } from "@/utils";
 import { upperFirst } from "lodash";
 import { TrackContext } from "../Track/trackMachine";
+import { ToggleContext } from "@/machines/toggleMachine";
 
 function FxSelector({ trackId }: { trackId: number }) {
+  const sendToggle = ToggleContext.useActorRef().send;
   const { send } = TrackContext.useActorRef();
   const { fxNames } = TrackContext.useSelector((state) => state.context);
 
@@ -16,15 +18,15 @@ function FxSelector({ trackId }: { trackId: number }) {
     send({ type: "TRACK.UPDATE_FX_NAMES", fxId, fxName, action });
   }
 
-  const state = TrackContext.useSelector((s) => s);
-  const isOpen = state.matches("ready.fxPanelOpen");
+  const state = ToggleContext.useSelector((s) => s);
+  const isOpen = state.matches("active");
 
   return (
     <>
       {fxNames.length > 0 && (
         <button
           className="toggle-fx-btn"
-          onClick={() => send({ type: "TRACK.TOGGLE_FX_PANEL" })}
+          onClick={() => sendToggle({ type: "TOGGLE" })}
         >
           {isOpen ? "Close Fx" : "Open Fx"}
         </button>
