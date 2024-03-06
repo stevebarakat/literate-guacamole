@@ -1,3 +1,4 @@
+import { mixerMachine } from "@/components/Mixer/mixerMachine";
 import { scale, logarithmically } from "@/utils";
 import { createActorContext } from "@xstate/react";
 import { interval, animationFrameScheduler } from "rxjs";
@@ -17,6 +18,9 @@ export const trackMachine = createMachine(
       fxNames: [],
     }),
     initial: "ready",
+    // entry: assign(({ context }) => ({
+    //   channel: context.channel.dispose(),
+    // })),
     states: {
       ready: {
         initial: "fxPanelOpen",

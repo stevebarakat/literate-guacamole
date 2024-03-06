@@ -6,7 +6,7 @@ import { MixerContext } from "./mixerMachine";
 
 export default function Mixer() {
   const tracks = MixerContext.useSelector((s) => s.context.sourceSong?.tracks);
-  const buffers = MixerContext.useSelector((s) => s.context.audioBuffers);
+  const channels = MixerContext.useSelector((s) => s.context.channels);
 
   const isLoaded = MixerContext.useSelector((state) => state.matches("ready"));
   if (!isLoaded) return null;
@@ -20,8 +20,7 @@ export default function Mixer() {
             options={{
               input: {
                 track,
-                trackId: i,
-                buffer: buffers[i],
+                channel: channels[i],
               },
             }}
           >

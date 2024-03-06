@@ -37,6 +37,7 @@ export const mixerMachine = createMachine(
 
     initial: "not ready",
 
+    entry: "disposeTracks",
     states: {
       "not ready": {},
 
@@ -45,7 +46,6 @@ export const mixerMachine = createMachine(
       },
 
       building: {
-        entry: "disposeTracks",
         invoke: {
           src: "builder",
           input: ({ context }) => ({ sourceSong: context.sourceSong }),
@@ -166,19 +166,16 @@ export const mixerMachine = createMachine(
           },
         });
         context.audioBuffers.forEach((buffer, i) => {
-          const players = [];
-          const channels = [];
-          players[i] = new Player(buffer).sync().start();
-          channels[i] = new Channel().toDestination();
-          players[i].connect(channels[i]);
+          context.players[i] = new Player(buffer).sync().start();
+          context.channels[i] = new Channel().toDestination();
+          context.players[i].connect(context.channels[i]);
           trackMachineRefs = [
             ...trackMachineRefs,
             spawn(trackMachine, {
               id: `track-${i}`,
               input: {
-                channel: channels[i],
+                channel: context.channels[i],
                 track: context.sourceSong!.tracks[i],
-                trackId: i,
               },
             }),
           ];
@@ -206,9 +203,18 @@ export const mixerMachine = createMachine(
         Destination.volume.value = scaled;
         return { volume: event.volume };
       }),
-      disposeTracks: assign(() => ({
-        buffer: undefined,
-      })),
+      disposeTracks: assign(({ context }) => {
+        context.players?.forEach((player: Player | undefined, i: number) => {
+          console.log("disposing tracks!!!");
+          console.log("context", context);
+          player?.dispose();
+          context.channels[i]?.dispose();
+        });
+        return {
+          channels: [],
+          players: [],
+        };
+      }),
     },
     actors: {
       builder: fromPromise(({ input }) =>
