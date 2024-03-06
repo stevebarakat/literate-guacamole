@@ -166,9 +166,11 @@ export const mixerMachine = createMachine(
           },
         });
         context.audioBuffers.forEach((buffer, i) => {
-          context.players[i] = new Player(buffer).sync().start();
+          context.players[i] = new Player(buffer)
+            .sync()
+            .start(0, context.sourceSong?.startPosition);
           context.channels[i] = new Channel().toDestination();
-          context.players[i].connect(context.channels[i]);
+          context.players[i]?.connect(context.channels[i]);
           trackMachineRefs = [
             ...trackMachineRefs,
             spawn(trackMachine, {
