@@ -7,6 +7,8 @@ import { MixerContext } from "./mixerMachine";
 export default function Mixer() {
   const tracks = MixerContext.useSelector((s) => s.context.sourceSong?.tracks);
   const channels = MixerContext.useSelector((s) => s.context.channels);
+  const state = MixerContext.useSelector((s) => s);
+  console.log("state", state.value);
 
   const isLoaded = MixerContext.useSelector((state) => state.matches("ready"));
   if (!isLoaded) return null;

@@ -13,7 +13,7 @@ function Play() {
   );
 
   if (sourceSong && currentTime > sourceSong.endPosition) {
-    send({ type: "RESET" });
+    send({ type: "END" });
   }
 
   return (

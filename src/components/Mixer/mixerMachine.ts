@@ -198,7 +198,7 @@ export const mixerMachine = createMachine(
           t.seconds = t.seconds - 10;
         }
       },
-      stopSong: () => stopChild("ticker"),
+      stopClock: () => stopChild("ticker"),
       setMainVolume: assign(({ event }) => {
         assertEvent(event, "CHANGE_VOLUME");
         const scaled = scale(logarithmically(event.volume));
