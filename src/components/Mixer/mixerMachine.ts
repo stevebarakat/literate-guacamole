@@ -1,5 +1,12 @@
 import { animationFrameScheduler, interval } from "rxjs";
-import { Transport as t, Channel, Destination, Player, start } from "tone";
+import {
+  Transport as t,
+  Channel,
+  Destination,
+  Player,
+  start,
+  loaded,
+} from "tone";
 import {
   assertEvent,
   assign,
@@ -9,9 +16,9 @@ import {
   stopChild,
 } from "xstate";
 import { scale, logarithmically } from "@/utils";
-import { createActorContext } from "@xstate/react";
 import { trackMachine } from "../Track/trackMachine";
 import { clockMachine } from "../Transport/clockMachine";
+import { createActorContext } from "@xstate/react";
 
 type InitialContext = {
   currentTime: number;
@@ -46,12 +53,12 @@ export const mixerMachine = createMachine(
       },
 
       building: {
+        entry: "buildMixer",
         invoke: {
           src: "builder",
           input: ({ context }) => ({ sourceSong: context.sourceSong }),
           onDone: {
-            target: "100%",
-            actions: ["setAudioBuffers", "buildMixer"],
+            target: "ready",
           },
           onError: {
             target: "error",
@@ -62,11 +69,6 @@ export const mixerMachine = createMachine(
         },
       },
 
-      "100%": {
-        after: {
-          1000: { target: "ready" },
-        },
-      },
       ready: {
         on: {
           RESET: {
@@ -152,9 +154,7 @@ export const mixerMachine = createMachine(
         assertEvent(event, "BUILD.MIXER");
         return { sourceSong: event.song };
       }),
-      setAudioBuffers: assign(({ event }) => ({
-        audioBuffers: event.output,
-      })),
+
       buildMixer: assign(({ context, spawn }) => {
         start();
 
@@ -165,8 +165,8 @@ export const mixerMachine = createMachine(
             sourceSong: context.sourceSong,
           },
         });
-        context.audioBuffers.forEach((buffer, i) => {
-          context.players[i] = new Player(buffer)
+        context.sourceSong.tracks.forEach((track, i) => {
+          context.players[i] = new Player(track.path)
             .sync()
             .start(0, context.sourceSong?.startPosition);
           context.channels[i] = new Channel().toDestination();
@@ -217,9 +217,7 @@ export const mixerMachine = createMachine(
       }),
     },
     actors: {
-      builder: fromPromise(({ input }) =>
-        createAudioBuffers(input.sourceSong.tracks)
-      ),
+      builder: fromPromise(async () => await loaded()),
       ticker: fromObservable(() => interval(0, animationFrameScheduler)),
     },
     guards: {
@@ -235,38 +233,5 @@ export const mixerMachine = createMachine(
     },
   }
 );
-
-async function fetchAndDecodeAudio(path: string, progress: number) {
-  const progRef = document.getElementById("progress") as HTMLInputElement;
-  if (progRef && progress === 0) progRef.value = progress.toString();
-  const response = await fetch(path);
-  const audioContext = new AudioContext();
-  return audioContext.decodeAudioData(await response.arrayBuffer());
-}
-
-async function createAudioBuffers(tracks: SourceTrack[]) {
-  if (!tracks) return;
-  let progress = 0;
-  let audioBuffers: (AudioBuffer | undefined)[] = [];
-
-  for (const track of tracks) {
-    try {
-      const buffer: AudioBuffer | undefined = await fetchAndDecodeAudio(
-        track.path,
-        progress
-      );
-      audioBuffers = [...audioBuffers, buffer];
-    } catch (err) {
-      if (err instanceof Error) throw new Error(err.message);
-    } finally {
-      const files = tracks.length * 0.01;
-      progress = progress + 1 / files;
-      const progRef = document.getElementById("progress") as HTMLInputElement;
-      if (progRef) progRef.value = Math.ceil(progress).toString();
-    }
-  }
-  progress = 0;
-  return audioBuffers;
-}
 
 export const MixerContext = createActorContext(mixerMachine);

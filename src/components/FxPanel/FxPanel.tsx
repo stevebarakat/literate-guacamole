@@ -27,11 +27,7 @@ function FxPanel({ trackId }: { trackId: number }) {
     setPitchIndex(fxNames?.indexOf("pitchShift"));
   }, [fxNames]);
 
-  console.log("isOpen", isOpen);
-
   if (!isOpen) return;
-
-  console.log("fxNames", fxNames);
 
   return (
     <>
