@@ -35,16 +35,6 @@ export const trackMachine = createMachine(
               type: "setPan",
             },
           },
-          TOGGLE_SOLO: {
-            actions: {
-              type: "toggleSolo",
-            },
-          },
-          TOGGLE_MUTE: {
-            actions: {
-              type: "toggleMute",
-            },
-          },
         },
       },
     },
@@ -57,9 +47,7 @@ export const trackMachine = createMachine(
             fxId: number;
             action: string;
           }
-        | { type: "CHANGE_PAN"; pan: number }
-        | { type: "TOGGLE_SOLO"; checked: boolean }
-        | { type: "TOGGLE_MUTE"; checked: boolean },
+        | { type: "CHANGE_PAN"; pan: number },
       input: {} as {
         track: SourceTrack;
         channel: Channel | undefined;
@@ -117,20 +105,6 @@ export const trackMachine = createMachine(
             fx: context.fx.toSpliced(event.fxId, 1),
           };
         }
-      }),
-      toggleMute: assign(({ context, event }) => {
-        assertEvent(event, "TOGGLE_MUTE");
-        const checked = event.checked;
-        produce(context, (draft) => {
-          draft.channel.mute = checked;
-        });
-      }),
-      toggleSolo: assign(({ context, event }) => {
-        assertEvent(event, "TOGGLE_SOLO");
-        const checked = event.checked;
-        produce(context, (draft) => {
-          draft.channel.solo = checked;
-        });
       }),
     },
     actors: {
