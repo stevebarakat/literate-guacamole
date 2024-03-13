@@ -13,6 +13,8 @@ export default function Track({ trackId }: { trackId: number }) {
 
   fx && channel?.chain(...fx);
 
+  const { context } = TrackContext.useSelector((s) => s);
+  console.log("context", context);
   return (
     <>
       <div className="channel-wrap">
