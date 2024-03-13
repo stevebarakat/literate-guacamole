@@ -1,5 +1,5 @@
 import { songs } from "@/assets/songs";
-import { MixerContext } from "../Mixer/mixerMachine";
+import { MixerContext } from "../../machines/mixerMachine";
 
 export function SongSelector() {
   const slug = MixerContext.useSelector(
@@ -13,7 +13,7 @@ export function SongSelector() {
   function handleSongSelect(event: React.ChangeEvent<HTMLSelectElement>) {
     const song = songs.find((song) => song.slug === event.target.value);
     if (song) {
-      send({ type: "BUILD.MIXER", song });
+      send({ type: "BUILD_MIXER", song });
     }
   }
 

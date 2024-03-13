@@ -1,4 +1,4 @@
-import { MixerContext } from "@/components/Mixer/mixerMachine";
+import { MixerContext } from "@/machines/mixerMachine";
 import { TransportButton } from "../Buttons";
 import { FastForward as FastFwdIcon, Rewind as RewindIcon } from "lucide-react";
 

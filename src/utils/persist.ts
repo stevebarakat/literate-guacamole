@@ -1,4 +1,4 @@
-import { mixerMachine } from "@/components/Mixer/mixerMachine";
+import { mixerMachine } from "@/machines/mixerMachine";
 import { createActor } from "xstate";
 
 const feedbackActor = createActor(mixerMachine).start();

@@ -1,4 +1,4 @@
-import { TrackContext } from "@/components/Track/trackMachine";
+import { TrackContext } from "@/machines/trackMachine";
 import { ReactNode } from "react";
 
 type Props = {
@@ -22,11 +22,9 @@ function Fader({ children }: Props) {
           value={volume}
           onChange={(e) => {
             const value = parseFloat(e.target.value);
-            send({ type: "TRACK.CHANGE_VOLUME", volume: value });
+            send({ type: "CHANGE_VOLUME", volume: value });
           }}
-          onDoubleClick={() =>
-            send({ type: "TRACK.CHANGE_VOLUME", volume: -32 })
-          }
+          onDoubleClick={() => send({ type: "CHANGE_VOLUME", volume: -32 })}
         />
       </div>
     </>

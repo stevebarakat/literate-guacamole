@@ -6,7 +6,7 @@ import Delay from "../Fx/Delay";
 import { useState, useEffect } from "react";
 import { FxHeader } from "../FxPanel";
 import { ToggleContext } from "@/machines/toggleMachine";
-import { TrackContext } from "../Track/trackMachine";
+import { TrackContext } from "../../machines/trackMachine";
 
 const defaults = {
   className: "fx-panel",

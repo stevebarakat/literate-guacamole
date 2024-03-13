@@ -1,4 +1,4 @@
-import { mixerMachine } from "@/components/Mixer/mixerMachine";
+import { mixerMachine } from "@/machines/mixerMachine";
 import { scale, logarithmically } from "@/utils";
 import { createActorContext } from "@xstate/react";
 import { interval, animationFrameScheduler } from "rxjs";
@@ -22,25 +22,25 @@ export const trackMachine = createMachine(
     states: {
       ready: {
         on: {
-          "TRACK.CHANGE_VOLUME": {
+          CHANGE_VOLUME: {
             actions: {
               type: "setVolume",
             },
           },
-          "TRACK.UPDATE_FX_NAMES": {
+          UPDATE_FX_NAMES: {
             actions: ["setFxNames"],
           },
-          "TRACK.CHANGE_PAN": {
+          CHANGE_PAN: {
             actions: {
               type: "setPan",
             },
           },
-          "TRACK.TOGGLE_SOLO": {
+          TOGGLE_SOLO: {
             actions: {
               type: "toggleSolo",
             },
           },
-          "TRACK.TOGGLE_MUTE": {
+          TOGGLE_MUTE: {
             actions: {
               type: "toggleMute",
             },
@@ -50,16 +50,16 @@ export const trackMachine = createMachine(
     },
     types: {
       events: {} as
-        | { type: "TRACK.CHANGE_VOLUME"; volume: number }
+        | { type: "CHANGE_VOLUME"; volume: number }
         | {
-            type: "TRACK.UPDATE_FX_NAMES";
+            type: "UPDATE_FX_NAMES";
             fxName: string;
             fxId: number;
             action: string;
           }
-        | { type: "TRACK.CHANGE_PAN"; pan: number }
-        | { type: "TRACK.TOGGLE_SOLO"; checked: boolean }
-        | { type: "TRACK.TOGGLE_MUTE"; checked: boolean },
+        | { type: "CHANGE_PAN"; pan: number }
+        | { type: "TOGGLE_SOLO"; checked: boolean }
+        | { type: "TOGGLE_MUTE"; checked: boolean },
       input: {} as {
         track: SourceTrack;
         channel: Channel | undefined;
@@ -69,7 +69,7 @@ export const trackMachine = createMachine(
   {
     actions: {
       setVolume: assign(({ context, event }) => {
-        assertEvent(event, "TRACK.CHANGE_VOLUME");
+        assertEvent(event, "CHANGE_VOLUME");
         const volume = parseFloat(event.volume.toFixed(2));
         const scaled = scale(logarithmically(volume));
         produce(context, (draft) => {
@@ -79,7 +79,7 @@ export const trackMachine = createMachine(
       }),
 
       setPan: assign(({ context, event }) => {
-        assertEvent(event, "TRACK.CHANGE_PAN");
+        assertEvent(event, "CHANGE_PAN");
         const pan = event.pan.toFixed(2);
         produce(context, (draft) => {
           draft.channel.pan.value = pan;
@@ -87,7 +87,7 @@ export const trackMachine = createMachine(
         return { pan };
       }),
       setFxNames: assign(({ context, event }) => {
-        assertEvent(event, "TRACK.UPDATE_FX_NAMES");
+        assertEvent(event, "UPDATE_FX_NAMES");
 
         if (event.action === "add") {
           const spliced = context.fxNames.toSpliced(event.fxId, 1);
@@ -119,14 +119,14 @@ export const trackMachine = createMachine(
         }
       }),
       toggleMute: assign(({ context, event }) => {
-        assertEvent(event, "TRACK.TOGGLE_MUTE");
+        assertEvent(event, "TOGGLE_MUTE");
         const checked = event.checked;
         produce(context, (draft) => {
           draft.channel.mute = checked;
         });
       }),
       toggleSolo: assign(({ context, event }) => {
-        assertEvent(event, "TRACK.TOGGLE_SOLO");
+        assertEvent(event, "TOGGLE_SOLO");
         const checked = event.checked;
         produce(context, (draft) => {
           draft.channel.solo = checked;
