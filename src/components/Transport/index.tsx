@@ -3,7 +3,7 @@ import Reset from "./Reset";
 import Seek from "./Seek";
 import Play from "./Play";
 import { ClockContext } from "./clockMachine";
-import { MixerContext } from "../Mixer/mixerMachine";
+import { MixerContext } from "../../machines/mixerMachine";
 
 const Transport = () => {
   const { sourceSong } = MixerContext.useSelector((state) => state.context);

@@ -1,6 +1,6 @@
 import { array } from "@/utils";
 import { upperFirst } from "lodash";
-import { TrackContext } from "../Track/trackMachine";
+import { TrackContext } from "../../machines/trackMachine";
 import { ToggleContext } from "@/machines/toggleMachine";
 
 function FxSelector({ trackId }: { trackId: number }) {

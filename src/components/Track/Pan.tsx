@@ -1,4 +1,4 @@
-import { TrackContext } from "@/components/Track/trackMachine";
+import { TrackContext } from "@/machines/trackMachine";
 
 function Pan() {
   const { send } = TrackContext.useActorRef();

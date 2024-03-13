@@ -1,4 +1,4 @@
-import { MixerContext } from "../Mixer/mixerMachine";
+import { MixerContext } from "../../machines/mixerMachine";
 
 function Error() {
   const isError = MixerContext.useSelector((state) => state.matches("error"));

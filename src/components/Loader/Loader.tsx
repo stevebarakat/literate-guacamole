@@ -1,4 +1,4 @@
-import { MixerContext } from "@/components/Mixer/mixerMachine";
+import { MixerContext } from "@/machines/mixerMachine";
 
 const Loader = () => {
   const state = MixerContext.useSelector((state) => state);

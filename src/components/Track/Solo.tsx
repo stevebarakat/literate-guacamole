@@ -1,6 +1,6 @@
 import { ToggleContext } from "@/machines/toggleMachine";
 import { Toggle } from "../Buttons";
-import { TrackContext } from "./trackMachine";
+import { TrackContext } from "../../machines/trackMachine";
 
 function Solo() {
   const { id } = TrackContext.useSelector((state) => state.context.track);

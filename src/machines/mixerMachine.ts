@@ -16,8 +16,8 @@ import {
   stopChild,
 } from "xstate";
 import { scale, logarithmically } from "@/utils";
-import { trackMachine } from "../Track/trackMachine";
-import { clockMachine } from "../Transport/clockMachine";
+import { trackMachine } from "./trackMachine";
+import { clockMachine } from "../components/Transport/clockMachine";
 import { createActorContext } from "@xstate/react";
 
 type InitialContext = {

@@ -1,5 +1,5 @@
 import { songs } from "@/assets/songs";
-import { MixerContext } from "../Mixer/mixerMachine";
+import { MixerContext } from "../../machines/mixerMachine";
 
 export function SongSelector() {
   const slug = MixerContext.useSelector(
