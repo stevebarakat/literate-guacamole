@@ -33,7 +33,7 @@ export const mixerMachine = setup({
   types: {
     context: {} as InitialContext,
     events: {} as
-      | { type: "BUILD.MIXER"; song: SourceSong }
+      | { type: "BUILD_MIXER"; song: SourceSong }
       | { type: "START" }
       | { type: "PAUSE" }
       | { type: "RESET" }
@@ -43,7 +43,7 @@ export const mixerMachine = setup({
   },
   actions: {
     setSourceSong: assign(({ event }) => {
-      assertEvent(event, "BUILD.MIXER");
+      assertEvent(event, "BUILD_MIXER");
       return { sourceSong: event.song };
     }),
 
@@ -136,7 +136,7 @@ export const mixerMachine = setup({
   id: "mixerMachine",
   initial: "not ready",
   on: {
-    "BUILD.MIXER": {
+    BUILD_MIXER: {
       target: "#mixerMachine.building",
       actions: {
         type: "setSourceSong",

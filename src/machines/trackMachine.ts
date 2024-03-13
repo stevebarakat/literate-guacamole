@@ -4,50 +4,70 @@ import { interval, animationFrameScheduler } from "rxjs";
 import { produce } from "immer";
 import { FeedbackDelay, PitchShift } from "tone";
 import { assign, fromObservable, assertEvent, setup } from "xstate";
+import { toggleMachine } from "./toggleMachine";
 
 type TrackContextType = {
   volume: number;
   pan: number;
   track: SourceTrack;
-  channel: Channel;
+  channel: Channel | Destination;
   fx: (FeedbackDelay | PitchShift)[];
   fxNames: ("delay" | "pitchShift")[];
 };
 export const trackMachine = setup({
   types: {
-    input: {} as { track: SourceTrack; channel: Channel },
+    input: {} as { track: SourceTrack; channel: Channel | undefined },
     context: {} as TrackContextType,
     events: {} as
-      | { type: "TRACK.CHANGE_VOLUME"; volume: number }
+      | { type: "SPAWN_TOGGLES" }
+      | { type: "CHANGE_VOLUME"; volume: number }
       | {
-          type: "TRACK.UPDATE_FX_NAMES";
+          type: "UPDATE_FX_NAMES";
           fxName: string;
           fxId: number;
           action: string;
         }
-      | { type: "TRACK.CHANGE_PAN"; pan: number },
+      | { type: "CHANGE_PAN"; pan: number },
   },
   actions: {
+    spawnToggles: assign(({ context, spawn }) => {
+      const soloToggleRef = spawn(toggleMachine, {
+        id: "solo-toggle",
+        input: {
+          channel: context.channel,
+        },
+      });
+      const muteToggleRef = spawn(toggleMachine, {
+        id: "mute-toggle",
+        input: {
+          channel: context.channel,
+        },
+      });
+      return {
+        soloToggleRef,
+        muteToggleRef,
+      };
+    }),
     setVolume: assign(({ context, event }) => {
-      assertEvent(event, "TRACK.CHANGE_VOLUME");
+      assertEvent(event, "CHANGE_VOLUME");
       const volume = parseFloat(event.volume.toFixed(2));
       const scaled = scale(logarithmically(volume));
       produce(context, (draft) => {
-        draft.channel.volume.value = scaled;
+        draft.channel!.volume.value = scaled;
       });
       return { volume };
     }),
 
     setPan: assign(({ context, event }) => {
-      assertEvent(event, "TRACK.CHANGE_PAN");
+      assertEvent(event, "CHANGE_PAN");
       const pan = Number(event.pan.toFixed(2));
       produce(context, (draft) => {
-        draft.channel.pan.value = pan;
+        draft.channel!.pan.value = pan;
       });
       return { pan };
     }),
     setFxNames: assign(({ context, event }) => {
-      assertEvent(event, "TRACK.UPDATE_FX_NAMES");
+      assertEvent(event, "UPDATE_FX_NAMES");
 
       if (event.action === "add") {
         const spliced = context.fxNames.toSpliced(event.fxId, 1);
@@ -82,28 +102,12 @@ export const trackMachine = setup({
   actors: {
     ticker: fromObservable(() => interval(0, animationFrameScheduler)),
   },
-  schemas: {
-    events: {
-      "TRACK.CHANGE_VOLUME": {
-        type: "object",
-        properties: {},
-      },
-      "TRACK.UPDATE_FX_NAMES": {
-        type: "object",
-        properties: {},
-      },
-      "TRACK.CHANGE_PAN": {
-        type: "object",
-        properties: {},
-      },
-    },
-  },
 }).createMachine({
   context: ({ input }) => ({
     volume: -32,
     pan: 0,
-    track: input.track,
-    channel: input.channel,
+    track: input?.track,
+    channel: input?.channel,
     fx: [],
     fxNames: [],
   }),
@@ -111,18 +115,19 @@ export const trackMachine = setup({
   initial: "ready",
   states: {
     ready: {
+      entry: "spawnToggles",
       on: {
-        "TRACK.CHANGE_VOLUME": {
+        CHANGE_VOLUME: {
           actions: {
             type: "setVolume",
           },
         },
-        "TRACK.UPDATE_FX_NAMES": {
+        UPDATE_FX_NAMES: {
           actions: {
             type: "setFxNames",
           },
         },
-        "TRACK.CHANGE_PAN": {
+        CHANGE_PAN: {
           actions: {
             type: "setPan",
           },

@@ -1,6 +1,7 @@
 import { ToggleContext } from "@/machines/toggleMachine";
 import { Toggle } from "../Buttons";
-import { TrackContext } from "../../machines/trackMachine";
+import { TrackContext, trackMachine } from "../../machines/trackMachine";
+import { useMachine } from "@xstate/react";
 
 function Mute() {
   const { id } = TrackContext.useSelector((state) => state.context.track);
@@ -8,6 +9,10 @@ function Mute() {
 
   const { send } = ToggleContext.useActorRef();
   const isActive = ToggleContext.useSelector((state) => state.context.active);
+
+  const [state] = useMachine(trackMachine);
+  // console.log("state.value", state.value);
+  console.log("state.context", state.context);
 
   return (
     <Toggle

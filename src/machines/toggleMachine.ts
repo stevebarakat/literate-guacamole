@@ -1,12 +1,49 @@
 import { createActorContext } from "@xstate/react";
-import { createMachine } from "xstate";
+import { setup } from "xstate";
 
-export const toggleMachine = createMachine({
+export const toggleMachine = setup({
+  types: {
+    context: {} as {},
+    events: {} as { type: "TOGGLE" },
+  },
+  actions: {
+    toggle: function ({ context, event }) {
+      console.log("message");
+    },
+  },
+  schemas: {
+    events: {
+      TOGGLE: {
+        type: "object",
+        properties: {},
+      },
+    },
+  },
+}).createMachine({
+  context: {},
   id: "toggle",
   initial: "active",
   states: {
-    inactive: { on: { TOGGLE: "active" } },
-    active: { on: { TOGGLE: "inactive" } },
+    active: {
+      on: {
+        TOGGLE: {
+          target: "inactive",
+          actions: {
+            type: "toggle",
+          },
+        },
+      },
+    },
+    inactive: {
+      on: {
+        TOGGLE: {
+          target: "active",
+          actions: {
+            type: "toggle",
+          },
+        },
+      },
+    },
   },
 });
 

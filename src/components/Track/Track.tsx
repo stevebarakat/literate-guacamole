@@ -1,10 +1,11 @@
-import { TrackContext } from "@/machines/trackMachine";
+import { TrackContext, trackMachine } from "@/machines/trackMachine";
 import { Pan, Fader, SoloMute } from ".";
 import Meter from "../Meter";
 import ChannelLabel from "../ChannelLabel";
 import { FxPanel } from "../FxPanel";
 import { FxSelector } from "../Selectors";
 import { ToggleContext } from "@/machines/toggleMachine";
+import { useMachine } from "@xstate/react";
 
 export default function Track({ trackId }: { trackId: number }) {
   const { track, fx, channel } = TrackContext.useSelector(
@@ -13,8 +14,9 @@ export default function Track({ trackId }: { trackId: number }) {
 
   fx && channel?.chain(...fx);
 
-  const { context } = TrackContext.useSelector((s) => s);
-  console.log("context", context);
+  const [state] = useMachine(trackMachine);
+  // console.log("state.value", state.value);
+  // console.log("state.context", state.context);
   return (
     <>
       <div className="channel-wrap">

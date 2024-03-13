@@ -5,8 +5,9 @@ import PitchShifter from "../Fx/PitchShifter";
 import Delay from "../Fx/Delay";
 import { useState, useEffect } from "react";
 import { FxHeader } from "../FxPanel";
-import { ToggleContext } from "@/machines/toggleMachine";
+import { toggleMachine } from "@/machines/toggleMachine";
 import { TrackContext } from "../../machines/trackMachine";
+import { useMachine } from "@xstate/react";
 
 const defaults = {
   className: "fx-panel",
@@ -16,7 +17,8 @@ const defaults = {
 };
 
 function FxPanel({ trackId }: { trackId: number }) {
-  const isOpen = ToggleContext.useSelector((state) => state.matches("active"));
+  const [state] = useMachine(toggleMachine);
+  const isOpen = state.matches("active");
   const { track, fx, fxNames } = TrackContext.useSelector((s) => s.context);
 
   const [delayIndex, setDelayIndex] = useState(-1);

@@ -1,8 +1,8 @@
 import { Track } from "../Track";
 import Main from "../Main";
-import Transport from "@/components/Transport";
-import { TrackContext } from "@/machines/trackMachine";
 import { MixerContext } from "../../machines/mixerMachine";
+import { TrackContext } from "../../machines/trackMachine";
+import Transport from "../Transport";
 
 export default function Mixer() {
   const tracks = MixerContext.useSelector((s) => s.context.sourceSong?.tracks);
