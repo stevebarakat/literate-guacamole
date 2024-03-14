@@ -63,7 +63,7 @@ export const mixerMachine = createMachine(
 
           onError: {
             target: "error",
-            actions: "inline:mixerMachine.building#error.platform.mixerMachine.building:invocation[0][-1]#transition[0]",
+            actions: "logError",
           },
 
           id: "builder"
