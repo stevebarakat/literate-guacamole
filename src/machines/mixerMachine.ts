@@ -6,438 +6,351 @@ import {
   Player,
   start,
   loaded,
+  FeedbackDelay,
+  PitchShift,
 } from "tone";
 import {
   assertEvent,
   assign,
-  createMachine,
+  setup,
   fromObservable,
   fromPromise,
   stopChild,
+  createMachine,
 } from "xstate";
 import { scale, logarithmically } from "@/utils";
 import { trackMachine } from "./trackMachine";
 import { clockMachine } from "./clockMachine";
 import { createActorContext } from "@xstate/react";
+import { produce } from "immer";
 
-type InitialContext = {
-  currentTime: number;
-  volume: number;
-  sourceSong?: SourceSong | undefined;
-  players: (Player | undefined)[];
-  channels: (Channel | undefined)[];
-};
+export const mixerMachine = setup({
+  types: {
+    context: {} as {},
+    events: {} as
+      | { type: "CHANGE_PAN" }
+      | { type: "CHANGE_VOLUME" }
+      | { type: "UPDATE_FX_NAMES" },
+  },
+  actions: {
+    setVolume: assign(({ context, event }) => {
+      assertEvent(event, "CHANGE_VOLUME");
+      const volume = parseFloat(event.volume.toFixed(2));
+      const scaled = scale(logarithmically(volume));
+      produce(context, (draft) => {
+        draft.channel.volume.value = scaled;
+      });
+      return { volume };
+    }),
 
-export const mixerMachine = createMachine(
-  {
-    /** @xstate-layout N4IgpgJg5mDOIC5QFsCWAPMAnAsgQwGMALVAOzADoAjAV1QBsIyoBiCAe3IrIDd2BrSrQYRsAbQAMAXUSgADu1ioALqk6yQ6RACYJAFgDsAGhABPRAEZtANj0BfOybSZchEl2GNmLbFnZYKOXo8ZQAzf2RqOkZxaQ0FJVV1JE0dbXSTcwQATm0AVgcnDGx8YjJKLDA8CFMKWGV2OTlIFgBlABUAQQAldskZFISVNVINLQQLCwAOKczLA11CkGcSt3KKSura+rwsZRaABU6AVVaAUX74xWHk0HHsvW05iYWJJZXXMq5NmpZus-OfTig2uSVGKXGVmseWeFkMBUcy2Kn3cFSqv3OZwA0pcQYkRmNLNZssYzDoJAYEUUXKVURt0aYWABhAASnQAcgBxM4AfQAagB5AAyxxwF2B8lBBIhlmyAGYYWSELpKe9kbTym0zkKzkz2jzWgKubjJfjbqkJtlrE8lQYpto1TS1t8GRRlFhCPwNVxWux6OxuKRCKoeGAWO0BZzOTqTSAhmDCS9JrCDBY3oiPt60Vs3R6CF7nZRff6KMHUKHw5Ho+KBqabuC7pY8sSU2nHasvtmarnPVmKDgaPtA2WKxGozGJXGpebxrpshIUxJ09SO3SfrV3b3C-3B5QR2Gx9XY-HpY3LXpZkqLAYl+2Uet1z381mWMcDgARTrtXkAMQAGjy7KdGKrTHtODYWtocoSIqWTXtkFh3n2j6bs+hbMmyXK8oKIpimBZoQbO0FyrCeRylMSHbiheYFp2GEctyPJHOy+H1omUEWCRV7WNY6aIqQ7CiPAKSZoWVwEYmUx6NYzzSQ6GbqtuAnKN0DLiWxMoTNoUnPHkbYKU6nYUL4-jqQmmnpDBzwGHo9gGau6yeEwpBQGZp4WhY2R5AuV4SNalFGeubkzogUwPLCjwGAFa6uvUjTNBAwWEZYEhprC1oUfZ94ujmOx7JASWJmmViwlMvHRQ+rqobRqKFZpcIGFxcF6fJK7ZV2G40X2xbsHVZ4WHk2gWKRN4VTl3bVd1foBmQ+59R5eRlel0xjR1T41esPWlgQIZgPNkJ5POpW3llyFVV124Dvs+2ykupHladVHnVuRlXZQs07eWe14hp-VWrBRISJlbVnTmk2Xbu227TdlotleBjzg4DhAA */
-    id: "mixerMachine",
+    setPan: assign(({ context, event }) => {
+      assertEvent(event, "CHANGE_PAN");
+      const pan = event.pan.toFixed(2);
+      produce(context, (draft) => {
+        draft.channel.pan.value = pan;
+      });
+      return { pan };
+    }),
+    setFxNames: assign(({ context, event }) => {
+      assertEvent(event, "UPDATE_FX_NAMES");
 
-    context: {
-      volume: -32,
-      currentTime: 0,
-      sourceSong: undefined,
-      players: [undefined],
-      channels: [undefined],
-    },
+      if (event.action === "add") {
+        const spliced = context.fxNames.toSpliced(event.fxId, 1);
+        const fxSpliced = context.fx.toSpliced(event.fxId, 1);
+        context.fx[event.fxId]?.dispose();
 
-    entry: "disposeTracks",
+        switch (event.fxName) {
+          case "delay":
+            return {
+              fxNames: [...spliced, event.fxName],
+              fx: [...fxSpliced, new FeedbackDelay().toDestination()],
+            };
 
-    states: {
-      notReady: {},
+          case "pitchShift":
+            return {
+              fxNames: [...spliced, event.fxName],
+              fx: [...fxSpliced, new PitchShift().toDestination()],
+            };
 
-      error: {
-        entry: "disposeTracks",
-      },
-
-      building: {
-        entry: "buildMixer",
-
-        invoke: {
-          src: "builder",
-          input: ({ context }) => ({ sourceSong: context.sourceSong }),
-
-          onDone: {
-            target: "ready",
-          },
-
-          onError: {
-            target: "error",
-            actions: "logError",
-          },
-
-          id: "builder"
+          default:
+            break;
         }
-      },
+      } else {
+        context.fx[event.fxId].dispose();
+        return {
+          fxNames: context.fxNames.toSpliced(event.fxId, 1),
+          fx: context.fx.toSpliced(event.fxId, 1),
+        };
+      }
+    }),
+    setSourceSong: assign(({ event }) => {
+      assertEvent(event, "SELECT_SONG");
+      return { sourceSong: event.song };
+    }),
 
-      ready: {
-        on: {
-          RESET: {
-            guard: "canStop?",
-            target: ".stopped",
+    buildMixer: assign(({ context, spawn }) => {
+      start();
 
-            actions: {
-              type: "reset",
-            },
-          },
-          SEEK: {
-            guard: "canSeek?",
-
-            actions: {
-              type: "seek",
-            },
-          },
-          CHANGE_VOLUME: {
-            actions: {
-              type: "setMainVolume",
-            },
-          },
+      let trackMachineRefs = [];
+      const clockMachineRef = spawn(clockMachine, {
+        id: "clock-machine",
+        input: {
+          sourceSong: context.sourceSong,
         },
-
-        exit: ["reset", "disposeTracks"],
-        states: {
-          stopped: {
-            on: {
-              START: {
-                target: "started",
-                guard: "canPlay?",
-
-                actions: {
-                  type: "play",
-                },
-              },
+      });
+      context.sourceSong.tracks.forEach((track, i) => {
+        context.players[i] = new Player(track.path)
+          .sync()
+          .start(0, context.sourceSong?.startPosition);
+        context.channels[i] = new Channel().toDestination();
+        context.players[i]?.connect(context.channels[i]);
+        trackMachineRefs = [
+          ...trackMachineRefs,
+          spawn(trackMachine, {
+            id: `track-${i}`,
+            input: {
+              channel: context.channels[i],
+              track: context.sourceSong!.tracks[i],
             },
-          },
-
-          started: {
-            on: {
-              PAUSE: {
-                target: "stopped",
-
-                actions: {
-                  type: "pause",
-                },
-
-                guard: "canStop?",
-              },
-            },
-          },
-
-          trackMachine: {
-            type: "parallel",
-
-            states: {
-              Solo: {
-                initial: "inactive",
-
-                states: {
-                  inactive: {
-                    on: {
-                      TOGGLE: "active"
-                    }
-                  },
-
-                  active: {
-                    on: {
-                      TOGGLE: "inactive"
-                    }
-                  }
-                }
-              },
-              Mute: {
-                initial: "inactive",
-
-                states: {
-                  inactive: {
-                    on: {
-                      TOGGLE: "active"
-                    }
-                  },
-
-                  active: {
-                    on: {
-                      TOGGLE: "inactive"
-                    }
-                  }
-                }
-              }
-            },
-
-            on: {
-              CHANGE_VOLUME: {
-                target: undefined,
-                actions: "setVolume"
-              },
-              UPDATE_FX_NAMES: {
-                target: undefined,
-                actions: "setFxNames"
-              },
-              CHANGE_PAN: {
-                target: undefined,
-                actions: "setPan"
-              }
-            }
-          }
-        },
-
-        type: "parallel",
-      },
-
-      trackMachine: {
-        states: {
-          inactive: {
-            on: {
-              TOGGLE: "active"
-            }
-          },
-
-          active: {
-            on: {
-              TOGGLE: "inactive"
-            }
-          },
-
-          Solo: {
-            initial: "inactive",
-
-            states: {
-              inactive: {
-                on: {
-                  TOGGLE: "active"
-                }
-              },
-
-              active: {
-                on: {
-                  TOGGLE: "inactive"
-                }
-              }
-            }
-          },
-
-          Mute: {
-            states: {
-              inactive: {
-                on: {
-                  TOGGLE: "active"
-                }
-              },
-
-              active: {
-                on: {
-                  TOGGLE: "inactive"
-                }
-              }
-            },
-
-            initial: "inactive"
-          },
-
-          "Solo (copy)": {
-            states: {
-              inactive: {
-                on: {
-                  TOGGLE: "active"
-                }
-              },
-
-              active: {
-                on: {
-                  TOGGLE: "inactive"
-                }
-              }
-            }
-          },
-
-          "Mute (copy)": {
-            states: {
-              inactive: {
-                on: {
-                  TOGGLE: "active"
-                }
-              },
-
-              active: {
-                on: {
-                  TOGGLE: "inactive"
-                }
-              }
-            }
-          }
-        },
-
-        on: {
-          UPDATE_FX_NAMES: {
-            target: undefined,
-            actions: "setFxNames"
-          }
-        },
-
-        type: "parallel",
-        initial: "Solo (copy)"
-      },
-
-      inactive: {
-        on: {
-          TOGGLE: "active"
-        }
-      },
-
-      active: {
-        on: {
-          TOGGLE: "inactive"
-        }
-      },
-
-      "inactive (copy)": {
-        on: {
-          TOGGLE: "active (copy)"
-        }
-      },
-
-      "active (copy)": {
-        on: {
-          TOGGLE: "inactive (copy)"
-        }
-      },
-
-      Mute: {
-        states: {
-          inactive: {
-            on: {
-              TOGGLE: "active"
-            }
-          },
-
-          active: {
-            on: {
-              TOGGLE: "inactive"
-            }
-          }
-        }
-      },
-
-      Solo: {
-        states: {
-          inactive: {
-            on: {
-              TOGGLE: "active"
-            }
-          },
-
-          active: {
-            on: {
-              TOGGLE: "inactive"
-            }
-          }
-        }
+          }),
+        ];
+      });
+      return {
+        trackMachineRefs,
+        clockMachineRef,
+      };
+    }),
+    reset: () => t.stop(),
+    play: () => t.start(),
+    pause: () => t.pause(),
+    seek: ({ event }) => {
+      assertEvent(event, "SEEK");
+      if (event.direction === "forward") {
+        t.seconds = t.seconds + 10;
+      } else {
+        t.seconds = t.seconds - 10;
       }
     },
-
-    types: {
-      context: {} as InitialContext,
-      events: {} as
-        | { type: "SELECT_SONG"; song: SourceSong }
-        | { type: "START" }
-        | { type: "PAUSE" }
-        | { type: "RESET" }
-        | { type: "SEEK"; direction: string; amount: number }
-        | { type: "CHANGE_VOLUME"; volume: number },
-    },
-
-    on: {
-      SELECT_SONG: {
-        target: ".building",
-        actions: "setSourceSong",
-      },
-    },
-
-    initial: "notReady"
+    stopClock: () => stopChild("ticker"),
+    setMainVolume: assign(({ event }) => {
+      assertEvent(event, "CHANGE_VOLUME");
+      const scaled = scale(logarithmically(event.volume));
+      Destination.volume.value = scaled;
+      return { volume: event.volume };
+    }),
+    disposeTracks: assign(({ context }) => {
+      context.players?.forEach((player: Player | undefined, i: number) => {
+        player?.dispose();
+        context.channels[i]?.dispose();
+      });
+      return {
+        channels: [],
+        players: [],
+      };
+    }),
   },
-  {
-    actions: {
-      setSourceSong: assign(({ event }) => {
-        assertEvent(event, "SELECT_SONG");
-        return { sourceSong: event.song };
-      }),
-
-      buildMixer: assign(({ context, spawn }) => {
-        start();
-
-        let trackMachineRefs = [];
-        const clockMachineRef = spawn(clockMachine, {
-          id: "clock-machine",
-          input: {
-            sourceSong: context.sourceSong,
+  actors: {
+    builder: fromPromise(async () => await loaded()),
+    ticker: fromObservable(() => interval(0, animationFrameScheduler)),
+  },
+  guards: {
+    "canPlay?": function ({ context, event }) {
+      // Add your guard condition here
+      return true;
+    },
+    "canStop?": function ({ context, event }) {
+      // Add your guard condition here
+      return true;
+    },
+    "canSeek?": function ({ context, event }) {
+      // Add your guard condition here
+      return true;
+    },
+  },
+  schemas: {
+    events: {
+      CHANGE_PAN: {
+        type: "object",
+        properties: {},
+      },
+      CHANGE_VOLUME: {
+        type: "object",
+        properties: {},
+      },
+      UPDATE_FX_NAMES: {
+        type: "object",
+        properties: {},
+      },
+    },
+  },
+}).createMachine({
+  context: {
+    players: [],
+    channels: [],
+    currentTime: 0,
+  },
+  id: "mixerMachine",
+  initial: "notReady",
+  on: {
+    SELECT_SONG: {
+      target: "#mixerMachine.building",
+      actions: {
+        type: "setSourceSong",
+      },
+    },
+  },
+  entry: {
+    type: "disposeTracks",
+  },
+  states: {
+    notReady: {},
+    error: {
+      entry: {
+        type: "disposeTracks",
+      },
+    },
+    building: {
+      entry: {
+        type: "buildMixer",
+      },
+      invoke: {
+        src: "builder",
+        input: ({ context }) => ({ sourceSong: context.sourceSong }),
+        onDone: {
+          target: "ready",
+        },
+        onError: {
+          target: "error",
+          actions: ({ event }) => {
+            console.error(event.error);
           },
-        });
-        context.sourceSong.tracks.forEach((track, i) => {
-          context.players[i] = new Player(track.path)
-            .sync()
-            .start(0, context.sourceSong?.startPosition);
-          context.channels[i] = new Channel().toDestination();
-          context.players[i]?.connect(context.channels[i]);
-          trackMachineRefs = [
-            ...trackMachineRefs,
-            spawn(trackMachine, {
-              id: `track-${i}`,
-              input: {
-                channel: context.channels[i],
-                track: context.sourceSong!.tracks[i],
+        },
+      },
+    },
+    ready: {
+      type: "parallel",
+      on: {
+        RESET: {
+          target: "#mixerMachine.ready.stopped",
+          actions: {
+            type: "reset",
+          },
+          guard: {
+            type: "canStop?",
+          },
+        },
+        SEEK: {
+          actions: {
+            type: "seek",
+          },
+          guard: {
+            type: "canSeek?",
+          },
+        },
+        CHANGE_VOLUME: {
+          actions: {
+            type: "setMainVolume",
+          },
+        },
+      },
+      exit: [
+        {
+          type: "reset",
+        },
+        {
+          type: "disposeTracks",
+        },
+      ],
+      states: {
+        stopped: {
+          on: {
+            START: {
+              target: "started",
+              actions: {
+                type: "play",
               },
-            }),
-          ];
-        });
-        return {
-          trackMachineRefs,
-          clockMachineRef,
-        };
-      }),
-      reset: () => t.stop(),
-      play: () => t.start(),
-      pause: () => t.pause(),
-      seek: ({ event }) => {
-        assertEvent(event, "SEEK");
-        if (event.direction === "forward") {
-          t.seconds = t.seconds + 10;
-        } else {
-          t.seconds = t.seconds - 10;
-        }
+              guard: {
+                type: "canPlay?",
+              },
+            },
+          },
+        },
+        started: {
+          on: {
+            PAUSE: {
+              target: "stopped",
+              actions: {
+                type: "pause",
+              },
+              guard: {
+                type: "canStop?",
+              },
+            },
+          },
+        },
+        trackMachine: {
+          type: "parallel",
+          on: {
+            UPDATE_FX_NAMES: {
+              actions: {
+                type: "setFxNames",
+              },
+            },
+            CHANGE_VOLUME: {
+              actions: {
+                type: "setVolume",
+              },
+            },
+            CHANGE_PAN: {
+              actions: {
+                type: "setPan",
+              },
+            },
+          },
+          states: {
+            Solo: {
+              initial: "inactive",
+              states: {
+                inactive: {
+                  on: {
+                    TOGGLE: {
+                      target: "active",
+                    },
+                  },
+                },
+                active: {
+                  on: {
+                    TOGGLE: {
+                      target: "inactive",
+                    },
+                  },
+                },
+              },
+            },
+            Mute: {
+              initial: "inactive",
+              states: {
+                inactive: {
+                  on: {
+                    TOGGLE: {
+                      target: "active",
+                    },
+                  },
+                },
+                active: {
+                  on: {
+                    TOGGLE: {
+                      target: "inactive",
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
       },
-      stopClock: () => stopChild("ticker"),
-      setMainVolume: assign(({ event }) => {
-        assertEvent(event, "CHANGE_VOLUME");
-        const scaled = scale(logarithmically(event.volume));
-        Destination.volume.value = scaled;
-        return { volume: event.volume };
-      }),
-      disposeTracks: assign(({ context }) => {
-        context.players?.forEach((player: Player | undefined, i: number) => {
-          player?.dispose();
-          context.channels[i]?.dispose();
-        });
-        return {
-          channels: [],
-          players: [],
-        };
-      }),
     },
-    actors: {
-      builder: fromPromise(async () => await loaded()),
-      ticker: fromObservable(() => interval(0, animationFrameScheduler)),
-    },
-    guards: {
-      "canSeek?": ({ context, event }) => {
-        assertEvent(event, "SEEK");
-        return event.direction === "forward"
-          ? t.seconds < context.sourceSong!.endPosition - event.amount
-          : t.seconds > event.amount;
-      },
-
-      "canStop?": () => t.seconds !== 0,
-      "canPlay?": () => !(t.state === "started"),
-    },
-  }
-);
+  },
+});
 
 export const MixerContext = createActorContext(mixerMachine);
