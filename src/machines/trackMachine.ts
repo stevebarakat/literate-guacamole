@@ -8,6 +8,7 @@ import { createMachine, assign, fromObservable, assertEvent } from "xstate";
 
 export const trackMachine = createMachine(
   {
+    /** @xstate-layout N4IgpgJg5mDOIC5QBcBOBDAxgawLJYAsBLAOzADpUx0IBPAYgGEAJAQQDkBxAUQH0A1APIAZAKq5uAbQAMAXUSgADgHtYRZEWUkFIAB6IATAEYj5AJwGDAZgAcB6QYBsAFivTHVgDQhaiK49MrE2kjM1sbZwMAVijHAF847zQsPEJSCioaBlEABQARVgAVPgAxAA1edlYJAGUZeSQQFTUNLR19BCiAdijyIy7XCKijG0cYx29fBCsYvtGzLptpCOcu9wSkjBx8TGIySmo6JjYuPhyOep1m9U1tRo6rMzNyKPCusaNHF2kvHz9ZkaOBZLFZreIbEAkZQQOA6ZLbNJkK6qG5te6IT5WcyWWz2Jyudy-KZGZw2cj+JyhGxmV7GAwQ+GpXbpA5ZZEtW7tQyOAzYszSZzSaRRflRGzvSaGJzknkBMzU2lGekJOJAA */
     id: "trackMachine",
     context: ({ input }) => ({
       volume: -32,

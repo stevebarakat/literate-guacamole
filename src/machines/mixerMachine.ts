@@ -30,6 +30,7 @@ type InitialContext = {
 
 export const mixerMachine = createMachine(
   {
+    /** @xstate-layout N4IgpgJg5mDOIC5QFsCWAPMAnAsgQwGMALVAOzADoAjAV1QBsIyoBiCAe3IrIDd2BrSrQYRsAbQAMAXUSgADu1ioALqk6yQ6RAFYAnADYANCACeiAOwAOcwF8bxtJlyESXYY2YtsWdlgpz6PGUAM19kajpGcWkNBSVVdSRNC0sJYzMEABZtCTsHDGx8YjJKLDA8CBMKWGV2OTlIFgBlABUAQQAlFskZJLiVNVINLQRLAEYx9MQxgGYxyzyQR0KXEooyiqqavCxlRoAFNoBVJoBRHtjFAcTQEe19bSmEWfnF5edirg3Klg7Ts+6MT6VwSQySd3GTzGEks+jeBQ+rlK5R+Z1OAGkLsD4oNhildBRdON7uYZpYAEzjcmPUzTPQLexLBFFJHrFEmFgAYQAEm0AHIAcVOAH0AGoAeQAMkccOcgfIQbjwTptOSKGNtKlLJkJGNMuTdDNMlD6fCnCySs1TpLTpyWsKmuLBViFTibskEABaeZPcnmbRmlafSjKLCEfgW8gsI77AAibRaIoAYgANYV8tqypoukD9UF457k-QUVJ+smGiQzbQ6mkZfSWGbqywU-TmCTmTK6XSZTKBxFrUPhyNgLm8wUiw58nN5pW3RDextjfSZcz6Ga6CQGTITcnG2kIeuL5tFtsdrs9vvDiiDggR1ZRnn8oViqUyuW9V3XMFzhAzGYSChzA3Tsu27fRdwkPc6wbJsW1PECL0Zd4rzIQhVB4EcWnFAUBRtadFXdEZvXMEsq3JGZ9E3StNWsIx93mfQCTXCRyQ1cjDQmXskOZe9KDQ1AMJYLCcLw+VcwI78PTGckAKXFc1w3LcdyhIDMgoZjWNVdc5j1S9eO4Uh+IwgACAAKAg6hMABKITsNw99LjdSSiLGEiGy0yiNyrZtV19aEAKLSD-xXWFyUpPTgwoIywDMiy5Gs2yRIc7EvwLaTZOXVd103ZdlP3GTqQoQLMmCqxwPC7jzX0m870ipp2HodgDOixL7Pwpy0uyCgYU3VUrG0TVzFYqE9RI6TskrdcN1eSqg1ZGqr3qxqooIdDMLs0SP3EjrlQQSlGx63Q+ssAbrHJKF2zVcacj-LtdQZfIqsihb9JwGg9ma1aBPWpL2tS3a9W0ChO0BzVoXSw0TQkIHyoGvRLqOgNZv7LgXsit6Ppa4S2rEmdCMQfbgd0UHxl1GTdChEqANhgaNyGxG7EZUh2FEeAkmQ3jHP+n9PX0OiMl05Gr2Z5QOnZLn812mYOyeOYkceua1m8XwJdnD1zA130hoi1l3CYUgoFV-GEG0WYnk1eWmSe1lvgyT9JZ-U3zCeWEuIVlHkU2apanqSAjecxA1xmKEwrhIX9Nt72dj2CB-YLNda2mbIHqtxXUbDW9hzj3bO261Ijr9E7Bs0l2O3VXcbqm+6xh1tZUK+jDs55tV3PIzzqJ8-npiAxsNLY7TONrrhoqbqT5nVTKFJy7dpKhUL1P-TT2J0t3U4968M9q1klvYUeRl0EjDuO06hsmfcD8XCvJru+Ya-DyL67W2LLKsvf5xbsiKKo7zaN9Fi1OKqVUKFV3ZXmis-eKr8UoOzHpYCe8lspKVnvlTcjZAGQTKmFFOHNnqb0Wg1Jqj9vpv2eJRPOvVC4n2GvRdsYxy4TVutNbBPFcFDn0jvFaa0SGUjoUfShxcRo6noZXG+zDrYDjwa9d6YASEHyJiTcG5Ng70TJHQmm8N6YDSHiGSR6NpGfS4dAtWIwlwARBtkMGZNUGUwNOpMKcM6YGi0ffeaujWQYz4g3GRRjjY8PkRY0mENKZEjsdSWmCNnF2CAA */
     id: "mixerMachine",
 
     context: {
@@ -40,9 +41,8 @@ export const mixerMachine = createMachine(
       channels: [undefined],
     },
 
-    initial: "notReady",
-
     entry: "disposeTracks",
+
     states: {
       notReady: {},
 
@@ -52,19 +52,22 @@ export const mixerMachine = createMachine(
 
       building: {
         entry: "buildMixer",
+
         invoke: {
           src: "builder",
           input: ({ context }) => ({ sourceSong: context.sourceSong }),
+
           onDone: {
             target: "ready",
           },
+
           onError: {
             target: "error",
-            actions: ({ event }) => {
-              console.error(event.error);
-            },
+            actions: "inline:mixerMachine.building#error.platform.mixerMachine.building:invocation[0][-1]#transition[0]",
           },
-        },
+
+          id: "builder"
+        }
       },
 
       ready: {
@@ -122,6 +125,120 @@ export const mixerMachine = createMachine(
           },
         },
       },
+
+      trackMachine: {
+        states: {
+          inactive: {
+            on: {
+              TOGGLE: "active"
+            }
+          },
+
+          active: {
+            on: {
+              TOGGLE: "inactive"
+            }
+          },
+
+          Solo: {
+            initial: "inactive",
+
+            states: {
+              inactive: {
+                on: {
+                  TOGGLE: "active"
+                }
+              },
+
+              active: {
+                on: {
+                  TOGGLE: "inactive"
+                }
+              }
+            }
+          },
+
+          Mute: {
+            states: {
+              inactive: {
+                on: {
+                  TOGGLE: "active"
+                }
+              },
+
+              active: {
+                on: {
+                  TOGGLE: "inactive"
+                }
+              }
+            }
+          }
+        },
+
+        on: {
+          UPDATE_FX_NAMES: {
+            target: undefined,
+            actions: "setFxNames"
+          },
+
+          CHANGE_PAN: {
+            target: "trackMachine",
+            internal: true,
+            actions: "setPan"
+          },
+
+          CHANGE_VOLUME: {
+            target: "trackMachine",
+            internal: true,
+            actions: "setVolume"
+          }
+        },
+
+        type: "parallel",
+        initial: "Mute"
+      },
+
+      inactive: {
+        on: {
+          TOGGLE: "active"
+        }
+      },
+
+      active: {
+        on: {
+          TOGGLE: "inactive"
+        }
+      },
+
+      "inactive (copy)": {
+        on: {
+          TOGGLE: "active (copy)"
+        }
+      },
+
+      "active (copy)": {
+        on: {
+          TOGGLE: "inactive (copy)"
+        }
+      },
+
+      Mute: {
+        initial: "inactive",
+
+        states: {
+          inactive: {
+            on: {
+              TOGGLE: "active"
+            }
+          },
+
+          active: {
+            on: {
+              TOGGLE: "inactive"
+            }
+          }
+        }
+      }
     },
 
     types: {
@@ -141,6 +258,9 @@ export const mixerMachine = createMachine(
         actions: "setSourceSong",
       },
     },
+
+    type: "parallel",
+    initial: "inactive"
   },
   {
     actions: {
