@@ -30,7 +30,7 @@ type InitialContext = {
 
 export const mixerMachine = createMachine(
   {
-    /** @xstate-layout N4IgpgJg5mDOIC5QFsCWAPMAnAsgQwGMALVAOzADoAjAV1QBsIyoBiCAe3IrIDd2BrSrQYRsAbQAMAXUSgADu1ioALqk6yQ6RACYJAFgDsAGhABPRAEZtANj0BfOybSZchEl2GNmLbFnZYKOXo8ZQAzf2RqOkZxaQ0FJVV1JE0dbXSTcwQATm0AVgcnDGx8YjJKLDA8CFMKWGV2OTlIFgBlABUAQQAldskZFISVNVINLQQLCwAOKczLA11CkGcSt3KKSura+rwsZRaABU6AVVaAUX74xWHk0HHsvW05iYWJJZXXMq5NmpZus-OfTig2uSVGKXGVmseWeFkMBUcy2Kn3cFSqv3OZwA0pcQYkRmNLNZssYzDoJAYEUUXKVURt0aYWABhAASnQAcgBxM4AfQAagB5AAyxxwF2B8lBBIhlmyAGYYWSELpKe9kbTym0zkKzkz2jzWgKubjJfjbqkJtlrE8lQYpto1TS1t8GRRlFhCPwNVxWux6OxuKRCKoeGAWO0BZzOTqTSAhmDCS9JrCDBY3oiPt60Vs3R6CF7nZRff6KMHUKHw5Ho+KBqabuC7pY8sSU2nHasvtmarnPVmKDgaPtA2WKxGozGJXGpebxrpshIUxJ09SO3SfrV3b3C-3B5QR2Gx9XY-HpY3LXpZkqLAYl+2Uet1z381mWMcDgARTrtXkAMQAGjy7KdGKrTHtODYWtocoSIqWTXtkFh3n2j6bs+hbMmyXK8oKIpimBZoQbO0FyrCeRylMSHbiheYFp2GEctyPJHOy+H1omUEWCRV7WNY6aIqQ7CiPAKSZoWVwEYmUx6NYzzSQ6GbqtuAnKN0DLiWxMoTNoUnPHkbYKU6nYUL4-jqQmmnpDBzwGHo9gGau6yeEwpBQGZp4WhY2R5AuV4SNalFGeubkzogUwPLCjwGAFa6uvUjTNBAwWEZYEhprC1oUfZ94ujmOx7JASWJmmViwlMvHRQ+rqobRqKFZpcIGFxcF6fJK7ZV2G40X2xbsHVZ4WHk2gWKRN4VTl3bVd1foBmQ+59R5eRlel0xjR1T41esPWlgQIZgPNkJ5POpW3llyFVV124Dvs+2ykupHladVHnVuRlXZQs07eWe14hp-VWrBRISJlbVnTmk2Xbu227TdlotleBjzg4DhAA */
+    /** @xstate-layout N4IgpgJg5mDOIC5QFsCWAPMAnAsgQwGMALVAOzADoAjAV1QBsIyoBiCAe3IrIDd2BrSrQYRsAbQAMAXUSgADu1ioALqk6yQ6RAEYAbABYArBQAcAJjOGJATgm7L1s-oA0IAJ6IDZihZMnt1tr+AMzaAOyGAL6RrmiYuIQkXMKMzCzYWOxYFHL0eMoAZlnI1HSM4tIaCkqq6kiaOrrB3s2WNnYOTq4eCIba3hIR+kHtEiZRMSBx2PjEZJRYYHgQbhTKWIT8s0mUAMrs9OzcpISqPGAsACoA8gDitwAyAKKSMvXVKmqkGloIegGmXQ2fTWMIgszBFzuHTNYIUYLWXS2My6PRhCK6aKxDAzRLzCiLZardabbb4-aHCinVDnK53R4vSrvRSfOqgX7afTowHA0HgyHdGEQ+GI5Go3TowyYybTBJzLiElZrDYELZ4rg4GjKShkam0m73Z6vKos2rfeoc6zWEw86wgsGOAXQv6hOEIpESFFojFYqY4uU7AlLJUk1VkjVayh6i4GhnG5k1L4-HTjXS2+38qE9bSukUer0Sn0y-3hhbB4kqtXyi4AYQAEgBBABytyeAH0AGrXB4AVRwjLe8lNSYtiAswTCFEMJhsM7MtlBlkFf0G+gonsMwyRhmC-n0wV9stLQaJytJ6ouPYACgARBuXdsAMQAGm2mw3+7t40PE2yGghx2sKcZ2tT0FzCJdnRzMxJw3LdrB3PcD2LeJj0VCtz2rFh62bVs2yvZtvxAD4zWTACnEnadZzAmwIMMZdtACNM4L0BDd05ZDsVQi8TxWFgACUnl2J5LiIkiR3ZRATAMChdDkpxIQkfQmmXaxgjhewJAkTdgj6MI7AmLjcWrXi3BYYSngAaTE4c-w5Lk0xMLkJHCMZDGnMEGN0HdZIcCd-BsQxEUPEsePQ7DGxbdsu17fsbN-c1JL+MJOVMZzXPGDys0aHz7CC-ztEC4KUOMwNSHYZR+PLcynmeGtLjbXZrhbeLWUS-9FwoNTbGUpwuUCXRlx3OEwl0sJxjtWwJpC7iTPQs9SFgBQsGUY9YGUdg5DkSAWAInthNa0jRwQExAlkqw-B3KUIkYhi0QoIJXWnAIzBMMJpSMgN8XmklFuW1aePWvAVp23ZLgbfjRKZH82rI064W0C7xl0iU+jMBjdO8AbXve+Txn0aJJnK0R4HqI8LxNBKyLktcbG8wYnKBK1rGXSwBiGEZbDcmbSvxcrKvLSnYeO8a1xuly7BBByWeddztAoCCprMMC9EGHmvq4DIsiFo6kqCM6KNCQLRqUkwhshB62IhQqLH0Jz1ePFImFIKAdYk-9+hBeEbuGMZPX07LegsS2d2tz0nHtkqNbLIk3bsxAUoGRErFFpmrWXFKbU07T9z0gyHbC8szzDCmE2FvX2PTPlHUDm213dMVvSlAu5qL0Mq0DCl2Dj9r7PnKuHQhWuczdUVPXFSUPr9WbAx+ytjy745ox7sjOTtAfMwY6280bwtm6jtC2-nnjF+XsvdY9kEbWk3lB6dbNhlH-MJ6LT7D9Pdvj01bUV+OkZr6ZhmGud1hQN3Hk3Ke5NW4f2PiZb+OoTgEDOGAX+es3pwhvpNO+tcLDyzAQWSeLdZ5H0woGeBVIkE0hQefd2HI3qTkwUAoeDF9ASCfrvQhB9C4wLwH9LIANqyoP-O9CQ65k4M2UjYdOUE7BAUejmZ6jg3qQNCtAkMGw+ErTWhtLakAhG-BnDaOmKdGZSJltmGC3gr5BEUXbRGRDvokM0QIwMQMQYQH0ToP2CtDDKyctJSEQIzZQScKImcSkOgBBzGMQmkQgA */
     id: "mixerMachine",
 
     context: {
@@ -44,7 +44,14 @@ export const mixerMachine = createMachine(
     entry: "disposeTracks",
 
     states: {
-      notReady: {},
+      notReady: {
+        on: {
+          SELECT_SONG: {
+            target: "building",
+            actions: "setSourceSong",
+          }
+        }
+      },
 
       error: {
         entry: "disposeTracks",
@@ -57,9 +64,7 @@ export const mixerMachine = createMachine(
           src: "builder",
           input: ({ context }) => ({ sourceSong: context.sourceSong }),
 
-          onDone: {
-            target: "ready",
-          },
+          onDone: "ready",
 
           onError: {
             target: "error",
@@ -74,7 +79,7 @@ export const mixerMachine = createMachine(
         on: {
           RESET: {
             guard: "canStop?",
-            target: ".stopped",
+            target: ".transportMachine",
 
             actions: {
               type: "reset",
@@ -109,19 +114,7 @@ export const mixerMachine = createMachine(
             },
           },
 
-          started: {
-            on: {
-              PAUSE: {
-                target: "stopped",
-
-                actions: {
-                  type: "pause",
-                },
-
-                guard: "canStop?",
-              },
-            },
-          },
+          started: {},
 
           trackMachine: {
             type: "parallel",
@@ -177,6 +170,31 @@ export const mixerMachine = createMachine(
                 actions: "setPan"
               }
             }
+          },
+
+          transportMachine: {
+            states: {
+              stopped: {
+                on: {
+                  PAUSE: {
+                    target: "started",
+                    cond: "canStop?",
+                    actions: "pause"
+                  }
+                }
+              },
+              started: {
+                on: {
+                  START: {
+                    target: "stopped",
+                    cond: "canPlay?",
+                    actions: "play"
+                  }
+                }
+              }
+            },
+
+            initial: "stopped"
           }
         },
 
@@ -343,13 +361,6 @@ export const mixerMachine = createMachine(
         | { type: "RESET" }
         | { type: "SEEK"; direction: string; amount: number }
         | { type: "CHANGE_VOLUME"; volume: number },
-    },
-
-    on: {
-      SELECT_SONG: {
-        target: ".building",
-        actions: "setSourceSong",
-      },
     },
 
     initial: "notReady"
