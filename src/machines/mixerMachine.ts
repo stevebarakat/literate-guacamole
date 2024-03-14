@@ -127,7 +127,7 @@ export const mixerMachine = createMachine(
     types: {
       context: {} as InitialContext,
       events: {} as
-        | { type: "BUILD_MIXER"; song: SourceSong }
+        | { type: "SELECT_SONG"; song: SourceSong }
         | { type: "START" }
         | { type: "PAUSE" }
         | { type: "RESET" }
@@ -136,7 +136,7 @@ export const mixerMachine = createMachine(
     },
 
     on: {
-      BUILD_MIXER: {
+      SELECT_SONG: {
         target: ".building",
         actions: "setSourceSong",
       },
@@ -145,7 +145,7 @@ export const mixerMachine = createMachine(
   {
     actions: {
       setSourceSong: assign(({ event }) => {
-        assertEvent(event, "BUILD_MIXER");
+        assertEvent(event, "SELECT_SONG");
         return { sourceSong: event.song };
       }),
 
