@@ -98,7 +98,7 @@ declare global {
   };
 
   type MeterProps = {
-    channel: Channel | Destination;
+    channel: Channel | Destination | undefined;
     options?: MeterOptions;
   };
 

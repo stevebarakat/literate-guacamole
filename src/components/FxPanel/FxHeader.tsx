@@ -1,4 +1,4 @@
-import { ToggleContext } from "@/machines/toggleMachine";
+import { MixerContext } from "@/machines/toggleMachine";
 import { X } from "lucide-react";
 
 type Props = {
@@ -7,7 +7,7 @@ type Props = {
 };
 
 function FxHeader({ track, trackId }: Props) {
-  const { send } = ToggleContext.useActorRef();
+  const { send } = MixerContext.useActorRef();
 
   function togglePanel() {
     send({ type: "TOGGLE" });

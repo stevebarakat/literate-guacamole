@@ -1,14 +1,10 @@
 import { Track } from "../Track";
 import Main from "../Main";
 import Transport from "@/components/Transport";
-import { TrackContext } from "@/machines/trackMachine";
 import { MixerContext } from "../../machines/mixerMachine";
 
 export default function Mixer() {
   const tracks = MixerContext.useSelector((s) => s.context.sourceSong?.tracks);
-  const channels = MixerContext.useSelector((s) => s.context.channels);
-  const state = MixerContext.useSelector((s) => s);
-  console.log("state", state.value);
 
   const isLoaded = MixerContext.useSelector((state) => state.matches("ready"));
   if (!isLoaded) return null;
@@ -17,17 +13,7 @@ export default function Mixer() {
     <>
       <div className="channels">
         {tracks?.map((track: SourceTrack, i: number) => (
-          <TrackContext.Provider
-            key={track.id}
-            options={{
-              input: {
-                track,
-                channel: channels[i],
-              },
-            }}
-          >
-            <Track trackId={i} />
-          </TrackContext.Provider>
+          <Track key={track.id} trackId={i} />
         ))}
         <Main />
       </div>

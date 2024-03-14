@@ -11,4 +11,4 @@ export const toggleMachine = createMachine({
   },
 });
 
-export const ToggleContext = createActorContext(toggleMachine);
+export const MixerContext = createActorContext(toggleMachine);

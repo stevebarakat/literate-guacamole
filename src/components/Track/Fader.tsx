@@ -1,4 +1,4 @@
-import { TrackContext } from "@/machines/trackMachine";
+import { MixerContext } from "@/machines/mixerMachine";
 import { ReactNode } from "react";
 
 type Props = {
@@ -6,8 +6,8 @@ type Props = {
 };
 
 function Fader({ children }: Props) {
-  const { send } = TrackContext.useActorRef();
-  const { volume } = TrackContext.useSelector((state) => state.context);
+  const { send } = MixerContext.useActorRef();
+  const { volume } = MixerContext.useSelector((state) => state.context);
 
   return (
     <>
@@ -24,7 +24,6 @@ function Fader({ children }: Props) {
             const value = parseFloat(e.target.value);
             send({ type: "CHANGE_VOLUME", volume: value });
           }}
-          onDoubleClick={() => send({ type: "CHANGE_VOLUME", volume: -32 })}
         />
       </div>
     </>

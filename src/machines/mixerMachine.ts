@@ -1,4 +1,3 @@
-import { animationFrameScheduler, interval } from "rxjs";
 import {
   Transport as t,
   Channel,
@@ -6,26 +5,24 @@ import {
   Player,
   start,
   loaded,
+  FeedbackDelay,
+  PitchShift,
 } from "tone";
-import {
-  assertEvent,
-  assign,
-  createMachine,
-  fromObservable,
-  fromPromise,
-  stopChild,
-} from "xstate";
+import { assertEvent, assign, createMachine, fromPromise } from "xstate";
 import { scale, logarithmically } from "@/utils";
-import { trackMachine } from "./trackMachine";
 import { clockMachine } from "./clockMachine";
 import { createActorContext } from "@xstate/react";
+import { produce } from "immer";
 
 type InitialContext = {
   currentTime: number;
+  mainVolume: number;
   volume: number;
   sourceSong?: SourceSong | undefined;
   players: (Player | undefined)[];
   channels: (Channel | undefined)[];
+  clockMachineRef: any;
+  trackMachineRefs: any[];
 };
 
 export const mixerMachine = createMachine(
@@ -35,23 +32,25 @@ export const mixerMachine = createMachine(
 
     context: {
       volume: -32,
+      mainVolume: -32,
       currentTime: 0,
       sourceSong: undefined,
       players: [undefined],
       channels: [undefined],
+      clockMachineRef: undefined,
+      trackMachineRefs: [],
     },
 
     entry: "disposeTracks",
 
-    states: {
-      notReady: {
-        on: {
-          SELECT_SONG: {
-            target: "building",
-            actions: "setSourceSong",
-          },
-        },
+    on: {
+      SELECT_SONG: {
+        target: ".building",
+        actions: "setSourceSong",
       },
+    },
+    states: {
+      notReady: {},
 
       error: {
         entry: "disposeTracks",
@@ -64,7 +63,7 @@ export const mixerMachine = createMachine(
           src: "builder",
           input: ({ context }) => ({ sourceSong: context.sourceSong }),
 
-          onDone: "ready",
+          onDone: { target: "ready" },
 
           onError: {
             target: "error",
@@ -85,13 +84,7 @@ export const mixerMachine = createMachine(
               type: "reset",
             },
           },
-          SEEK: {
-            guard: "canSeek?",
 
-            actions: {
-              type: "seek",
-            },
-          },
           CHANGE_MAIN_VOLUME: {
             actions: {
               type: "setMainVolume",
@@ -101,7 +94,7 @@ export const mixerMachine = createMachine(
 
         exit: ["reset", "disposeTracks"],
         states: {
-          trackMachine: {
+          mixerMachine: {
             type: "parallel",
 
             states: {
@@ -158,6 +151,15 @@ export const mixerMachine = createMachine(
           },
 
           transportMachine: {
+            on: {
+              SEEK: {
+                guard: "canSeek?",
+
+                actions: {
+                  type: "seek",
+                },
+              },
+            },
             states: {
               stopped: {
                 on: {
@@ -203,6 +205,7 @@ export const mixerMachine = createMachine(
           }
         | { type: "SEEK"; direction: string; amount: number }
         | { type: "CHANGE_MAIN_VOLUME"; volume: number }
+        | { type: "CHANGE_PAN"; pan: number }
         | { type: "CHANGE_VOLUME"; volume: number },
     },
 
@@ -217,6 +220,8 @@ export const mixerMachine = createMachine(
 
       buildMixer: assign(({ context, spawn }) => {
         start();
+
+        console.log("building mixer!");
 
         let trackMachineRefs = [];
         const clockMachineRef = spawn(clockMachine, {
@@ -233,25 +238,74 @@ export const mixerMachine = createMachine(
           context.players[i]?.connect(context.channels[i]);
           trackMachineRefs = [
             ...trackMachineRefs,
-            spawn(trackMachine, {
+            spawn(mixerMachine, {
               id: `track-${i}`,
               input: {
                 channel: context.channels[i],
                 track: context.sourceSong!.tracks[i],
+                fxNames: [],
+                fx: [],
               },
             }),
           ];
         });
+        console.log("trackMachineRefs", trackMachineRefs);
         return {
           trackMachineRefs,
           clockMachineRef,
         };
       }),
+      setVolume: assign(({ context, event }) => {
+        assertEvent(event, "CHANGE_VOLUME");
+        const volume = parseFloat(event.volume.toFixed(2));
+        const scaled = scale(logarithmically(volume));
+        produce(context, (draft) => {
+          draft.channel.volume.value = scaled;
+        });
+        return { volume };
+      }),
+      setPan: assign(({ context, event }) => {
+        assertEvent(event, "CHANGE_PAN");
+        const pan = event.pan.toFixed(2);
+        produce(context, (draft) => {
+          draft.channel.pan.value = pan;
+        });
+        return { pan };
+      }),
+      setFxNames: assign(({ context, event }) => {
+        assertEvent(event, "UPDATE_FX_NAMES");
+
+        if (event.action === "add") {
+          const spliced = context.fxNames.toSpliced(event.fxId, 1);
+          const fxSpliced = context.fx.toSpliced(event.fxId, 1);
+          context.fx[event.fxId]?.dispose();
+
+          switch (event.fxName) {
+            case "delay":
+              return {
+                fxNames: [...spliced, event.fxName],
+                fx: [...fxSpliced, new FeedbackDelay().toDestination()],
+              };
+
+            case "pitchShift":
+              return {
+                fxNames: [...spliced, event.fxName],
+                fx: [...fxSpliced, new PitchShift().toDestination()],
+              };
+
+            default:
+              break;
+          }
+        } else {
+          context.fx[event.fxId].dispose();
+          return {
+            fxNames: context.fxNames.toSpliced(event.fxId, 1),
+            fx: context.fx.toSpliced(event.fxId, 1),
+          };
+        }
+      }),
       reset: () => t.stop(),
-      play: () => {
-        console.log("started");
-        t.start();
-      },
+      play: () => t.start(),
       pause: () => t.pause(),
       seek: ({ event }) => {
         assertEvent(event, "SEEK");

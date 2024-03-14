@@ -7,7 +7,7 @@ import {
   roundFourth,
   scale,
 } from "@/utils";
-import { TrackContext } from "@/machines/trackMachine";
+import { MixerContext } from "@/machines/mixerMachine";
 
 type Props = {
   trackId: number;
@@ -24,7 +24,7 @@ type WriteProps = {
 };
 
 function useVolumeAutomationData({ trackId, channel, track }: Props) {
-  const volume = TrackContext.useSelector((state) => state.context.volume);
+  const volume = MixerContext.useSelector((state) => state.context.volume);
 
   useWrite({ trackId, value: volume, track });
   useRead({ trackId, channel, track });
@@ -64,7 +64,7 @@ function useWrite({ trackId, value, track }: WriteProps) {
 // !!! --- READ --- !!! //
 function useRead({ track, channel }: ReadProps) {
   const automationMode = track.volumeMode;
-  const { send } = TrackContext.useActorRef();
+  const { send } = MixerContext.useActorRef();
 
   const setVolume = useCallback(
     (value: number): void => {

@@ -1,12 +1,11 @@
 import { array } from "@/utils";
 import { upperFirst } from "lodash";
-import { TrackContext } from "../../machines/trackMachine";
-import { ToggleContext } from "@/machines/toggleMachine";
+import { MixerContext } from "@/machines/toggleMachine";
 
 function FxSelector({ trackId }: { trackId: number }) {
-  const sendToggle = ToggleContext.useActorRef().send;
-  const { send } = TrackContext.useActorRef();
-  const { fxNames } = TrackContext.useSelector((state) => state.context);
+  const sendToggle = MixerContext.useActorRef().send;
+  const { send } = MixerContext.useActorRef();
+  const { fxNames } = MixerContext.useSelector((state) => state.context);
 
   function handleSetFxNames(
     e: React.FormEvent<HTMLSelectElement>,
@@ -18,7 +17,7 @@ function FxSelector({ trackId }: { trackId: number }) {
     send({ type: "UPDATE_FX_NAMES", fxId, fxName, action });
   }
 
-  const state = ToggleContext.useSelector((s) => s);
+  const state = MixerContext.useSelector((s) => s);
   const isOpen = state.matches("active");
 
   return (

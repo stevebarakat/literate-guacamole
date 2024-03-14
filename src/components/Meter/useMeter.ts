@@ -12,7 +12,7 @@ const lowOn = "hsla(330, 100%, 70%, 0.9)";
 const lowOff = "hsla(330, 100%, 70%, 0.5)";
 
 type Props = {
-  channel: Channel | Destination;
+  channel: Channel | Destination | undefined;
   canvas: React.MutableRefObject<HTMLCanvasElement | null>;
   options: MeterOptions | undefined;
 };
