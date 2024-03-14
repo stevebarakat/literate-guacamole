@@ -92,7 +92,7 @@ export const mixerMachine = createMachine(
               type: "seek",
             },
           },
-          CHANGE_VOLUME: {
+          CHANGE_MAIN_VOLUME: {
             actions: {
               type: "setMainVolume",
             },
@@ -194,7 +194,15 @@ export const mixerMachine = createMachine(
         | { type: "START" }
         | { type: "PAUSE" }
         | { type: "RESET" }
+        | { type: "TOGGLE" }
+        | {
+            type: "UPDATE_FX_NAMES";
+            fxName: string;
+            fxId: number;
+            action: string;
+          }
         | { type: "SEEK"; direction: string; amount: number }
+        | { type: "CHANGE_MAIN_VOLUME"; volume: number }
         | { type: "CHANGE_VOLUME"; volume: number },
     },
 
@@ -254,7 +262,7 @@ export const mixerMachine = createMachine(
         }
       },
       setMainVolume: assign(({ event }) => {
-        assertEvent(event, "CHANGE_VOLUME");
+        assertEvent(event, "CHANGE_MAIN_VOLUME");
         const scaled = scale(logarithmically(event.volume));
         Destination.volume.value = scaled;
         return { volume: event.volume };
