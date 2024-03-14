@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Meter } from "tone";
 
 const MAX_BOX_COUNT = 100;
@@ -105,7 +105,7 @@ function useMeter({ channel, canvas, options }: Props) {
     animation.current = requestAnimationFrame(animateMeter);
   }, []);
 
-  requestAnimationFrame(animateMeter);
+  useMemo(() => requestAnimationFrame(animateMeter), [animateMeter]);
 
   return meterVals;
 }

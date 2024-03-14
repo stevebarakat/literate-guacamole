@@ -9,11 +9,11 @@ function Play() {
     (state) => state.context
   );
   const canPause = MixerContext.useSelector((state) =>
-    state.matches("ready.started")
+    state.matches({ ready: { transportMachine: "started" } })
   );
 
   if (sourceSong && currentTime > sourceSong.endPosition) {
-    send({ type: "END" });
+    send({ type: "RESET" });
   }
 
   return (

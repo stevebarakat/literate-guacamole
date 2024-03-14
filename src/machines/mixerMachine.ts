@@ -49,8 +49,8 @@ export const mixerMachine = createMachine(
           SELECT_SONG: {
             target: "building",
             actions: "setSourceSong",
-          }
-        }
+          },
+        },
       },
 
       error: {
@@ -71,8 +71,8 @@ export const mixerMachine = createMachine(
             actions: "logError",
           },
 
-          id: "builder"
-        }
+          id: "builder",
+        },
       },
 
       ready: {
@@ -101,21 +101,6 @@ export const mixerMachine = createMachine(
 
         exit: ["reset", "disposeTracks"],
         states: {
-          stopped: {
-            on: {
-              START: {
-                target: "started",
-                guard: "canPlay?",
-
-                actions: {
-                  type: "play",
-                },
-              },
-            },
-          },
-
-          started: {},
-
           trackMachine: {
             type: "parallel",
 
@@ -126,16 +111,16 @@ export const mixerMachine = createMachine(
                 states: {
                   inactive: {
                     on: {
-                      TOGGLE: "active"
-                    }
+                      TOGGLE: "active",
+                    },
                   },
 
                   active: {
                     on: {
-                      TOGGLE: "inactive"
-                    }
-                  }
-                }
+                      TOGGLE: "inactive",
+                    },
+                  },
+                },
               },
               Mute: {
                 initial: "inactive",
@@ -143,213 +128,63 @@ export const mixerMachine = createMachine(
                 states: {
                   inactive: {
                     on: {
-                      TOGGLE: "active"
-                    }
+                      TOGGLE: "active",
+                    },
                   },
 
                   active: {
                     on: {
-                      TOGGLE: "inactive"
-                    }
-                  }
-                }
-              }
+                      TOGGLE: "inactive",
+                    },
+                  },
+                },
+              },
             },
 
             on: {
               CHANGE_VOLUME: {
                 target: undefined,
-                actions: "setVolume"
+                actions: "setVolume",
               },
               UPDATE_FX_NAMES: {
                 target: undefined,
-                actions: "setFxNames"
+                actions: "setFxNames",
               },
               CHANGE_PAN: {
                 target: undefined,
-                actions: "setPan"
-              }
-            }
+                actions: "setPan",
+              },
+            },
           },
 
           transportMachine: {
             states: {
               stopped: {
                 on: {
-                  PAUSE: {
+                  START: {
                     target: "started",
-                    cond: "canStop?",
-                    actions: "pause"
-                  }
-                }
+                    guard: "canPlay?",
+                    actions: "play",
+                  },
+                },
               },
               started: {
                 on: {
-                  START: {
+                  PAUSE: {
                     target: "stopped",
-                    cond: "canPlay?",
-                    actions: "play"
-                  }
-                }
-              }
+                    guard: "canStop?",
+                    actions: "pause",
+                  },
+                },
+              },
             },
 
-            initial: "stopped"
-          }
+            initial: "stopped",
+          },
         },
 
         type: "parallel",
       },
-
-      trackMachine: {
-        states: {
-          inactive: {
-            on: {
-              TOGGLE: "active"
-            }
-          },
-
-          active: {
-            on: {
-              TOGGLE: "inactive"
-            }
-          },
-
-          Solo: {
-            initial: "inactive",
-
-            states: {
-              inactive: {
-                on: {
-                  TOGGLE: "active"
-                }
-              },
-
-              active: {
-                on: {
-                  TOGGLE: "inactive"
-                }
-              }
-            }
-          },
-
-          Mute: {
-            states: {
-              inactive: {
-                on: {
-                  TOGGLE: "active"
-                }
-              },
-
-              active: {
-                on: {
-                  TOGGLE: "inactive"
-                }
-              }
-            },
-
-            initial: "inactive"
-          },
-
-          "Solo (copy)": {
-            states: {
-              inactive: {
-                on: {
-                  TOGGLE: "active"
-                }
-              },
-
-              active: {
-                on: {
-                  TOGGLE: "inactive"
-                }
-              }
-            }
-          },
-
-          "Mute (copy)": {
-            states: {
-              inactive: {
-                on: {
-                  TOGGLE: "active"
-                }
-              },
-
-              active: {
-                on: {
-                  TOGGLE: "inactive"
-                }
-              }
-            }
-          }
-        },
-
-        on: {
-          UPDATE_FX_NAMES: {
-            target: undefined,
-            actions: "setFxNames"
-          }
-        },
-
-        type: "parallel",
-        initial: "Solo (copy)"
-      },
-
-      inactive: {
-        on: {
-          TOGGLE: "active"
-        }
-      },
-
-      active: {
-        on: {
-          TOGGLE: "inactive"
-        }
-      },
-
-      "inactive (copy)": {
-        on: {
-          TOGGLE: "active (copy)"
-        }
-      },
-
-      "active (copy)": {
-        on: {
-          TOGGLE: "inactive (copy)"
-        }
-      },
-
-      Mute: {
-        states: {
-          inactive: {
-            on: {
-              TOGGLE: "active"
-            }
-          },
-
-          active: {
-            on: {
-              TOGGLE: "inactive"
-            }
-          }
-        }
-      },
-
-      Solo: {
-        states: {
-          inactive: {
-            on: {
-              TOGGLE: "active"
-            }
-          },
-
-          active: {
-            on: {
-              TOGGLE: "inactive"
-            }
-          }
-        }
-      }
     },
 
     types: {
@@ -363,7 +198,7 @@ export const mixerMachine = createMachine(
         | { type: "CHANGE_VOLUME"; volume: number },
     },
 
-    initial: "notReady"
+    initial: "notReady",
   },
   {
     actions: {
@@ -405,7 +240,10 @@ export const mixerMachine = createMachine(
         };
       }),
       reset: () => t.stop(),
-      play: () => t.start(),
+      play: () => {
+        console.log("started");
+        t.start();
+      },
       pause: () => t.pause(),
       seek: ({ event }) => {
         assertEvent(event, "SEEK");
@@ -415,7 +253,6 @@ export const mixerMachine = createMachine(
           t.seconds = t.seconds - 10;
         }
       },
-      stopClock: () => stopChild("ticker"),
       setMainVolume: assign(({ event }) => {
         assertEvent(event, "CHANGE_VOLUME");
         const scaled = scale(logarithmically(event.volume));
@@ -435,7 +272,6 @@ export const mixerMachine = createMachine(
     },
     actors: {
       builder: fromPromise(async () => await loaded()),
-      ticker: fromObservable(() => interval(0, animationFrameScheduler)),
     },
     guards: {
       "canSeek?": ({ context, event }) => {
