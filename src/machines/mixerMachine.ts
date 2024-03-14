@@ -17,7 +17,7 @@ import {
 } from "xstate";
 import { scale, logarithmically } from "@/utils";
 import { trackMachine } from "./trackMachine";
-import { clockMachine } from "../components/Transport/clockMachine";
+import { clockMachine } from "./clockMachine";
 import { createActorContext } from "@xstate/react";
 
 type InitialContext = {
@@ -26,7 +26,6 @@ type InitialContext = {
   sourceSong?: SourceSong | undefined;
   players: (Player | undefined)[];
   channels: (Channel | undefined)[];
-  audioBuffers: (AudioBuffer | undefined)[];
 };
 
 export const mixerMachine = createMachine(
@@ -39,14 +38,13 @@ export const mixerMachine = createMachine(
       sourceSong: undefined,
       players: [undefined],
       channels: [undefined],
-      audioBuffers: [undefined],
     },
 
-    initial: "not ready",
+    initial: "notReady",
 
     entry: "disposeTracks",
     states: {
-      "not ready": {},
+      notReady: {},
 
       error: {
         entry: "disposeTracks",
@@ -120,9 +118,6 @@ export const mixerMachine = createMachine(
 
                 guard: "canStop?",
               },
-              END: {
-                actions: "stopClock",
-              },
             },
           },
         },
@@ -137,8 +132,7 @@ export const mixerMachine = createMachine(
         | { type: "PAUSE" }
         | { type: "RESET" }
         | { type: "SEEK"; direction: string; amount: number }
-        | { type: "CHANGE_VOLUME"; volume: number }
-        | { type: "END" },
+        | { type: "CHANGE_VOLUME"; volume: number },
     },
 
     on: {

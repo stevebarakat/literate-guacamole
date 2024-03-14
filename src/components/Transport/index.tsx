@@ -2,7 +2,7 @@ import Clock from "./Clock";
 import Reset from "./Reset";
 import Seek from "./Seek";
 import Play from "./Play";
-import { ClockContext } from "./clockMachine";
+import { ClockContext } from "../../machines/clockMachine";
 import { MixerContext } from "../../machines/mixerMachine";
 
 const Transport = () => {

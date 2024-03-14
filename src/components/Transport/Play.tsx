@@ -1,7 +1,7 @@
 import { MixerContext } from "@/machines/mixerMachine";
 import { TransportButton } from "../Buttons";
 import { Play as PlayIcon, Pause as PauseIcon } from "lucide-react";
-import { ClockContext } from "./clockMachine";
+import { ClockContext } from "../../machines/clockMachine";
 
 function Play() {
   const { send } = MixerContext.useActorRef();

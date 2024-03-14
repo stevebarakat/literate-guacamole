@@ -1,6 +1,6 @@
 import { formatMilliseconds } from "@/utils";
 import "./clock.css";
-import { ClockContext } from "./clockMachine";
+import { ClockContext } from "../../machines/clockMachine";
 
 function Clock() {
   const { currentTime } = ClockContext.useSelector((state) => state.context);
