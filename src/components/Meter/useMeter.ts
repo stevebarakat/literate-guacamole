@@ -33,21 +33,21 @@ function useMeter({ channel, canvas, options }: Props) {
   useEffect(() => {
     const draw = canvas.current?.getContext("2d");
 
-    const boxGap = (options?.gap && options.gap * 0.1) ?? 0.1;
-    const boxCount = options?.total ?? 50;
-    const boxCountMid = options?.midCount ?? 20;
-    const boxCountHi = options?.highCount ?? 10;
     const width = options?.width ?? 12;
     const height = (options?.height || 200) - 4;
 
-    // Gap between boxes and box height
+    const boxCount = options?.total ?? 50;
+    const boxCountMid = options?.midCount ?? 20;
+    const boxCountHi = options?.highCount ?? 10;
+
+    const boxGap = (options?.gap && options.gap * 0.1) ?? 0.1;
+
     const boxHeight = height / (boxCount + (boxCount + 1) * boxGap);
     const boxGapY = boxHeight * boxGap;
 
     const boxWidth = width - boxGapY * 2;
     const boxGapX = (width - boxWidth) / 2;
 
-    // Get the color of a box given it's ID and the current value
     const getBoxColor = (id: number, val: number) => {
       if (id > boxCount - boxCountHi) {
         return id <= Math.ceil((val / MAX_BOX_COUNT) * boxCount) ? hiOn : hiOff;
@@ -60,7 +60,7 @@ function useMeter({ channel, canvas, options }: Props) {
       return id <= Math.ceil((val / MAX_BOX_COUNT) * boxCount) ? lowOn : lowOff;
     };
 
-    function createMeter() {
+    function drawMeter() {
       if (!canvas.current || draw == null)
         throw new Error("Could not get canvas context");
       const meterValue: number = Number(canvas.current.dataset.meterlevel) + 85;
@@ -86,10 +86,10 @@ function useMeter({ channel, canvas, options }: Props) {
         draw.translate(0, boxHeight + boxGapY);
       }
       draw.restore();
-      pencil.current = requestAnimationFrame(createMeter);
+      pencil.current = requestAnimationFrame(drawMeter);
     }
 
-    requestAnimationFrame(createMeter);
+    drawMeter();
 
     return () => {
       pencil.current && cancelAnimationFrame(pencil.current);
