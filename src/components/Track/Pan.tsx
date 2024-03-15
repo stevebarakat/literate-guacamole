@@ -1,8 +1,8 @@
-import { MixerContext } from "@/machines/mixerMachine";
+import { TrackContext } from "@/machines/trackMachine";
 
 function Pan() {
-  const { send } = MixerContext.useActorRef();
-  const { pan } = MixerContext.useSelector((state) => state.context);
+  const { send } = TrackContext.useActorRef();
+  const { pan } = TrackContext.useSelector((state) => state.context);
 
   return (
     <div className="pan">
