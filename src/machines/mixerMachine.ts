@@ -30,7 +30,7 @@ type InitialContext = {
 
 export const mixerMachine = createMachine(
   {
-    /** @xstate-layout N4IgpgJg5mDOIC5QFsCWAPMAnAsgQwGMALVAOzADpSB7AFwCUw8IBPAYgGUBRAGS4GEAKgH0OAeQByAcQDaABgC6iUAAdqsVLVTVSykOkQAOACwBmCgCYA7AFYAbHLtW5N0xeMBOADQgWiT4aWZhYAjMZ21lZRNgC+MT5omLiEJOQUAEYArqgANhBkUGwQOpRkAG7UANaUWbkQ2PJKSCBqGlo6egYIIXLhFB7uxsZWdoZWhh4RPn4IzhYUNnJjTmYmLsZxCRjY+MRkNdl5BWzYWNRYFCo5eLQAZufIGYf1WI16rZraus1dHoaBFg8IQsplcvQsNg8NmmRkhCzMISsplMdhCNhGmxAiR2KX2FCwTFYbH4AAkAILSLjCABqYh4AFUcFw3s0Pu1vqAuiEHOYxoYbJ5emFTGYYd05BZApM7MYLHJkaYQoYQpjsck9mkCcwWBRYLRqCoVJA2AAFHhkgCaLNU6k+HR+iGB-wW-1cwLsNhCHm8vkQ4zk-TkVg8waWExCaNV23VqUoWtYutoeCwtGNJrJ9O41patvZnUdi3MisiDhcAysYtsAZM6KWkw8LnsUaSu1j+MJ7G4XAA0tm2V9891ZYF7H8LHYBg2oYYxRHTB4FojSw4ZRO7M2cRq4x22PQuNxBH3cwOHd0vYFQW4RoqbJ7g7OXFK7DLgciJqEVZiaPV4M01a39neY97U5RAPXmQwLDlaxrDGdwfRmEEAWCMIIiiaINxjPEaAYDsgLaE9QNmbkKH+XpHAmDxjDgsUbCgoI3FQyIog2eIsWjAC0lOc58LtDl9D9ORqygiUrFgsTPDFEwF2cCYy29JFbEwziDjqApeLzU9nGMBY-hCUwxPcUwJlMMUZR0oTlisVZjHWZTcU1PDWWA-iuXcAMbFdYsPS9BDEEWAMG2DUN-iBYFYjY-8HO3bVEwNI0IA0wiBO6QEQgoMM3XHT1vUrMJA2ChtQojCx7K3dtYr1ZNU0S5yCJAlLUPMCc3EWZUI1RUzfQQQx5woHooVvcZxm9CK4iAA */
+    /** @xstate-layout N4IgpgJg5mDOIC5QFsCWAPMAnAsgQwGMALVAOzADpSB7AFwCUw8IBPAYgGUBRAGS4GEAKgH0OAeQByAcQDaABgC6iUAAdqsVLVTVSykOkQAOACwBmCgCYA7AFYAbHLtW5N0xeMBOADQgWiT4aWZhYAjMZ21lZRNgC+MT5omLiEJOQUAEYArqgANhBkUGwQOpRkAG7UANaUWbkQ2PJKSCBqGlo6egYIIXLhFB7uxsZWdoZWhh52Pn4IzhYUNnJjTmYmLsZxCRjY+MRkNdl5BWzYWNRYFCo5eLQAZufIGYf1WI16rZraus1dHoaBFg8IQsplcvQsNg8NmmRkhCzMISsplMdhCNhGmxAiR2KX2FCwTFYFFgtGoKhUkDYAAUeABBACab2aH3a31AXWB-wW-1cwLsNhCHm8vkQ4zk-TkVg8UqWExCaMx2OSezSBOYLGJtDwWFolKptIAqtwmap1J8Oj9EGi5OZTMCog4XAMrDDZosKCZ0UtJh4XPZFdtlalKGrWGx6FxuIITS0zazOlbBYFQW4RnabALDK6ejZApM7MZgciJqEA0ldsH8YT2NwuABpGMsr4J7rGCyBex-Cx2Aa+ybZkKmDwLRGOhwFqxxeIgGj1eDNJUV-bvOPNy0IAC0xizIs33bkZZxKsoNAY1ZXbTX7NFITsHsMvUcEw826sFldNgs83cbjCESiUQbNOi64mkpznBe5psvoopyOKhhfnI1jWGM7jCjMJjDs4ExOkKSK2IeQZ4rURykFAkHxuuzjGAsfyDm+P4TKYroFjRcHLFYqzGOshFLqq57MquFrXt07jirmhi8t2ApCh+cESlKMr-ECg68aBIbVpqZIUhAFFXjBolAhQspSfygroTeNG+opvrKfKFhqceVbqpq2q6rpgmXsJBl-uYPZuIshjyreISuoYQ4UD0UIZuM4xCrEU5AA */
     id: "mixerMachine",
 
     context: {
@@ -185,100 +185,6 @@ export const mixerMachine = createMachine(
         },
 
         type: "parallel",
-      },
-
-      trackMachine: {
-        states: {
-          inactive: {
-            on: {
-              TOGGLE: "active"
-            }
-          },
-
-          active: {
-            on: {
-              TOGGLE: "inactive"
-            }
-          },
-
-          Solo: {
-            initial: "inactive",
-
-            states: {
-              inactive: {
-                on: {
-                  TOGGLE: "active"
-                }
-              },
-
-              active: {
-                on: {
-                  TOGGLE: "inactive"
-                }
-              }
-            }
-          },
-
-          Mute: {
-            states: {
-              inactive: {
-                on: {
-                  TOGGLE: "active"
-                }
-              },
-
-              active: {
-                on: {
-                  TOGGLE: "inactive"
-                }
-              }
-            },
-
-            initial: "inactive"
-          },
-
-          "Solo (copy)": {
-            states: {
-              inactive: {
-                on: {
-                  TOGGLE: "active"
-                }
-              },
-
-              active: {
-                on: {
-                  TOGGLE: "inactive"
-                }
-              }
-            }
-          },
-
-          "Mute (copy)": {
-            states: {
-              inactive: {
-                on: {
-                  TOGGLE: "active"
-                }
-              },
-
-              active: {
-                on: {
-                  TOGGLE: "inactive"
-                }
-              }
-            }
-          }
-        },
-
-        on: {
-          UPDATE_FX_NAMES: {
-            target: undefined,
-            actions: "setFxNames"
-          }
-        },
-
-        type: "parallel",
-        initial: "Solo (copy)"
       },
 
       inactive: {
