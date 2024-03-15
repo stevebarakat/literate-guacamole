@@ -1,4 +1,3 @@
-import { mixerMachine } from "@/machines/mixerMachine";
 import { scale, logarithmically } from "@/utils";
 import { createActorContext } from "@xstate/react";
 import { interval, animationFrameScheduler } from "rxjs";
@@ -8,7 +7,6 @@ import { createMachine, assign, fromObservable, assertEvent } from "xstate";
 
 export const trackMachine = createMachine(
   {
-    /** @xstate-layout N4IgpgJg5mDOIC5QBcBOBDAxgawLJYAsBLAOzADpUx0IBPAYgGEAJAQQDkBxAUQH0A1APIAZAKq5uAbQAMAXUSgADgHtYRZEWUkFIAB6IATAEYj5AJwGDAZgAcB6QYBsAFivTHVgDQhaiK49MrE2kjM1sbZwMAVijHAF847zQsPEJSCioaBlEABQARVgAVPgAxAA1edlYJAGUZeSQQFTUNLR19BCiAdijyIy7XCKijG0cYx29fBCsYvtGzLptpCOcu9wSkjBx8TGIySmo6JjYuPhyOep1m9U1tRo6rMzNyKPCusaNHF2kvHz9ZkaOBZLFZreIbEAkZQQOA6ZLbNJkK6qG5te6IT5WcyWWz2Jyudy-KZGZw2cj+JyhGxmV7GAwQ+GpXbpA5ZZEtW7tQyOAzYszSZzSaRRflRGzvSaGJzknkBMzU2lGekJOJAA */
     id: "trackMachine",
     context: ({ input }) => ({
       volume: -32,
@@ -24,17 +22,13 @@ export const trackMachine = createMachine(
       ready: {
         on: {
           CHANGE_VOLUME: {
-            actions: {
-              type: "setVolume",
-            },
+            actions: "setVolume",
           },
           UPDATE_FX_NAMES: {
-            actions: ["setFxNames"],
+            actions: "setFxNames",
           },
           CHANGE_PAN: {
-            actions: {
-              type: "setPan",
-            },
+            actions: "setPan",
           },
         },
       },
@@ -111,8 +105,6 @@ export const trackMachine = createMachine(
     actors: {
       ticker: fromObservable(() => interval(0, animationFrameScheduler)),
     },
-    guards: {},
-    delays: {},
   }
 );
 

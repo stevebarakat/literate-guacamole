@@ -5,7 +5,7 @@ import PitchShifter from "../Fx/PitchShifter";
 import Delay from "../Fx/Delay";
 import { useState, useEffect } from "react";
 import { FxHeader } from "../FxPanel";
-import { MixerContext } from "@/machines/toggleMachine";
+import { MixerContext } from "@/machines/mixerMachine";
 
 const defaults = {
   className: "fx-panel",

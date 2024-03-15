@@ -15,7 +15,7 @@ export const blueMonday = {
     {
       id: uuid(),
       name: "Drums 1",
-      path: "https://ioxpcmpvgermtfqxwykx.supabase.co/storage/v1/object/public/songs/blueMonday/01-Drums-01.mp3",
+      path: "https://ioxpcmmtfqxwykx.supabase.co/storage/v1/object/public/songs/blueMonday/01-Drums-01.mp3",
     },
     {
       id: uuid(),

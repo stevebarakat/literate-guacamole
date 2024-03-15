@@ -7,7 +7,13 @@ import Error from "./components/Loader/Error";
 
 function App() {
   return (
-    <MixerContext.Provider>
+    <MixerContext.Provider
+    // options={{
+    //   inspect: (ev) => {
+    //     console.log("snapshot", ev.snapshot?.value);
+    //   },
+    // }}
+    >
       <Loader />
       <Mixer />
       <Error />

@@ -17,9 +17,9 @@ export const clockMachine = setup({
     currentTime: 0,
   }),
   id: "clockMachine",
-  initial: "ready",
+  initial: "ticking",
   states: {
-    ready: {
+    ticking: {
       invoke: {
         src: "ticker",
         id: "ticker",
