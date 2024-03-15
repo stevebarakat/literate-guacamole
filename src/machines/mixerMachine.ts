@@ -1,3 +1,4 @@
+import { animationFrameScheduler, interval } from "rxjs";
 import {
   Transport as t,
   Channel,
@@ -5,53 +6,56 @@ import {
   Player,
   start,
   loaded,
-  FeedbackDelay,
-  PitchShift,
 } from "tone";
-import { assertEvent, assign, createMachine, fromPromise } from "xstate";
+import {
+  assertEvent,
+  assign,
+  createMachine,
+  fromObservable,
+  fromPromise,
+  stopChild,
+} from "xstate";
 import { scale, logarithmically } from "@/utils";
+import { trackMachine } from "./trackMachine";
 import { clockMachine } from "./clockMachine";
 import { createActorContext } from "@xstate/react";
-import { trackMachine } from "./trackMachine";
 
 type InitialContext = {
-  mainVolume: number;
   currentTime: number;
+  volume: number;
   sourceSong?: SourceSong | undefined;
-  clockMachineRef: any;
-  trackMachineRefs: any[];
   players: (Player | undefined)[];
   channels: (Channel | undefined)[];
 };
 
 export const mixerMachine = createMachine(
   {
-    /** @xstate-layout N4IgpgJg5mDOIC5QFsCWAPMAnAsgQwGMALVAOzADoAjAV1QBsIyoBiCAe3IrIDd2BrSrQYRsAbQAMAXUSgADu1ioALqk6yQ6RAEYAbABYArBQAcAJjOGJATgm7L1s-oA0IAJ6IDZihZMnt1tr+AMzaAOyGAL6RrmiYuIQkXMKMzCzYWOxYFHL0eMoAZlnI1HSM4tIaCkqq6kiaOrrB3s2WNnYOTq4eCIba3hIR+kHtEiZRMSBx2PjEZJRYYHgQbhTKWIT8s0mUAMrs9OzcpISqPGAsACoA8gDitwAyAKKSMvXVKmqkGloIegGmXQ2fTWMIgszBFzuHTNYIUYLWXS2My6PRhCK6aKxDAzRLzCiLZardabbb4-aHCinVDnK53R4vSrvRSfOqgX7afTowHA0HgyHdGEQ+GI5Go3TowyYybTBJzLiElZrDYELZ4rg4GjKShkam0m73Z6vKos2rfeoc6zWEw86wgsGOAXQv6hOEIpESFFojFYqY4uU7AlLJUk1VkjVayh6i4GhnG5k1L4-HTjXS2+38qE9bSukUer0Sn0y-3hhbB4kqtXyi4AYQAEgBBABytyeAH0AGrXB4AVRwjLe8lNSYtiAswTCFEMJhsM7MtlBlkFf0G+gonsMwyRhmC-n0wV9stLQaJytJ6ouPYACgARBuXdsAMQAGm2mw3+7t40PE2yGghx2sKcZ2tT0FzCJdnRzMxJw3LdrB3PcD2LeJj0VCtz2rFh62bVs2yvZtvxAD4zWTACnEnadZzAmwIMMZdtACNM4L0BDd05ZDsVQi8TxWFgACUnl2J5LiIkiR3ZRATAMChdDkpxIQkfQmmXaxgjhewJAkTdgj6MI7AmLjcWrXi3BYYSngAaTE4c-w5Lk0xMLkJHCMZDGnMEGN0HdZIcCd-BsQxEUPEsePQ7DGxbdsu17fsbN-c1JL+MJOVMZzXPGDys0aHz7CC-ztEC4KUOMwNSHYZR+PLcynmeGtLjbXZrhbeLWUS-9FwoNTbGUpwuUCXRlx3OEwl0sJxjtWwJpC7iTPQs9SFgBQsGUY9YGUdg5DkSAWAInthNa0jRwQExAlkqw-B3KUIkYhi0QoIJXWnAIzBMMJpSMgN8XmklFuW1aePWvAVp23ZLgbfjRKZH82rI064W0C7xl0iU+jMBjdO8AbXve+Txn0aJJnK0R4HqI8LxNBKyLktcbG8wYnKBK1rGXSwBiGEZbDcmbSvxcrKvLSnYeO8a1xuly7BBByWeddztAoCCprMMC9EGHmvq4DIsiFo6kqCM6KNCQLRqUkwhshB62IhQqLH0Jz1ePFImFIKAdYk-9+hBeEbuGMZPX07LegsS2d2tz0nHtkqNbLIk3bsxAUoGRErFFpmrWXFKbU07T9z0gyHbC8szzDCmE2FvX2PTPlHUDm213dMVvSlAu5qL0Mq0DCl2Dj9r7PnKuHQhWuczdUVPXFSUPr9WbAx+ytjy745ox7sjOTtAfMwY6280bwtm6jtC2-nnjF+XsvdY9kEbWk3lB6dbNhlH-MJ6LT7D9Pdvj01bUV+OkZr6ZhmGud1hQN3Hk3Ke5NW4f2PiZb+OoTgEDOGAX+es3pwhvpNO+tcLDyzAQWSeLdZ5H0woGeBVIkE0hQefd2HI3qTkwUAoeDF9ASCfrvQhB9C4wLwH9LIANqyoP-O9CQ65k4M2UjYdOUE7BAUejmZ6jg3qQNCtAkMGw+ErTWhtLakAhG-BnDaOmKdGZSJltmGC3gr5BEUXbRGRDvokM0QIwMQMQYQH0ToP2CtDDKyctJSEQIzZQScKImcSkOgBBzGMQmkQgA */
+    /** @xstate-layout N4IgpgJg5mDOIC5QFsCWAPMAnAsgQwGMALVAOzADpSB7AFwCUw8IBPAYgGUBRAGS4GEAKgH0OAeQByAcQDaABgC6iUAAdqsVLVTVSykOkQAOACwBmCgCYA7AFYAbHLtW5N0xeMBOADQgWiT4aWZhYAjMZ21lZRNgC+MT5omLiEJOQUAEYArqgANhBkUGwQOpRkAG7UANaUWbkQ2PJKSCBqGlo6egYIIXLhFB7uxsZWdoZWhh4RPn4IzhYUNnJjTmYmLsZxCRjY+MRkNdl5BWzYWNRYFCo5eLQAZufIGYf1WI16rZraus1dHoaBFg8IQsplcvQsNg8NmmRkhCzMISsplMdhCNhGmxAiR2KX2FCwTFYbH4AAkAILSLjCABqYh4AFUcFw3s0Pu1vqAuiEHOYxoYbJ5emFTGYYd05BZApM7MYLHJkaYQoYQpjsck9mkCcwWBRYLRqCoVJA2AAFHhkgCaLNU6k+HR+iGB-wW-1cwLsNhCHm8vkQ4zk-TkVg8waWExCaNV23VqUoWtYutoeCwtGNJrJ9O41patvZnUdi3MisiDhcAysYtsAZM6KWkw8LnsUaSu1j+MJ7G4XAA0tm2V9891ZYF7H8LHYBg2oYYxRHTB4FojSw4ZRO7M2cRq4x22PQuNxBH3cwOHd0vYFQW4RoqbJ7g7OXFK7DLgciJqEVZiaPV4M01a39neY97U5RAPXmQwLDlaxrDGdwfRmEEAWCMIIiiaINxjPEaAYDsgLaE9QNmbkKH+XpHAmDxjDgsUbCgoI3FQyIog2eIsWjAC0lOc58LtDl9D9ORqygiUrFgsTPDFEwF2cCYy29JFbEwziDjqApeLzU9nGMBY-hCUwxPcUwJlMMUZR0oTlisVZjHWZTcU1PDWWA-iuXcAMbFdYsPS9BDEEWAMG2DUN-iBYFYjY-8HO3bVEwNI0IA0wiBO6QEQgoMM3XHT1vUrMJA2ChtQojCx7K3dtYr1ZNU0S5yCJAlLUPMCc3EWZUI1RUzfQQQx5woHooVvcZxm9CK4iAA */
     id: "mixerMachine",
 
     context: {
-      mainVolume: -32,
+      volume: -32,
       currentTime: 0,
       sourceSong: undefined,
-      clockMachineRef: undefined,
-      trackMachineRefs: [],
-      players: [],
-      channels: [],
+      players: [undefined],
+      channels: [undefined],
     },
 
     entry: "disposeTracks",
 
-    on: {
-      SELECT_SONG: {
-        target: ".building",
-        actions: "setSourceSong",
-      },
-    },
     states: {
-      notReady: {},
+      notReady: {
+        on: {
+          SELECT_SONG: {
+            target: "building",
+            actions: "setSourceSong",
+          }
+        }
+      },
 
       error: {
         entry: "disposeTracks",
+        type: "final"
       },
 
       building: {
@@ -61,135 +65,298 @@ export const mixerMachine = createMachine(
           src: "builder",
           input: ({ context }) => ({ sourceSong: context.sourceSong }),
 
-          onDone: { target: "ready" },
+          onDone: "ready",
 
           onError: {
             target: "error",
             actions: "logError",
           },
 
-          id: "builder",
-        },
+          id: "builder"
+        }
       },
 
       ready: {
         on: {
-          CHANGE_MAIN_VOLUME: {
+          CHANGE_VOLUME: {
             actions: {
               type: "setMainVolume",
             },
-          },
+          }
         },
 
         exit: ["reset", "disposeTracks"],
         states: {
-          mixerMachine: {
+          stopped: {},
+
+          started: {},
+
+          trackMachine: {
             type: "parallel",
 
             states: {
-              Solo: {
+              solo: {
                 initial: "inactive",
 
                 states: {
                   inactive: {
                     on: {
-                      TOGGLE: {
-                        target: "active",
-                        actions: "toggleSolo",
-                      },
-                    },
+                      TOGGLE: "active"
+                    }
                   },
 
                   active: {
                     on: {
-                      TOGGLE: "inactive",
-                    },
-                  },
-                },
+                      TOGGLE: "inactive"
+                    }
+                  }
+                }
               },
-              Mute: {
+              mute: {
                 initial: "inactive",
 
                 states: {
                   inactive: {
                     on: {
-                      TOGGLE: {
-                        target: "active",
-                        actions: "toggleMute",
-                      },
-                    },
+                      TOGGLE: "active"
+                    }
                   },
 
                   active: {
                     on: {
-                      TOGGLE: "inactive",
-                    },
-                  },
-                },
-              },
+                      TOGGLE: "inactive"
+                    }
+                  }
+                }
+              }
             },
 
             on: {
               CHANGE_VOLUME: {
                 target: undefined,
-                actions: "setVolume",
-              },
-              CHANGE_FX: {
-                target: undefined,
-                actions: "setFx",
+                actions: "setVolume"
               },
               CHANGE_PAN: {
                 target: undefined,
-                actions: "setPan",
+                actions: "setPan"
               },
-            },
+              CHANGE_FX: {
+                target: undefined,
+                actions: "setFxNames"
+              }
+            }
           },
 
           transportMachine: {
-            on: {
-              RESET: {
-                guard: "canStop?",
-                target: "transportMachine",
-
-                actions: {
-                  type: "reset",
-                },
-              },
-              SEEK: {
-                guard: "canSeek?",
-
-                actions: {
-                  type: "seek",
-                },
-              },
-            },
             states: {
               stopped: {
                 on: {
                   START: {
                     target: "started",
-                    guard: "canPlay?",
-                    actions: "play",
+                    cond: "canPlay?",
+                    actions: "play"
                   },
-                },
-              },
-              started: {
-                on: {
+
                   PAUSE: {
-                    target: "stopped",
-                    guard: "canStop?",
-                    actions: "pause",
-                  },
-                },
+                    target: "started",
+                    cond: "canStop?",
+                    actions: "pause"
+                  }
+                }
               },
+
+              started: {}
             },
 
             initial: "stopped",
-          },
+
+            on: {
+              SEEK: [{
+                target: undefined,
+                cond: "canSeek?",
+                actions: "seek"
+              }, {
+                target: "transportMachine",
+                internal: true,
+                cond: "canSeek?"
+              }]
+            }
+          }
         },
 
         type: "parallel",
       },
+
+      trackMachine: {
+        states: {
+          inactive: {
+            on: {
+              TOGGLE: "active"
+            }
+          },
+
+          active: {
+            on: {
+              TOGGLE: "inactive"
+            }
+          },
+
+          Solo: {
+            initial: "inactive",
+
+            states: {
+              inactive: {
+                on: {
+                  TOGGLE: "active"
+                }
+              },
+
+              active: {
+                on: {
+                  TOGGLE: "inactive"
+                }
+              }
+            }
+          },
+
+          Mute: {
+            states: {
+              inactive: {
+                on: {
+                  TOGGLE: "active"
+                }
+              },
+
+              active: {
+                on: {
+                  TOGGLE: "inactive"
+                }
+              }
+            },
+
+            initial: "inactive"
+          },
+
+          "Solo (copy)": {
+            states: {
+              inactive: {
+                on: {
+                  TOGGLE: "active"
+                }
+              },
+
+              active: {
+                on: {
+                  TOGGLE: "inactive"
+                }
+              }
+            }
+          },
+
+          "Mute (copy)": {
+            states: {
+              inactive: {
+                on: {
+                  TOGGLE: "active"
+                }
+              },
+
+              active: {
+                on: {
+                  TOGGLE: "inactive"
+                }
+              }
+            }
+          }
+        },
+
+        on: {
+          UPDATE_FX_NAMES: {
+            target: undefined,
+            actions: "setFxNames"
+          }
+        },
+
+        type: "parallel",
+        initial: "Solo (copy)"
+      },
+
+      inactive: {
+        on: {
+          TOGGLE: "active"
+        }
+      },
+
+      active: {
+        on: {
+          TOGGLE: "inactive"
+        }
+      },
+
+      "inactive (copy)": {
+        on: {
+          TOGGLE: "active (copy)"
+        }
+      },
+
+      "active (copy)": {
+        on: {
+          TOGGLE: "inactive (copy)"
+        }
+      },
+
+      Solo: {
+        states: {
+          inactive: {
+            on: {
+              TOGGLE: "active"
+            }
+          },
+
+          active: {
+            on: {
+              TOGGLE: "inactive"
+            }
+          }
+        }
+      },
+
+      ready: {
+        states: {
+          stopped: {
+            on: {
+              PLAY: {
+                target: "started",
+                cond: "canPlay?"
+              }
+            }
+          },
+          started: {
+            on: {
+              PAUSE: {
+                target: "stopped",
+                cond: "canStop?"
+              }
+            }
+          }
+        },
+
+        initial: "stopped",
+        entry: ["reset", "disposeTracks"],
+
+        on: {
+          RESET: {
+            target: undefined,
+            cond: "canStop?",
+            actions: "reset"
+          },
+          SEEK: {
+            target: undefined,
+            cond: "canSeek?",
+            actions: "seek"
+          }
+        }
+      }
     },
 
     types: {
@@ -199,20 +366,11 @@ export const mixerMachine = createMachine(
         | { type: "START" }
         | { type: "PAUSE" }
         | { type: "RESET" }
-        | { type: "TOGGLE"; trackId: number }
-        | {
-            type: "CHANGE_FX";
-            fxName: string;
-            fxId: number;
-            action: string;
-          }
         | { type: "SEEK"; direction: string; amount: number }
-        | { type: "CHANGE_MAIN_VOLUME"; volume: number }
-        | { type: "CHANGE_PAN"; pan: number; trackId: number }
-        | { type: "CHANGE_VOLUME"; volume: number; trackId: number },
+        | { type: "CHANGE_VOLUME"; volume: number },
     },
 
-    initial: "notReady",
+    initial: "notReady"
   },
   {
     actions: {
@@ -224,28 +382,26 @@ export const mixerMachine = createMachine(
       buildMixer: assign(({ context, spawn }) => {
         start();
 
+        let trackMachineRefs = [];
         const clockMachineRef = spawn(clockMachine, {
           id: "clock-machine",
           input: {
             sourceSong: context.sourceSong,
           },
         });
-        let trackMachineRefs = [];
-        context.sourceSong?.tracks.map((track, i) => {
+        context.sourceSong.tracks.forEach((track, i) => {
           context.players[i] = new Player(track.path)
             .sync()
             .start(0, context.sourceSong?.startPosition);
-          context.channels[i] = new Channel(
-            scale(logarithmically(-32))
-          ).toDestination();
+          context.channels[i] = new Channel().toDestination();
           context.players[i]?.connect(context.channels[i]);
           trackMachineRefs = [
             ...trackMachineRefs,
             spawn(trackMachine, {
-              id: `track-${i + 1}`,
+              id: `track-${i}`,
               input: {
-                track: context.sourceSong!.tracks[i],
                 channel: context.channels[i],
+                track: context.sourceSong!.tracks[i],
               },
             }),
           ];
@@ -254,39 +410,6 @@ export const mixerMachine = createMachine(
           trackMachineRefs,
           clockMachineRef,
         };
-      }),
-
-      setFx: assign(({ context, event }) => {
-        assertEvent(event, "CHANGE_FX");
-
-        if (event.action === "add") {
-          const spliced = context.fxNames.toSpliced(event.fxId, 1);
-          const fxSpliced = context.fx.toSpliced(event.fxId, 1);
-          context.fx[event.fxId]?.dispose();
-
-          switch (event.fxName) {
-            case "delay":
-              return {
-                fxNames: [...spliced, event.fxName],
-                fx: [...fxSpliced, new FeedbackDelay().toDestination()],
-              };
-
-            case "pitchShift":
-              return {
-                fxNames: [...spliced, event.fxName],
-                fx: [...fxSpliced, new PitchShift().toDestination()],
-              };
-
-            default:
-              break;
-          }
-        } else {
-          context.fx[event.fxId].dispose();
-          return {
-            fxNames: context.fxNames.toSpliced(event.fxId, 1),
-            fx: context.fx.toSpliced(event.fxId, 1),
-          };
-        }
       }),
       reset: () => t.stop(),
       play: () => t.start(),
@@ -299,8 +422,9 @@ export const mixerMachine = createMachine(
           t.seconds = t.seconds - 10;
         }
       },
+      stopClock: () => stopChild("ticker"),
       setMainVolume: assign(({ event }) => {
-        assertEvent(event, "CHANGE_MAIN_VOLUME");
+        assertEvent(event, "CHANGE_VOLUME");
         const scaled = scale(logarithmically(event.volume));
         Destination.volume.value = scaled;
         return { volume: event.volume };
@@ -318,6 +442,7 @@ export const mixerMachine = createMachine(
     },
     actors: {
       builder: fromPromise(async () => await loaded()),
+      ticker: fromObservable(() => interval(0, animationFrameScheduler)),
     },
     guards: {
       "canSeek?": ({ context, event }) => {
