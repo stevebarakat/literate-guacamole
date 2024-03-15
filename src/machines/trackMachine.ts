@@ -11,8 +11,8 @@ export const trackMachine = setup({
       channel: Channel | undefined;
       volume: number;
       pan: number;
-      fx: any[];
       fxNames: string[];
+      fx: (PitchShift | FeedbackDelay)[];
     },
 
     events: {} as
@@ -52,8 +52,11 @@ export const trackMachine = setup({
     }),
     setFx: assign(({ context, event }) => {
       assertEvent(event, "CHANGE_FX");
+      console.log("SET FX!!!");
+      console.log("event", event);
 
       if (event.action === "add") {
+        console.log("ADDING FX!!!");
         const spliced = context.fxNames.toSpliced(event.fxId, 1);
         const fxSpliced = context.fx.toSpliced(event.fxId, 1);
         context.fx[event.fxId]?.dispose();
@@ -75,6 +78,7 @@ export const trackMachine = setup({
             break;
         }
       } else {
+        console.log("REMOVING FX!!!");
         context.fx[event.fxId].dispose();
         return {
           fxNames: context.fxNames.toSpliced(event.fxId, 1),

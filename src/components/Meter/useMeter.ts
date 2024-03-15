@@ -23,8 +23,6 @@ function useMeter({ channel, canvas, options }: Props) {
   const pencil = useRef<number | null>(null);
   const animation = useRef<number | null>(null);
 
-  console.log("channel", channel);
-
   useEffect(() => {
     meter.current = new Meter({ channels: 2 });
     channel?.connect(meter.current);

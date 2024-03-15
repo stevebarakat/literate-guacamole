@@ -8,21 +8,18 @@ import { ToggleContext } from "@/machines/toggleMachine";
 import { TrackContext } from "@/machines/trackMachine";
 
 export default function Track({ trackId }: { trackId: number }) {
-  const context = MixerContext.useSelector(
-    (state) => state.context.trackMachineRefs[trackId].getSnapshot().context
-  );
+  // const context = MixerContext.useSelector(
+  //   (state) => state.context.trackMachineRefs[trackId].getSnapshot().context
+  // );
+
+  const { context } = TrackContext.useSelector((s) => s);
   console.log("context", context);
 
-  const { channel, track, fx } = MixerContext.useSelector(
-    (state) => state.context.trackMachineRefs[trackId].getSnapshot().context
-  );
+  const { channel, track, fx } = context;
 
-  const state = TrackContext.useSelector((state) => state);
-  console.log("state", state);
+  console.log("fx", fx);
 
   fx && channel?.chain(...fx);
-
-  console.log("channel from Track", channel);
 
   return (
     <>
