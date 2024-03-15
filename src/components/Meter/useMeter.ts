@@ -20,8 +20,10 @@ type Props = {
 function useMeter({ channel, canvas, options }: Props) {
   const [meterVals, setMeterVals] = useState<number>();
   const meter = useRef<Meter | undefined>();
-  const painter = useRef<number | null>(null);
+  const pencil = useRef<number | null>(null);
   const animation = useRef<number | null>(null);
+
+  console.log("channel", channel);
 
   useEffect(() => {
     meter.current = new Meter({ channels: 2 });
@@ -29,8 +31,7 @@ function useMeter({ channel, canvas, options }: Props) {
   }, [channel]);
 
   useEffect(() => {
-    const paint = canvas.current?.getContext("2d");
-    if (paint == null) throw new Error("Could not get canvas context");
+    const draw = canvas.current?.getContext("2d");
 
     const boxGap = (options?.gap && options.gap * 0.1) ?? 0.1;
     const boxCount = options?.total ?? 50;
@@ -59,42 +60,42 @@ function useMeter({ channel, canvas, options }: Props) {
       return id <= Math.ceil((val / MAX_BOX_COUNT) * boxCount) ? lowOn : lowOff;
     };
 
-    const createMeter = function () {
-      if (!canvas.current) return;
+    function createMeter() {
+      if (!canvas.current || draw == null)
+        throw new Error("Could not get canvas context");
       const meterValue: number = Number(canvas.current.dataset.meterlevel) + 85;
 
       // Draw the container
-      paint.save();
-      paint.beginPath();
-      paint.rect(0, 0, width, height);
-      paint.fillStyle = "rgb(12,22,32)";
-      paint.fill();
-      paint.restore();
+      draw.save();
+      draw.beginPath();
+      draw.rect(0, 0, width, height);
+      draw.fillStyle = "rgb(12,22,32)";
+      draw.fill();
+      draw.restore();
 
       // Draw the boxes
-      paint.save();
-      paint.translate(boxGapX, boxGapY);
+      draw.save();
+      draw.translate(boxGapX, boxGapY);
       for (let i = 0; i < boxCount; i++) {
         const id = Math.abs(i - (boxCount - 1)) + 1;
 
-        paint.beginPath();
-        paint.rect(0, 0, boxWidth, boxHeight);
-        paint.fillStyle = getBoxColor(id, meterValue);
-        paint.fill();
-        paint.translate(0, boxHeight + boxGapY);
+        draw.beginPath();
+        draw.rect(0, 0, boxWidth, boxHeight);
+        draw.fillStyle = getBoxColor(id, meterValue);
+        draw.fill();
+        draw.translate(0, boxHeight + boxGapY);
       }
-      paint.restore();
-      painter.current = requestAnimationFrame(createMeter);
-    };
+      draw.restore();
+      pencil.current = requestAnimationFrame(createMeter);
+    }
 
     requestAnimationFrame(createMeter);
 
     return () => {
-      painter.current && cancelAnimationFrame(painter.current);
+      pencil.current && cancelAnimationFrame(pencil.current);
     };
   }, [options, canvas]);
 
-  // loop recursively to amimateMeters
   const animateMeter = useCallback(() => {
     const vals = meter.current?.getValue();
     if (typeof vals === "number") return;

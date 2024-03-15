@@ -13,6 +13,8 @@ export default function Track({ trackId }: { trackId: number }) {
 
   fx && channel?.chain(...fx);
 
+  console.log("channel from Track", channel);
+
   return (
     <>
       <div className="channel-wrap">

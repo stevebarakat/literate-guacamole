@@ -8,12 +8,8 @@ export default function Mixer() {
   const tracks = MixerContext.useSelector((s) => s.context.sourceSong?.tracks);
   const channels = MixerContext.useSelector((s) => s.context.channels);
 
-  const isLoaded = MixerContext.useSelector((state) => state.matches("ready"));
-
-  // const state = MixerContext.useSelector((state) => state);
-  // console.log("state.context", state.context);
-
-  if (!isLoaded) return null;
+  const ready = MixerContext.useSelector((state) => state.matches("ready"));
+  if (!ready) return null;
 
   return (
     <>
