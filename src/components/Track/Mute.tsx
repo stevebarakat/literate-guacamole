@@ -1,27 +1,23 @@
-import { MixerContext } from "@/machines/mixerMachine";
 import { Toggle } from "../Buttons";
+import { TrackContext } from "@/machines/trackMachine";
 
-function Mute({ trackId }: { trackId: number }) {
-  const id = MixerContext.useSelector(
-    (state) => state.context.sourceSong?.tracks[trackId].id
-  );
-  const channel = MixerContext.useSelector(
-    (state) => state.context.channels[trackId]
-  );
+function Mute() {
+  const { channel, track } = TrackContext.useSelector((state) => state.context);
 
-  const { send } = MixerContext.useActorRef();
-  const isActive = MixerContext.useSelector((state) => state.matches("active"));
+  const { send } = TrackContext.useActorRef();
+  const isActive = TrackContext.useSelector((state) =>
+    state.matches({ mute: "active" })
+  );
 
   return (
     <Toggle
-      id={`trackMute${id}`}
+      id={`trackMute${track.id}`}
       checked={isActive}
-      onChange={(e) => {
+      onChange={() => {
         if (!channel) return;
-        channel.mute = e.currentTarget.checked;
         send({
-          type: "TOGGLE",
-          trackId,
+          type: "TOGGLE_MUTE",
+          channel,
         });
       }}
     >

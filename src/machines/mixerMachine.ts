@@ -134,9 +134,9 @@ export const mixerMachine = createMachine(
                 target: undefined,
                 actions: "setVolume",
               },
-              UPDATE_FX_NAMES: {
+              CHANGE_FX: {
                 target: undefined,
-                actions: "setFxNames",
+                actions: "setFx",
               },
               CHANGE_PAN: {
                 target: undefined,
@@ -201,7 +201,7 @@ export const mixerMachine = createMachine(
         | { type: "RESET" }
         | { type: "TOGGLE"; trackId: number }
         | {
-            type: "UPDATE_FX_NAMES";
+            type: "CHANGE_FX";
             fxName: string;
             fxId: number;
             action: string;
@@ -256,8 +256,8 @@ export const mixerMachine = createMachine(
         };
       }),
 
-      setFxNames: assign(({ context, event }) => {
-        assertEvent(event, "UPDATE_FX_NAMES");
+      setFx: assign(({ context, event }) => {
+        assertEvent(event, "CHANGE_FX");
 
         if (event.action === "add") {
           const spliced = context.fxNames.toSpliced(event.fxId, 1);

@@ -15,7 +15,7 @@ function FxSelector({ trackId }: { trackId: number }) {
     const fxName = e.currentTarget.value;
     const fxId = Number(e.currentTarget.id.at(-1));
 
-    send({ type: "UPDATE_FX_NAMES", fxId, fxName, action });
+    send({ type: "CHANGE_FX", fxId, fxName, action });
   }
 
   const state = ToggleContext.useSelector((s) => s);
