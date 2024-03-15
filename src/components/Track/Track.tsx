@@ -5,11 +5,20 @@ import ChannelLabel from "../ChannelLabel";
 import { FxPanel } from "../FxPanel";
 import { FxSelector } from "../Selectors";
 import { ToggleContext } from "@/machines/toggleMachine";
+import { TrackContext } from "@/machines/trackMachine";
 
 export default function Track({ trackId }: { trackId: number }) {
+  const context = MixerContext.useSelector(
+    (state) => state.context.trackMachineRefs[trackId].getSnapshot().context
+  );
+  console.log("context", context);
+
   const { channel, track, fx } = MixerContext.useSelector(
     (state) => state.context.trackMachineRefs[trackId].getSnapshot().context
   );
+
+  const state = TrackContext.useSelector((state) => state);
+  console.log("state", state);
 
   fx && channel?.chain(...fx);
 

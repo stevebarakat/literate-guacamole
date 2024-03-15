@@ -245,6 +245,7 @@ export const mixerMachine = createMachine(
               id: `track-${i + 1}`,
               input: {
                 track: context.sourceSong!.tracks[i],
+                channel: context.channels[i],
               },
             }),
           ];

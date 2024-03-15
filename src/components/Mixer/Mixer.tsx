@@ -11,6 +11,7 @@ export default function Mixer() {
   const ready = MixerContext.useSelector((state) => state.matches("ready"));
   if (!ready) return null;
 
+  console.log("channels!!", channels);
   return (
     <>
       <div className="channels">

@@ -9,9 +9,6 @@ function Fader({ children }: Props) {
   const { send } = TrackContext.useActorRef();
   const { volume } = TrackContext.useSelector((state) => state.context);
 
-  const state = TrackContext.useSelector((state) => state);
-  console.log("state", state);
-
   return (
     <>
       {children}
